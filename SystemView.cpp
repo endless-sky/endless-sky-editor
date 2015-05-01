@@ -12,6 +12,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 #include "SystemView.h"
 
+#include "DetailView.h"
 #include "SpriteSet.h"
 #include "StellarObject.h"
 #include "System.h"
@@ -28,8 +29,8 @@ using namespace std;
 
 
 
-SystemView::SystemView(QTabWidget *tabs, QWidget *parent) :
-    QWidget(parent), tabs(tabs)
+SystemView::SystemView(DetailView *detailView, QTabWidget *tabs, QWidget *parent) :
+    QWidget(parent), detailView(detailView), tabs(tabs)
 {
     setAutoFillBackground(true);
     QPalette p = palette();
@@ -44,6 +45,9 @@ SystemView::SystemView(QTabWidget *tabs, QWidget *parent) :
 
 void SystemView::Select(System *system)
 {
+    if(detailView)
+        detailView->SetSystem(system);
+
     this->system = system;
     if(system)
         system->SetDay(timeStep);

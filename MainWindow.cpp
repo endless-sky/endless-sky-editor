@@ -12,10 +12,13 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 #include "MainWindow.h"
 
+#include "DetailView.h"
 #include "GalaxyView.h"
 #include "Map.h"
 #include "SystemView.h"
 
+#include <QHBoxLayout>
+#include <QSizePolicy>
 #include <QTabWidget>
 
 #include <string>
@@ -27,15 +30,26 @@ using namespace std;
 MainWindow::MainWindow(Map &map, QWidget *parent)
     : QMainWindow(parent), map(map)
 {
-    QTabWidget *tabs = new QTabWidget(this);
-    setCentralWidget(tabs);
+    QHBoxLayout *layout = new QHBoxLayout;
+    QWidget *box = new QWidget(this);
+    box->setLayout(layout);
+    setCentralWidget(box);
 
-    SystemView *systemView = new SystemView(tabs);
+    DetailView *detailView = new DetailView(map, box);
+    detailView->setMinimumWidth(300);
+    layout->addWidget(detailView);
+
+    QTabWidget *tabs = new QTabWidget(box);
+    QSizePolicy policy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    tabs->setSizePolicy(policy);
+    layout->addWidget(tabs);
+
+    SystemView *systemView = new SystemView(detailView, tabs, tabs);
     auto it = map.Systems().find("Sol");
     if(it != map.Systems().end())
         systemView->Select(&it->second);
 
-    GalaxyView *galaxyView = new GalaxyView(map, systemView, tabs);
+    GalaxyView *galaxyView = new GalaxyView(map, systemView, tabs, tabs);
 
     tabs->addTab(galaxyView, "Galaxy");
     tabs->addTab(systemView, "System");

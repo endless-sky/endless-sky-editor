@@ -38,11 +38,16 @@ public:
     std::map<std::string, Planet> &Planets();
     const std::map<std::string, Planet> &Planets() const;
 
+    // Access the commodity data:
+    struct Commodity { std::string name; int low; int high; };
+    const std::vector<Commodity> &Commodities() const;
+
 
 private:
     std::map<std::string, Galaxy> galaxies;
     std::map<std::string, System> systems;
     std::map<std::string, Planet> planets;
+    std::vector<Commodity> commodities;
 
     std::list<DataNode> unparsed;
 };

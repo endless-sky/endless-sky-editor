@@ -18,6 +18,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include <QVector2D>
 #include <QTimer>
 
+class DetailView;
 class System;
 
 class QTabWidget;
@@ -28,7 +29,7 @@ class SystemView : public QWidget
 {
     Q_OBJECT
 public:
-    explicit SystemView(QTabWidget *tabs, QWidget *parent = 0);
+    explicit SystemView(DetailView *detailView, QTabWidget *tabs, QWidget *parent = 0);
 
     void Select(System *system);
     System *Selected() const;
@@ -49,6 +50,7 @@ protected:
     virtual void paintEvent(QPaintEvent *event) override;
 
 private:
+    DetailView *detailView;
     QTabWidget *tabs;
     System *system = nullptr;
 

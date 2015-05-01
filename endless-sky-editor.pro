@@ -25,7 +25,8 @@ SOURCES += main.cpp\
     Map.cpp \
     SpriteSet.cpp \
     GalaxyView.cpp \
-    Galaxy.cpp
+    Galaxy.cpp \
+    DetailView.cpp
 
 HEADERS  += DataFile.h\
 		DataNode.h\
@@ -38,4 +39,5 @@ HEADERS  += DataFile.h\
     Map.h \
     SpriteSet.h \
     GalaxyView.h \
-    Galaxy.h
+    Galaxy.h \
+    DetailView.h

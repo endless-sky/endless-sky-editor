@@ -33,6 +33,19 @@ void Map::Load(const string &path)
         else
             unparsed.push_back(node);
     }
+
+    string commodityPath = path.substr(0, path.rfind('/') + 1) + "commodities.txt";
+    DataFile tradeData(commodityPath);
+
+    for(const DataNode &node : tradeData)
+        if(node.Token(0) == "trade")
+            for(const DataNode &child : node)
+                if(child.Token(0) == "commodity" && child.Size() >= 4)
+                {
+                    int low = static_cast<int>(child.Value(2));
+                    int high = static_cast<int>(child.Value(3));
+                    commodities.push_back({child.Token(1), low, high});
+                }
 }
 
 
@@ -75,4 +88,11 @@ map<string, Planet> &Map::Planets()
 const map<string, Planet> &Map::Planets() const
 {
     return planets;
+}
+
+
+
+const std::vector<Map::Commodity> &Map::Commodities() const
+{
+    return commodities;
 }

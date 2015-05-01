@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
     string path = argc > 1 ? argv[1] : "/usr/share/games/endless-sky/data/map.txt";
     string dataDir = path.substr(0, path.rfind('/'));
     string rootDir = dataDir.substr(0, dataDir.rfind('/') + 1);
-    SpriteSet::SetRootPath(rootDir + "/images/");
+    SpriteSet::SetRootPath(rootDir + "images/");
 
     mapData.Load(path);
 
