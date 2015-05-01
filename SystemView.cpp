@@ -1,0 +1,131 @@
+/* SystemView.cpp
+Copyright (c) 2015 by Michael Zahniser
+
+Endless Sky is free software: you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later version.
+
+Endless Sky is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+*/
+
+#include "SystemView.h"
+
+#include "StellarObject.h"
+#include "System.h"
+
+#include <QPainter>
+#include <QMouseEvent>
+
+#include <algorithm>
+
+using namespace std;
+
+
+
+SystemView::SystemView(QWidget *parent) :
+    QWidget(parent)
+{
+    setAutoFillBackground(true);
+
+    connect(&timer, SIGNAL(timeout()), this, SLOT(step()));
+    timer.start(1. / 60.);
+}
+
+
+
+void SystemView::SetSystem(System *system)
+{
+    this->system = system;
+    if(system)
+        system->SetDay(timeStep);
+}
+
+
+
+QSize SystemView::minimumSizeHint() const
+{
+    return QSize(400, 300);
+}
+
+
+
+QSize SystemView::sizeHint() const
+{
+    return QSize(1200, 900);
+}
+
+
+
+void SystemView::step()
+{
+    timeStep += .01;
+    if(system)
+        system->SetDay(timeStep);
+    update();
+}
+
+
+
+void SystemView::mousePressEvent(QMouseEvent *event)
+{
+    clickOff = QVector2D(event->pos()) - offset;
+}
+
+
+
+void SystemView::mouseMoveEvent(QMouseEvent *event)
+{
+    offset = QVector2D(event->pos()) - clickOff;
+}
+
+
+
+void SystemView::wheelEvent(QWheelEvent *event)
+{
+    // Figure out where in the 100% scale image the click occurred.
+    QVector2D point(event->pos());
+    QVector2D center(.5 * width(), .5 * height());
+    // point = origin * scale + offset + center.
+    QVector2D origin = (point - offset - center) / scale;
+
+    scale = max(.0625, min(1., scale * exp(event->delta() * .001)));
+
+    // We want: point = origin * scale + offset + center.
+    offset = point - origin * scale - center;
+}
+
+
+
+void SystemView::paintEvent(QPaintEvent */*event*/)
+{
+    if(!system)
+        return;
+
+    QPainter painter(this);
+    QBrush brush(QColor(90, 90, 90));
+    painter.setBrush(brush);
+    QPen pen(QColor(0, 0, 0));
+    painter.setPen(pen);
+    painter.setRenderHint(QPainter::Antialiasing, true);
+
+    painter.translate(.5 * width(), .5 * height());
+    painter.translate(offset.x(), offset.y());
+    painter.scale(scale, scale);
+
+    // Draw lines linking objects to their parents.
+    for(const StellarObject &object : system->Objects())
+    {
+        QPointF parent;
+        if(object.Parent() >= 0)
+            parent = system->Objects()[object.Parent()].Position().toPointF();
+        painter.drawLine(object.Position().toPointF(), parent);
+    }
+
+    for(const StellarObject &object : system->Objects())
+    {
+        double radius = object.Radius();
+        painter.drawEllipse(object.Position().toPointF(), radius, radius);
+    }
+}
