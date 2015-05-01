@@ -25,16 +25,16 @@ using namespace std;
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    Map map;
+    Map mapData;
 
     string path = argc > 1 ? argv[1] : "/usr/share/games/endless-sky/data/map.txt";
     string dataDir = path.substr(0, path.rfind('/'));
     string rootDir = dataDir.substr(0, dataDir.rfind('/') + 1);
     SpriteSet::SetRootPath(rootDir + "/images/");
 
-    map.Load(path);
+    mapData.Load(path);
 
-    MainWindow w(map);
+    MainWindow w(mapData);
     w.resize(1200, 900);
     w.show();
 

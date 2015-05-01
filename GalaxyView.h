@@ -1,4 +1,4 @@
-/* SystemView.h
+/* GalaxyView.h
 Copyright (c) 2015 by Michael Zahniser
 
 Endless Sky is free software: you can redistribute it and/or modify it under the
@@ -10,34 +10,27 @@ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 */
 
-#ifndef SYSTEMVIEW_H
-#define SYSTEMVIEW_H
+#ifndef GALAXYVIEW_H
+#define GALAXYVIEW_H
 
 #include <QWidget>
 
 #include <QVector2D>
-#include <QTimer>
 
-class System;
+class Map;
+class SystemView;
 
 
 
-class SystemView : public QWidget
+class GalaxyView : public QWidget
 {
     Q_OBJECT
 public:
-    explicit SystemView(QWidget *parent = 0);
-
-    void Select(System *system);
-    System *Selected() const;
-
-    virtual QSize minimumSizeHint() const override;
-    virtual QSize sizeHint() const override;
+    explicit GalaxyView(Map &mapData, SystemView *systemView, QWidget *parent = 0);
 
 signals:
 
 public slots:
-    void step();
 
 protected:
     virtual void mousePressEvent(QMouseEvent *event) override;
@@ -47,18 +40,21 @@ protected:
     virtual void paintEvent(QPaintEvent *event) override;
 
 private:
-    System *system = nullptr;
+    QVector2D MapPoint(QPoint pos) const;
+
+
+private:
+    Map &mapData;
+    SystemView *systemView;
 
     // Center and scale of the view:
     QVector2D offset;
     double scale = 1.;
 
-    // Time:
-    QTimer timer;
-    double timeStep = 1000.;
-
     // Dragging:
     QVector2D clickOff;
 };
 
-#endif // SYSTEMVIEW_H
+
+
+#endif // GALAXYVIEW_H

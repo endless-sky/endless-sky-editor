@@ -41,11 +41,18 @@ SystemView::SystemView(QWidget *parent) :
 
 
 
-void SystemView::SetSystem(System *system)
+void SystemView::Select(System *system)
 {
     this->system = system;
     if(system)
         system->SetDay(timeStep);
+}
+
+
+
+System *SystemView::Selected() const
+{
+    return system;
 }
 
 
@@ -115,6 +122,7 @@ void SystemView::paintEvent(QPaintEvent */*event*/)
     QPen pen(QColor(255, 255, 255));
     painter.setPen(pen);
     painter.setRenderHint(QPainter::Antialiasing, true);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
 
     painter.translate(.5 * width(), .5 * height());
     painter.translate(offset.x(), offset.y());

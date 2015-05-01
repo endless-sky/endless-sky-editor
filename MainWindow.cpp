@@ -12,6 +12,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 #include "MainWindow.h"
 
+#include "GalaxyView.h"
 #include "Map.h"
 #include "SystemView.h"
 
@@ -29,15 +30,15 @@ MainWindow::MainWindow(Map &map, QWidget *parent)
     QTabWidget *tabs = new QTabWidget(this);
     setCentralWidget(tabs);
 
-    for(int i = 0; i < 3; ++i)
-    {
-        static const string SYSTEM[3] = {"Sol", "Alpha Centauri", "Kornephoros"};
-        SystemView *systemView = new SystemView(tabs);
-        auto it = map.Systems().find(SYSTEM[i]);
-        if(it != map.Systems().end())
-            systemView->SetSystem(&it->second);
-        tabs->addTab(systemView, QString::fromUtf8(SYSTEM[i].data(), SYSTEM[i].size()));
-    }
+    SystemView *systemView = new SystemView(tabs);
+    auto it = map.Systems().find("Sol");
+    if(it != map.Systems().end())
+        systemView->Select(&it->second);
+
+    GalaxyView *galaxyView = new GalaxyView(map, systemView, tabs);
+
+    tabs->addTab(galaxyView, "Galaxy");
+    tabs->addTab(systemView, "System");
 }
 
 MainWindow::~MainWindow()
