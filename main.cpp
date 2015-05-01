@@ -12,8 +12,13 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 #include "MainWindow.h"
 #include "Map.h"
+#include "SpriteSet.h"
 
 #include <QApplication>
+
+#include <string>
+
+using namespace std;
 
 
 
@@ -21,7 +26,13 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     Map map;
-    map.Load(argc > 1 ? argv[1] : "/usr/share/games/endless-sky/data/map.txt");
+
+    string path = argc > 1 ? argv[1] : "/usr/share/games/endless-sky/data/map.txt";
+    string dataDir = path.substr(0, path.rfind('/'));
+    string rootDir = dataDir.substr(0, dataDir.rfind('/') + 1);
+    SpriteSet::SetRootPath(rootDir + "/images/");
+
+    map.Load(path);
 
     MainWindow w(map);
     w.resize(1200, 900);

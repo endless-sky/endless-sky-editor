@@ -22,7 +22,8 @@ SOURCES += main.cpp\
         StellarObject.cpp\
         System.cpp \
     SystemView.cpp \
-    Map.cpp
+    Map.cpp \
+    SpriteSet.cpp
 
 HEADERS  += DataFile.h\
 		DataNode.h\
@@ -32,4 +33,5 @@ HEADERS  += DataFile.h\
         StellarObject.h\
         System.h \
     SystemView.h \
-    Map.h
+    Map.h \
+    SpriteSet.h

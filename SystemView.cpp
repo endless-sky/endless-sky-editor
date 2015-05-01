@@ -12,13 +12,16 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 #include "SystemView.h"
 
+#include "SpriteSet.h"
 #include "StellarObject.h"
 #include "System.h"
 
 #include <QPainter>
+#include <QPalette>
 #include <QMouseEvent>
 
 #include <algorithm>
+#include <cmath>
 
 using namespace std;
 
@@ -28,6 +31,9 @@ SystemView::SystemView(QWidget *parent) :
     QWidget(parent)
 {
     setAutoFillBackground(true);
+    QPalette p = palette();
+    p.setColor(backgroundRole(), QColor(0, 0, 0));
+    setPalette(p);
 
     connect(&timer, SIGNAL(timeout()), this, SLOT(step()));
     timer.start(1. / 60.);
@@ -104,9 +110,9 @@ void SystemView::paintEvent(QPaintEvent */*event*/)
         return;
 
     QPainter painter(this);
-    QBrush brush(QColor(90, 90, 90));
+    QBrush brush(QColor(128, 128, 128));
     painter.setBrush(brush);
-    QPen pen(QColor(0, 0, 0));
+    QPen pen(QColor(255, 255, 255));
     painter.setPen(pen);
     painter.setRenderHint(QPainter::Antialiasing, true);
 
@@ -125,7 +131,24 @@ void SystemView::paintEvent(QPaintEvent */*event*/)
 
     for(const StellarObject &object : system->Objects())
     {
-        double radius = object.Radius();
-        painter.drawEllipse(object.Position().toPointF(), radius, radius);
+        QPixmap sprite = SpriteSet::Get(object.Sprite());
+        if(sprite.width() && sprite.height())
+        {
+            QVector2D pos = object.Position();
+            double angle = atan2(pos.x(), pos.y());
+            angle *= 180. / M_PI;
+            angle += 180.;
+
+            painter.translate(pos.toPointF());
+            painter.rotate(-angle);
+            painter.drawPixmap(QPointF(-.5 * sprite.width(), -.5 * sprite.height()), sprite);
+            painter.rotate(angle);
+            painter.translate(-pos.toPointF());
+        }
+        else
+        {
+            double radius = object.Radius();
+            painter.drawEllipse(object.Position().toPointF(), radius, radius);
+        }
     }
 }
