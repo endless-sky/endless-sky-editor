@@ -20,13 +20,15 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 class Map;
 class SystemView;
 
+class QTabWidget;
+
 
 
 class GalaxyView : public QWidget
 {
     Q_OBJECT
 public:
-    explicit GalaxyView(Map &mapData, SystemView *systemView, QWidget *parent = 0);
+    explicit GalaxyView(Map &mapData, SystemView *systemView, QTabWidget *tabs, QWidget *parent = 0);
 
 signals:
 
@@ -34,6 +36,7 @@ public slots:
 
 protected:
     virtual void mousePressEvent(QMouseEvent *event) override;
+    virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
     virtual void mouseMoveEvent(QMouseEvent *event) override;
     virtual void wheelEvent(QWheelEvent *event) override;
 
@@ -46,6 +49,7 @@ private:
 private:
     Map &mapData;
     SystemView *systemView;
+    QTabWidget *tabs;
 
     // Center and scale of the view:
     QVector2D offset;

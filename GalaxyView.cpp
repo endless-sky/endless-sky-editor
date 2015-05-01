@@ -19,13 +19,14 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include <QPainter>
 #include <QPalette>
 #include <QMouseEvent>
+#include <QTabWidget>
 
 using namespace std;
 
 
 
-GalaxyView::GalaxyView(Map &mapData, SystemView *systemView, QWidget *parent) :
-    QWidget(parent), mapData(mapData), systemView(systemView)
+GalaxyView::GalaxyView(Map &mapData, SystemView *systemView, QTabWidget *tabs, QWidget *parent) :
+    QWidget(parent), mapData(mapData), systemView(systemView), tabs(tabs)
 {
     setAutoFillBackground(true);
     QPalette p = palette();
@@ -45,6 +46,24 @@ void GalaxyView::mousePressEvent(QMouseEvent *event)
         {
             systemView->Select(&it.second);
             update();
+            return;
+        }
+}
+
+
+
+void GalaxyView::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    clickOff = QVector2D(event->pos()) - offset;
+    if(!tabs)
+        return;
+
+    QVector2D origin = MapPoint(event->pos());
+    for(auto &it : mapData.Systems())
+        if(origin.distanceToPoint(it.second.Position()) < 5.)
+        {
+            systemView->Select(&it.second);
+            tabs->setCurrentWidget(systemView);
             return;
         }
 }
