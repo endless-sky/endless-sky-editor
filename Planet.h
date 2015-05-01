@@ -13,6 +13,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #ifndef PLANET_H_
 #define PLANET_H_
 
+#include <list>
 #include <string>
 #include <vector>
 
@@ -79,6 +80,8 @@ private:
     double requiredReputation;
     double bribe;
     double security;
+
+    std::list<DataNode> unparsed;
 };
 
 

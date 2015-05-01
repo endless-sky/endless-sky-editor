@@ -66,6 +66,8 @@ void Planet::Load(const DataNode &node)
             bribe = child.Value(1);
         else if(child.Token(0) == "security" && child.Size() >= 2)
             security = child.Value(1);
+        else
+            unparsed.push_back(child);
     }
 }
 

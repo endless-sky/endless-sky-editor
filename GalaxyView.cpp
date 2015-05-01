@@ -13,6 +13,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include "GalaxyView.h"
 
 #include "Map.h"
+#include "SpriteSet.h"
 #include "SystemView.h"
 
 #include <QPainter>
@@ -84,10 +85,19 @@ void GalaxyView::paintEvent(QPaintEvent */*event*/)
 
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
 
     painter.translate(.5 * width(), .5 * height());
     painter.translate(offset.x(), offset.y());
     painter.scale(scale, scale);
+
+    // Draw the "galaxy" images.
+    for(const auto &it : mapData.Galaxies())
+    {
+        QPixmap sprite = SpriteSet::Get(it.second.Sprite());
+        QPointF pos = (it.second.Position() - QVector2D(.5 * sprite.width(), .5 * sprite.height())).toPointF();
+        painter.drawPixmap(pos, sprite);
+    }
 
     painter.setPen(mediumPen);
     painter.setBrush(Qt::NoBrush);

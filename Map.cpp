@@ -28,21 +28,25 @@ void Map::Load(const string &path)
             planets[node.Token(1)].Load(node);
         else if(node.Token(0) == "system" && node.Size() >= 2)
             systems[node.Token(1)].Load(node);
+        else if(node.Token(0) == "galaxy" && node.Size() >= 2)
+            galaxies[node.Token(1)].Load(node);
+        else
+            unparsed.push_back(node);
     }
 }
 
 
 
-map<string, Planet> &Map::Planets()
+map<string, Galaxy> &Map::Galaxies()
 {
-    return planets;
+    return galaxies;
 }
 
 
 
-const map<string, Planet> &Map::Planets() const
+const map<string, Galaxy> &Map::Galaxies() const
 {
-    return planets;
+    return galaxies;
 }
 
 
@@ -57,4 +61,18 @@ map<string, System> &Map::Systems()
 const map<string, System> &Map::Systems() const
 {
     return systems;
+}
+
+
+
+map<string, Planet> &Map::Planets()
+{
+    return planets;
+}
+
+
+
+const map<string, Planet> &Map::Planets() const
+{
+    return planets;
 }

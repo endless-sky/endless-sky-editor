@@ -20,13 +20,15 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 class System;
 
+class QTabWidget;
+
 
 
 class SystemView : public QWidget
 {
     Q_OBJECT
 public:
-    explicit SystemView(QWidget *parent = 0);
+    explicit SystemView(QTabWidget *tabs, QWidget *parent = 0);
 
     void Select(System *system);
     System *Selected() const;
@@ -47,6 +49,7 @@ protected:
     virtual void paintEvent(QPaintEvent *event) override;
 
 private:
+    QTabWidget *tabs;
     System *system = nullptr;
 
     // Center and scale of the view:

@@ -19,6 +19,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include <QPainter>
 #include <QPalette>
 #include <QMouseEvent>
+#include <QTabWidget>
 
 #include <algorithm>
 #include <cmath>
@@ -27,8 +28,8 @@ using namespace std;
 
 
 
-SystemView::SystemView(QWidget *parent) :
-    QWidget(parent)
+SystemView::SystemView(QTabWidget *tabs, QWidget *parent) :
+    QWidget(parent), tabs(tabs)
 {
     setAutoFillBackground(true);
     QPalette p = palette();
@@ -73,6 +74,9 @@ QSize SystemView::sizeHint() const
 
 void SystemView::step()
 {
+    if(tabs && tabs->currentWidget() != this)
+        return;
+
     timeStep += .01;
     if(system)
         system->SetDay(timeStep);
