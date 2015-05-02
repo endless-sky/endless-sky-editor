@@ -59,9 +59,17 @@ void DataFile::Load(istream &in)
         int white = 0;
         while(white < length && line[white] <= ' ')
             ++white;
-
+        
+        // Skip comments and empty lines.
         if(white == length || line[white] == '#')
+        {
+            if(white != length)
+            {
+                comments += line;
+                comments += '\n';
+            }
             continue;
+        }
         while(whiteStack.back() >= white)
         {
             whiteStack.pop_back();
@@ -75,26 +83,23 @@ void DataFile::Load(istream &in)
         stack.push_back(&node);
         whiteStack.push_back(white);
 
-        // Tokenize the line. Skip comments and empty lines.
-        if(white != length && line[white] != '#')
+        // Tokenize the line.
+        int i = white;
+        while(i != length)
         {
-            int i = white;
-            while(i != length)
+            char endQuote = line[i];
+            bool isQuoted = (endQuote == '"' || endQuote == '`');
+            i += isQuoted;
+
+            node.tokens.push_back(string());
+            while(i != length && (isQuoted ? (line[i] != endQuote) : (line[i] > ' ')))
+                node.tokens.back() += line[i++];
+
+            if(i != length)
             {
-                char endQuote = line[i];
-                bool isQuoted = (endQuote == '"' || endQuote == '`');
                 i += isQuoted;
-
-                node.tokens.push_back(string());
-                while(i != length && (isQuoted ? (line[i] != endQuote) : (line[i] > ' ')))
-                    node.tokens.back() += line[i++];
-
-                if(i != length)
-                {
-                    i += isQuoted;
-                    while(i != length && line[i] <= ' ')
-                        ++i;
-                }
+                while(i != length && line[i] <= ' ')
+                    ++i;
             }
         }
 
@@ -114,4 +119,10 @@ list<DataNode>::const_iterator DataFile::begin() const
 list<DataNode>::const_iterator DataFile::end() const
 {
     return root.end();
+}
+
+// Get all the comments that were stripped out when reading.
+const string &DataFile::Comments() const
+{
+    return comments;
 }

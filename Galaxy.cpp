@@ -12,10 +12,18 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 #include "Galaxy.h"
 
+#include "DataNode.h"
+#include "DataWriter.h"
+
+using namespace std;
+
 
 
 void Galaxy::Load(const DataNode &node)
 {
+    if(node.Size() >= 2)
+        name = node.Token(1);
+
     for(const DataNode &child : node)
     {
         if(child.Token(0) == "pos" && child.Size() >= 3)
@@ -29,6 +37,24 @@ void Galaxy::Load(const DataNode &node)
 
 
 
+void Galaxy::Save(DataWriter &file) const
+{
+    if(name.empty())
+        file.Write("galaxy");
+    else
+        file.Write("galaxy", name);
+    file.BeginChild();
+    {
+        file.Write("pos", position.x(), position.y());
+        file.Write("sprite", sprite);
+        for(const DataNode &node : unparsed)
+            file.Write(node);
+    }
+    file.EndChild();
+}
+
+
+
 const QVector2D &Galaxy::Position() const
 {
     return position;
@@ -36,7 +62,7 @@ const QVector2D &Galaxy::Position() const
 
 
 
-const std::string &Galaxy::Sprite() const
+const string &Galaxy::Sprite() const
 {
     return sprite;
 }

@@ -16,6 +16,9 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include <QMainWindow>
 
 class Map;
+class DetailView;
+class GalaxyView;
+class SystemView;
 
 
 
@@ -27,9 +30,22 @@ public:
     MainWindow(Map &map, QWidget *parent = 0);
     ~MainWindow();
 
+public slots:
+    void Open();
+    void Save();
+    void Quit();
+
+private:
+    void CreateMenus();
+    void CreateWidgets();
+
 
 private:
     Map &map;
+
+    DetailView *detailView;
+    GalaxyView *galaxyView;
+    SystemView *systemView;
 };
 
 #endif // MAINWINDOW_H

@@ -17,6 +17,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 #include <istream>
 #include <list>
+#include <string>
 
 
 
@@ -38,9 +39,13 @@ public:
     std::list<DataNode>::const_iterator begin() const;
     std::list<DataNode>::const_iterator end() const;
 
+    // Get all the comments that were stripped out when reading.
+    const std::string &Comments() const;
+
 
 private:
     DataNode root;
+    std::string comments;
 };
 
 

@@ -13,6 +13,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include "Map.h"
 
 #include "DataFile.h"
+#include "DataWriter.h"
 
 using namespace std;
 
@@ -20,7 +21,12 @@ using namespace std;
 
 void Map::Load(const string &path)
 {
+    // Clear everything first.
+    *this = Map();
+
+    dataDirectory = path.substr(0, path.rfind('/') + 1);
     DataFile data(path);
+    comments = data.Comments();
 
     for(const DataNode &node : data)
     {
@@ -28,13 +34,16 @@ void Map::Load(const string &path)
             planets[node.Token(1)].Load(node);
         else if(node.Token(0) == "system" && node.Size() >= 2)
             systems[node.Token(1)].Load(node);
-        else if(node.Token(0) == "galaxy" && node.Size() >= 2)
-            galaxies[node.Token(1)].Load(node);
+        else if(node.Token(0) == "galaxy")
+        {
+            galaxies.push_back(Galaxy());
+            galaxies.back().Load(node);
+        }
         else
             unparsed.push_back(node);
     }
 
-    string commodityPath = path.substr(0, path.rfind('/') + 1) + "commodities.txt";
+    string commodityPath = dataDirectory + "commodities.txt";
     DataFile tradeData(commodityPath);
 
     for(const DataNode &node : tradeData)
@@ -50,14 +59,51 @@ void Map::Load(const string &path)
 
 
 
-map<string, Galaxy> &Map::Galaxies()
+void Map::Save(const string &path) const
+{
+    DataWriter file(path);
+    file.WriteRaw(comments);
+    file.Write();
+
+    for(const Galaxy &it : galaxies)
+    {
+        it.Save(file);
+        file.Write();
+    }
+    for(const auto &it : systems)
+    {
+        it.second.Save(file);
+        file.Write();
+    }
+    for(const auto &it : planets)
+    {
+        it.second.Save(file);
+        file.Write();
+    }
+    for(const auto &it : unparsed)
+    {
+        file.Write(it);
+        file.Write();
+    }
+}
+
+
+
+const string &Map::DataDirectory() const
+{
+    return dataDirectory;
+}
+
+
+
+list<Galaxy> &Map::Galaxies()
 {
     return galaxies;
 }
 
 
 
-const map<string, Galaxy> &Map::Galaxies() const
+const list<Galaxy> &Map::Galaxies() const
 {
     return galaxies;
 }
@@ -92,7 +138,7 @@ const map<string, Planet> &Map::Planets() const
 
 
 
-const std::vector<Map::Commodity> &Map::Commodities() const
+const vector<Map::Commodity> &Map::Commodities() const
 {
     return commodities;
 }

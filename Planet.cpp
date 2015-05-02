@@ -13,6 +13,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include "Planet.h"
 
 #include "DataNode.h"
+#include "DataWriter.h"
 
 #include <algorithm>
 #include <limits>
@@ -69,6 +70,67 @@ void Planet::Load(const DataNode &node)
         else
             unparsed.push_back(child);
     }
+}
+
+
+
+void Planet::Save(DataWriter &file) const
+{
+    file.Write("planet", name);
+    file.BeginChild();
+    {
+        if(!attributes.empty())
+        {
+            file.WriteToken("attributes");
+            for(const string &it : attributes)
+                file.WriteToken(it);
+            file.Write();
+        }
+
+        file.Write("landscape", landscape);
+
+        // Break the descriptions into paragraphs.
+        for(size_t pos = 0; pos < description.length(); ++pos)
+        {
+            size_t nextPos = description.find('\n', pos);
+            if(nextPos == string::npos)
+                nextPos = description.length();
+
+            file.WriteToken("description");
+            file.WriteToken(description.substr(pos, nextPos - pos), '`');
+            file.Write();
+
+            pos = nextPos;
+        }
+        for(size_t pos = 0; pos < spaceport.length(); ++pos)
+        {
+            size_t nextPos = spaceport.find('\n', pos);
+            if(nextPos == string::npos)
+                nextPos = spaceport.length();
+
+            file.WriteToken("spaceport");
+            file.WriteToken(spaceport.substr(pos, nextPos - pos), '`');
+            file.Write();
+
+            pos = nextPos;
+        }
+
+        for(const string &it : shipyard)
+            file.Write("shipyard", it);
+        for(const string &it : outfitter)
+            file.Write("outfitter", it);
+
+        if(!std::isnan(requiredReputation))
+            file.Write("required reputation", requiredReputation);
+        if(!std::isnan(bribe))
+            file.Write("bribe", bribe);
+        if(!std::isnan(security))
+            file.Write("security", security);
+
+        for(const DataNode &node : unparsed)
+            file.Write(node);
+    }
+    file.EndChild();
 }
 
 

@@ -13,24 +13,27 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #ifndef GALAXY_H
 #define GALAXY_H
 
-#include "DataNode.h"
-
 #include <QVector2D>
 
 #include <list>
 #include <string>
+
+class DataNode;
+class DataWriter;
 
 
 
 class Galaxy {
 public:
     void Load(const DataNode &node);
+    void Save(DataWriter &file) const;
 
     const QVector2D &Position() const;
     const std::string &Sprite() const;
 
 
 private:
+    std::string name;
     QVector2D position;
     std::string sprite;
 

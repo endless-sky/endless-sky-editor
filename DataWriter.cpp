@@ -77,10 +77,24 @@ void DataWriter::WriteComment(const string &str)
 
 
 
-void DataWriter::WriteToken(const char *a)
+void DataWriter::WriteRaw(const string &str)
 {
-    bool hasSpace = !*a;
-    bool hasQuote = false;
+    out << str;
+}
+
+
+
+void DataWriter::WriteToken(const string &str, char quote)
+{
+    WriteToken(str.c_str(), quote);
+}
+
+
+
+void DataWriter::WriteToken(const char *a, char quote)
+{
+    bool hasSpace = !*a || (quote == '"');
+    bool hasQuote = (quote == '`');
     for(const char *it = a; *it; ++it)
     {
         hasSpace |= (*it <= ' ');

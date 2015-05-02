@@ -28,9 +28,11 @@ class DataNode;
 class Map {
 public:
     void Load(const std::string &path);
+    void Save(const std::string &path) const;
+    const std::string &DataDirectory() const;
 
-    std::map<std::string, Galaxy> &Galaxies();
-    const std::map<std::string, Galaxy> &Galaxies() const;
+    std::list<Galaxy> &Galaxies();
+    const std::list<Galaxy> &Galaxies() const;
 
     std::map<std::string, System> &Systems();
     const std::map<std::string, System> &Systems() const;
@@ -44,11 +46,14 @@ public:
 
 
 private:
-    std::map<std::string, Galaxy> galaxies;
+    std::string dataDirectory;
+
+    std::list<Galaxy> galaxies;
     std::map<std::string, System> systems;
     std::map<std::string, Planet> planets;
     std::vector<Commodity> commodities;
 
+    std::string comments;
     std::list<DataNode> unparsed;
 };
 

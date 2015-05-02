@@ -18,6 +18,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include <vector>
 
 class DataNode;
+class DataWriter;
 class System;
 
 
@@ -30,6 +31,7 @@ class Planet {
 public:
     // Load a planet's description from a file.
     void Load(const DataNode &node);
+    void Save(DataWriter &file) const;
 
     // Get the name of the planet.
     const std::string &Name() const;

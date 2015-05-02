@@ -42,7 +42,7 @@ void GalaxyView::mousePressEvent(QMouseEvent *event)
 
     QVector2D origin = MapPoint(event->pos());
     for(auto &it : mapData.Systems())
-        if(origin.distanceToPoint(it.second.Position()) < 5.)
+        if(origin.distanceToPoint(it.second.Position()) < 10.)
         {
             systemView->Select(&it.second);
             update();
@@ -111,10 +111,10 @@ void GalaxyView::paintEvent(QPaintEvent */*event*/)
     painter.scale(scale, scale);
 
     // Draw the "galaxy" images.
-    for(const auto &it : mapData.Galaxies())
+    for(const Galaxy &it : mapData.Galaxies())
     {
-        QPixmap sprite = SpriteSet::Get(it.second.Sprite());
-        QPointF pos = (it.second.Position() - QVector2D(.5 * sprite.width(), .5 * sprite.height())).toPointF();
+        QPixmap sprite = SpriteSet::Get(it.Sprite());
+        QPointF pos = (it.Position() - QVector2D(.5 * sprite.width(), .5 * sprite.height())).toPointF();
         painter.drawPixmap(pos, sprite);
     }
 

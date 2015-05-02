@@ -13,6 +13,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include "System.h"
 
 #include "DataNode.h"
+#include "DataWriter.h"
 #include "Planet.h"
 
 #include <limits>
@@ -51,6 +52,33 @@ void System::Load(const DataNode &node)
         else
             unparsed.push_back(child);
     }
+}
+
+
+
+void System::Save(DataWriter &file) const
+{
+    file.Write("system", name);
+    file.BeginChild();
+    {
+        file.Write("pos", position.x(), position.y());
+        if(!government.empty())
+            file.Write("government", government);
+        file.Write("habitable", habitable);
+        for(const string &it : links)
+            file.Write("link", it);
+        for(const Asteroid &it : asteroids)
+            file.Write("asteroids", it.type, it.count, it.energy);
+        for(const auto &it : trade)
+            file.Write("trade", it.first, it.second);
+        for(const Fleet &it : fleets)
+            file.Write("fleet", it.name, it.period);
+        for(const DataNode &node : unparsed)
+            file.Write(node);
+        for(const StellarObject &object : objects)
+            SaveObject(file, object);
+    }
+    file.EndChild();
 }
 
 
@@ -175,4 +203,38 @@ void System::LoadObject(const DataNode &node, int parent)
         else
             object.unparsed.push_back(child);
     }
+}
+
+
+
+void System::SaveObject(DataWriter &file, const StellarObject &object) const
+{
+    int level = 0;
+    int parent = object.parent;
+    while(parent >= 0)
+    {
+        file.BeginChild();
+        ++level;
+        parent = objects[parent].parent;
+    }
+    if(!object.planet.empty())
+        file.Write("object", object.planet);
+    else
+        file.Write("object");
+    file.BeginChild();
+    {
+        if(!object.sprite.empty())
+            file.Write("sprite", object.sprite);
+        if(object.distance)
+            file.Write("distance", object.distance);
+        if(object.period)
+            file.Write("period", object.period);
+        if(object.offset)
+            file.Write("offset", object.offset);
+        for(const DataNode &node : unparsed)
+            file.Write(node);
+    }
+    file.EndChild();
+    while(level--)
+        file.EndChild();
 }

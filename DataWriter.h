@@ -41,11 +41,12 @@ public:
     void BeginChild();
     void EndChild();
 
+    // Write a raw string. It's your responsibility to make sure this string
+    // does not mess up the file formatting, since no checks are done on it.
+    void WriteRaw(const std::string &str);
     void WriteComment(const std::string &str);
-
-
-private:
-    void WriteToken(const char *a);
+    void WriteToken(const std::string &str, char quote = '\0');
+    void WriteToken(const char *a, char quote = '\0');
 
 
 private:

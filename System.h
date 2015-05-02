@@ -21,6 +21,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include <vector>
 
 class DataNode;
+class DataWriter;
 class Planet;
 
 
@@ -38,6 +39,7 @@ public:
 public:
     // Load a system's description.
     void Load(const DataNode &node);
+    void Save(DataWriter &file) const;
 
     // Get this system's name and position (in the star map).
     const std::string &Name() const;
@@ -68,6 +70,7 @@ public:
 
 private:
     void LoadObject(const DataNode &node, int parent = -1);
+    void SaveObject(DataWriter &file, const StellarObject &object) const;
 
 
 private:

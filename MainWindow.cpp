@@ -17,7 +17,11 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include "Map.h"
 #include "SystemView.h"
 
+#include <QAction>
+#include <QFileDialog>
 #include <QHBoxLayout>
+#include <QMenu>
+#include <QMenuBar>
 #include <QSizePolicy>
 #include <QTabWidget>
 
@@ -30,12 +34,37 @@ using namespace std;
 MainWindow::MainWindow(Map &map, QWidget *parent)
     : QMainWindow(parent), map(map)
 {
+    CreateMenus();
+    CreateWidgets();
+}
+
+MainWindow::~MainWindow()
+{
+}
+
+
+
+void MainWindow::CreateMenus()
+{
+    QMenu *fileMenu = menuBar()->addMenu("File");
+    QAction *openAction = fileMenu->addAction("Open...", this, SLOT(Open()));
+    openAction->setShortcut(QKeySequence::Open);
+    QAction *saveAction = fileMenu->addAction("Save...", this, SLOT(Save()));
+    saveAction->setShortcut(QKeySequence::Save);
+    QAction *quitAction = fileMenu->addAction("Quit", this, SLOT(Quit()));
+    quitAction->setShortcut(QKeySequence::Quit);
+}
+
+
+
+void MainWindow::CreateWidgets()
+{
     QHBoxLayout *layout = new QHBoxLayout;
     QWidget *box = new QWidget(this);
     box->setLayout(layout);
     setCentralWidget(box);
 
-    DetailView *detailView = new DetailView(map, box);
+    detailView = new DetailView(map, box);
     detailView->setMinimumWidth(300);
     layout->addWidget(detailView);
 
@@ -44,17 +73,51 @@ MainWindow::MainWindow(Map &map, QWidget *parent)
     tabs->setSizePolicy(policy);
     layout->addWidget(tabs);
 
-    SystemView *systemView = new SystemView(detailView, tabs, tabs);
+    systemView = new SystemView(detailView, tabs, tabs);
     auto it = map.Systems().find("Sol");
     if(it != map.Systems().end())
         systemView->Select(&it->second);
 
-    GalaxyView *galaxyView = new GalaxyView(map, systemView, tabs, tabs);
+    galaxyView = new GalaxyView(map, systemView, tabs, tabs);
 
     tabs->addTab(galaxyView, "Galaxy");
     tabs->addTab(systemView, "System");
 }
 
-MainWindow::~MainWindow()
+
+
+void MainWindow::Open()
 {
+    // TODO: ask about saving changes.
+    QString dir = QString::fromStdString(map.DataDirectory());
+    QString fileName = QFileDialog::getOpenFileName(this, "Open map file", dir);
+    if(!fileName.isEmpty())
+    {
+        string path(fileName.toUtf8());
+        map.Load(path);
+        systemView->Select(nullptr);
+        update();
+    }
+}
+
+
+
+void MainWindow::Save()
+{
+    QString dir = QString::fromStdString(map.DataDirectory());
+    QString fileName = QFileDialog::getSaveFileName(this, "Save map file", dir);
+    if(!fileName.isEmpty())
+    {
+        string path(fileName.toUtf8());
+        map.Save(path);
+    }
+}
+
+
+
+
+void MainWindow::Quit()
+{
+    // TODO: ask about saving changes.
+    close();
 }
