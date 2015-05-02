@@ -28,7 +28,11 @@ class GalaxyView : public QWidget
 {
     Q_OBJECT
 public:
-    explicit GalaxyView(Map &mapData, SystemView *systemView, QTabWidget *tabs, QWidget *parent = 0);
+    explicit GalaxyView(Map &mapData, QTabWidget *tabs, QWidget *parent = 0);
+
+    void SetSystemView(SystemView *view);
+    void SetCommodity(const std::string &name);
+    void SetGovernment(const std::string &name);
 
 signals:
 
@@ -48,7 +52,7 @@ private:
 
 private:
     Map &mapData;
-    SystemView *systemView;
+    SystemView *systemView = nullptr;
     QTabWidget *tabs;
 
     // Center and scale of the view:
@@ -57,6 +61,10 @@ private:
 
     // Dragging:
     QVector2D clickOff;
+
+    // Color systems by:
+    std::string commodity;
+    std::string government;
 };
 
 

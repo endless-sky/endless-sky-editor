@@ -64,24 +64,26 @@ void MainWindow::CreateWidgets()
     box->setLayout(layout);
     setCentralWidget(box);
 
-    detailView = new DetailView(map, box);
-    detailView->setMinimumWidth(300);
-    layout->addWidget(detailView);
-
     QTabWidget *tabs = new QTabWidget(box);
     QSizePolicy policy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     tabs->setSizePolicy(policy);
-    layout->addWidget(tabs);
+
+    galaxyView = new GalaxyView(map, tabs, tabs);
+
+    detailView = new DetailView(map, galaxyView, box);
+    detailView->setMinimumWidth(300);
 
     systemView = new SystemView(detailView, tabs, tabs);
     auto it = map.Systems().find("Sol");
     if(it != map.Systems().end())
         systemView->Select(&it->second);
+    galaxyView->SetSystemView(systemView);
 
-    galaxyView = new GalaxyView(map, systemView, tabs, tabs);
+    layout->addWidget(detailView);
 
     tabs->addTab(galaxyView, "Galaxy");
     tabs->addTab(systemView, "System");
+    layout->addWidget(tabs);
 }
 
 

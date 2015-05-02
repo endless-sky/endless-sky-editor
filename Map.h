@@ -43,6 +43,8 @@ public:
     // Access the commodity data:
     struct Commodity { std::string name; int low; int high; };
     const std::vector<Commodity> &Commodities() const;
+    // Map a price to a value between 0 and 1 (lowest vs. highest).
+    double MapPrice(std::string &commodity, int price) const;
 
 
 private:

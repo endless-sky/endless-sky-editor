@@ -21,12 +21,40 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include <QMouseEvent>
 #include <QTabWidget>
 
+#include <algorithm>
+
 using namespace std;
 
+namespace {
+    // Map a value between -1 and 1 to a color.
+    QColor MapColor(double value)
+    {
+        value = min(1., max(-1., value));
+        if(value < 0.)
+            return QColor(
+                (.12 + .12 * value) * 255.9,
+                (.48 + .36 * value) * 255.9,
+                (.48 - .12 * value) * 255.9);
+        else
+            return QColor(
+                (.12 + .48 * value) * 255.9,
+                (.48 + .00 * value) * 255.9,
+                (.48 - .48 * value) * 255.9);
+    }
+    QColor MapGrey(double value)
+    {
+        value = max(0., min(1., (value + 1.) / 2.));
+        return QColor(
+            200. * value + 55.9,
+            200. * value + 55.9,
+            200. * value + 55.9);
+    }
+}
 
 
-GalaxyView::GalaxyView(Map &mapData, SystemView *systemView, QTabWidget *tabs, QWidget *parent) :
-    QWidget(parent), mapData(mapData), systemView(systemView), tabs(tabs)
+
+GalaxyView::GalaxyView(Map &mapData, QTabWidget *tabs, QWidget *parent) :
+    QWidget(parent), mapData(mapData), tabs(tabs)
 {
     setAutoFillBackground(true);
     QPalette p = palette();
@@ -36,10 +64,43 @@ GalaxyView::GalaxyView(Map &mapData, SystemView *systemView, QTabWidget *tabs, Q
 
 
 
+void GalaxyView::SetSystemView(SystemView *view)
+{
+    systemView = view;
+}
+
+
+
+void GalaxyView::SetCommodity(const string &name)
+{
+    if(commodity != name)
+    {
+        commodity = name;
+        government.clear();
+        update();
+    }
+}
+
+
+
+void GalaxyView::SetGovernment(const string &name)
+{
+    if(government != name)
+    {
+        government = name;
+        commodity.clear();
+        update();
+    }
+}
+
+
+
 void GalaxyView::mousePressEvent(QMouseEvent *event)
 {
     clickOff = QVector2D(event->pos()) - offset;
 
+    if(!systemView)
+        return;
     QVector2D origin = MapPoint(event->pos());
     for(auto &it : mapData.Systems())
         if(origin.distanceToPoint(it.second.Position()) < 10.)
@@ -55,7 +116,7 @@ void GalaxyView::mousePressEvent(QMouseEvent *event)
 void GalaxyView::mouseDoubleClickEvent(QMouseEvent *event)
 {
     clickOff = QVector2D(event->pos()) - offset;
-    if(!tabs)
+    if(!tabs || !systemView)
         return;
 
     QVector2D origin = MapPoint(event->pos());
@@ -129,6 +190,17 @@ void GalaxyView::paintEvent(QPaintEvent */*event*/)
             if(lit == mapData.Systems().end())
                 continue;
 
+            double value = 0.;
+            if(!commodity.empty())
+            {
+                int difference = abs(it.second.Trade(commodity) - lit->second.Trade(commodity));
+                value = (difference - 50) / 50.;
+            }
+            else if(!government.empty())
+                value = (it.second.Government() != lit->second.Government());
+            // Set the link color based on the "value".
+            QPen pen(MapGrey(value));
+            painter.setPen(pen);
             painter.drawLine(pos, lit->second.Position().toPointF());
         }
     }
@@ -137,7 +209,16 @@ void GalaxyView::paintEvent(QPaintEvent */*event*/)
     {
         QPointF pos = it.second.Position().toPointF();
         painter.setPen(Qt::NoPen);
-        painter.setBrush(&it.second == systemView->Selected() ? brightBrush : mediumBrush);
+        //bool isSelected = (systemView && &it.second == systemView->Selected());
+        //painter.setBrush(isSelected ? brightBrush : mediumBrush);
+        double value = 0.;
+        if(!commodity.empty())
+            value = mapData.MapPrice(commodity, it.second.Trade(commodity)) * 2. - 1.;
+        else if(!government.empty())
+            value = (it.second.Government() == government);
+        // Set the link color based on the "value".
+        QBrush brush(MapColor(value));
+        painter.setBrush(brush);
         painter.drawEllipse(pos, 5, 5);
 
         painter.setPen(brightPen);
@@ -146,7 +227,7 @@ void GalaxyView::paintEvent(QPaintEvent */*event*/)
 
     painter.setPen(brightPen);
     painter.setBrush(Qt::NoBrush);
-    if(systemView->Selected())
+    if(systemView && systemView->Selected())
     {
         QPointF pos = systemView->Selected()->Position().toPointF();
         painter.drawEllipse(pos, 10, 10);

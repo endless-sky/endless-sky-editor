@@ -17,6 +17,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 #include <QList>
 
+class GalaxyView;
 class Map;
 class System;
 
@@ -29,16 +30,22 @@ class DetailView : public QWidget
 {
     Q_OBJECT
 public:
-    explicit DetailView(Map &mapData, QWidget *parent = 0);
+    explicit DetailView(Map &mapData, GalaxyView *galaxyView, QWidget *parent = 0);
 
     void SetSystem(System *system);
+    bool eventFilter(QObject* object, QEvent* event);
 
 signals:
 
 public slots:
+    void CommodityClicked(QTreeWidgetItem *item, int column);
+
+private:
+
 
 private:
     Map &mapData;
+    GalaxyView *galaxyView = nullptr;
     System *system = nullptr;
 
     QLineEdit *name;

@@ -15,6 +15,8 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include "DataFile.h"
 #include "DataWriter.h"
 
+#include <algorithm>
+
 using namespace std;
 
 
@@ -141,4 +143,16 @@ const map<string, Planet> &Map::Planets() const
 const vector<Map::Commodity> &Map::Commodities() const
 {
     return commodities;
+}
+
+
+
+// Map a price to a value between 0 and 1 (lowest vs. highest).
+double Map::MapPrice(std::string &commodity, int price) const
+{
+    for(const Commodity &it : commodities)
+        if(it.name == commodity)
+            return max(0., min(1., static_cast<double>(price - it.low) / (it.high - it.low)));
+
+    return .5;
 }
