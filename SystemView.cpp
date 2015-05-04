@@ -125,10 +125,6 @@ void SystemView::paintEvent(QPaintEvent */*event*/)
         return;
 
     QPainter painter(this);
-    QBrush brush(QColor(128, 128, 128));
-    painter.setBrush(brush);
-    QPen pen(QColor(255, 255, 255));
-    painter.setPen(pen);
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
 
@@ -136,7 +132,29 @@ void SystemView::paintEvent(QPaintEvent */*event*/)
     painter.translate(offset.x(), offset.y());
     painter.scale(scale, scale);
 
+    // Draw circles indicating the center and edges of the habitable zone.
+    {
+        painter.setBrush(Qt::NoBrush);
+        double radius = system->HabitableZone();
+
+        QPen innerPen(QColor(255., 200., 0.));
+        painter.setPen(innerPen);
+        painter.drawEllipse(QPointF(), .5 * radius, .5 * radius);
+
+        QPen centerPen(QColor(0., 255., 0.));
+        painter.setPen(centerPen);
+        painter.drawEllipse(QPointF(), radius, radius);
+
+        QPen outerPen(QColor(0., 150., 255.));
+        painter.setPen(outerPen);
+        painter.drawEllipse(QPointF(), 2. * radius, 2. * radius);
+    }
+
     // Draw lines linking objects to their parents.
+    QBrush brush(QColor(128, 128, 128));
+    painter.setBrush(brush);
+    QPen pen(QColor(255, 255, 255));
+    painter.setPen(pen);
     for(const StellarObject &object : system->Objects())
     {
         QPointF parent;
