@@ -13,6 +13,8 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #ifndef SYSTEMVIEW_H
 #define SYSTEMVIEW_H
 
+#include "AsteroidField.h"
+
 #include <QWidget>
 
 #include <QVector2D>
@@ -64,6 +66,8 @@ private:
 
     // Dragging:
     QVector2D clickOff;
+
+    AsteroidField asteroids;
 };
 
 #endif // SYSTEMVIEW_H

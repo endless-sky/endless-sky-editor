@@ -26,7 +26,8 @@ SOURCES += main.cpp\
     SpriteSet.cpp \
     GalaxyView.cpp \
     Galaxy.cpp \
-    DetailView.cpp
+    DetailView.cpp \
+    AsteroidField.cpp
 
 HEADERS  += DataFile.h\
 		DataNode.h\
@@ -40,4 +41,5 @@ HEADERS  += DataFile.h\
     SpriteSet.h \
     GalaxyView.h \
     Galaxy.h \
-    DetailView.h
+    DetailView.h \
+    AsteroidField.h

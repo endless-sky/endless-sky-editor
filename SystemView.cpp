@@ -38,7 +38,7 @@ SystemView::SystemView(DetailView *detailView, QTabWidget *tabs, QWidget *parent
     setPalette(p);
 
     connect(&timer, SIGNAL(timeout()), this, SLOT(step()));
-    timer.start(1. / 60.);
+    timer.start(1000. / 60.);
 }
 
 
@@ -49,6 +49,7 @@ void SystemView::Select(System *system)
         detailView->SetSystem(system);
 
     this->system = system;
+    asteroids.Set(system);
     if(system)
         system->SetDay(timeStep);
 }
@@ -81,7 +82,8 @@ void SystemView::step()
     if(tabs && tabs->currentWidget() != this)
         return;
 
-    timeStep += .01;
+    timeStep += .1;
+    asteroids.Step();
     if(system)
         system->SetDay(timeStep);
     update();
@@ -185,4 +187,5 @@ void SystemView::paintEvent(QPaintEvent */*event*/)
             painter.drawEllipse(object.Position().toPointF(), radius, radius);
         }
     }
+    asteroids.Draw(painter);
 }
