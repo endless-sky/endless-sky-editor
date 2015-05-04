@@ -13,8 +13,9 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #ifndef PLANET_H_
 #define PLANET_H_
 
+#include <QString>
+
 #include <list>
-#include <string>
 #include <vector>
 
 class DataNode;
@@ -34,29 +35,29 @@ public:
     void Save(DataWriter &file) const;
 
     // Get the name of the planet.
-    const std::string &Name() const;
+    const QString &Name() const;
     // Get the planet's descriptive text.
-    const std::string &Description() const;
+    const QString &Description() const;
     // Get the landscape sprite.
-    const std::string &Landscape() const;
+    const QString &Landscape() const;
 
     // Get the list of "attributes" of the planet.
-    const std::vector<std::string> &Attributes() const;
+    const std::vector<QString> &Attributes() const;
 
     // Check whether there is a spaceport (which implies there is also trading,
     // jobs, banking, and hiring).
     bool HasSpaceport() const;
     // Get the spaceport's descriptive text.
-    const std::string &SpaceportDescription() const;
+    const QString &SpaceportDescription() const;
 
     // Check if this planet has a shipyard.
     bool HasShipyard() const;
     // Get the list of ships in the shipyard.
-    const std::vector<std::string> &Shipyard() const;
+    const std::vector<QString> &Shipyard() const;
     // Check if this planet has an outfitter.
     bool HasOutfitter() const;
     // Get the list of outfits available from the outfitter.
-    const std::vector<std::string> &Outfitter() const;
+    const std::vector<QString> &Outfitter() const;
 
     // You need this good a reputation with this system's government to land here.
     double RequiredReputation() const;
@@ -69,15 +70,15 @@ public:
 
 
 private:
-    std::string name;
-    std::string description;
-    std::string spaceport;
-    std::string landscape;
+    QString name;
+    QString description;
+    QString spaceport;
+    QString landscape;
 
-    std::vector<std::string> attributes;
+    std::vector<QString> attributes;
 
-    std::vector<std::string> shipyard;
-    std::vector<std::string> outfitter;
+    std::vector<QString> shipyard;
+    std::vector<QString> outfitter;
 
     double requiredReputation;
     double bribe;

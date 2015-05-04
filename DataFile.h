@@ -15,9 +15,9 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 #include "DataNode.h"
 
-#include <istream>
+#include <QString>
+
 #include <list>
-#include <string>
 
 
 
@@ -30,22 +30,20 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 class DataFile {
 public:
     DataFile();
-    DataFile(const std::string &path);
-    DataFile(std::istream &in);
+    DataFile(const QString &path);
 
-    void Load(const std::string &path);
-    void Load(std::istream &in);
+    void Load(const QString &path);
 
     std::list<DataNode>::const_iterator begin() const;
     std::list<DataNode>::const_iterator end() const;
 
     // Get all the comments that were stripped out when reading.
-    const std::string &Comments() const;
+    const QString &Comments() const;
 
 
 private:
     DataNode root;
-    std::string comments;
+    QString comments;
 };
 
 

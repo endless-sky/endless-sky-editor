@@ -13,8 +13,9 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #ifndef DATA_WRITER_H_
 #define DATA_WRITER_H_
 
-#include <string>
-#include <fstream>
+#include <QFile>
+#include <QString>
+#include <QTextStream>
 
 class DataNode;
 
@@ -27,12 +28,12 @@ class DataNode;
 // automatically adds quotation marks around strings if they contain whitespace.
 class DataWriter {
 public:
-    DataWriter(const std::string &path);
+    DataWriter(const QString &path);
 
   template <class ...B>
     void Write(const char *a, B... others);
   template <class ...B>
-    void Write(const std::string &a, B... others);
+    void Write(const QString &a, B... others);
   template <class A, class ...B>
     void Write(const A &a, B... others);
     void Write(const DataNode &node);
@@ -43,17 +44,18 @@ public:
 
     // Write a raw string. It's your responsibility to make sure this string
     // does not mess up the file formatting, since no checks are done on it.
-    void WriteRaw(const std::string &str);
-    void WriteComment(const std::string &str);
-    void WriteToken(const std::string &str, char quote = '\0');
-    void WriteToken(const char *a, char quote = '\0');
+    void WriteRaw(const QString &str);
+    void WriteComment(const QString &str);
+    void WriteToken(const QString &str, QChar quote = '\0');
 
 
 private:
-    std::string indent;
-    static const std::string space;
-    const std::string *before;
-    std::ofstream out;
+    QString indent;
+    static const QString space;
+    const QString *before;
+
+    QFile file;
+    QTextStream out;
 };
 
 
@@ -61,16 +63,17 @@ private:
 template <class ...B>
 void DataWriter::Write(const char *a, B... others)
 {
-    WriteToken(a);
+    WriteToken(QString::fromUtf8(a));
     Write(others...);
 }
 
 
 
 template <class ...B>
-void DataWriter::Write(const std::string &a, B... others)
+void DataWriter::Write(const QString &a, B... others)
 {
-    Write(a.c_str(), others...);
+    WriteToken(a);
+    Write(others...);
 }
 
 

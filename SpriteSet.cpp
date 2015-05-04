@@ -19,22 +19,22 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 using namespace std;
 
 namespace {
-    string root;
-    map<string, QPixmap> sprite;
+    QString root;
+    map<QString, QPixmap> sprite;
 }
 
 
 
-void SpriteSet::SetRootPath(const string &path)
+void SpriteSet::SetRootPath(const QString &path)
 {
     root = path;
-    if(!root.empty() && root.back() != '/')
+    if(!root.isEmpty() && !root.endsWith('/'))
         root += '/';
 }
 
 
 
-QPixmap SpriteSet::Get(const string &name)
+QPixmap SpriteSet::Get(const QString &name)
 {
     auto it = sprite.find(name);
     if(it != sprite.end())
@@ -42,7 +42,7 @@ QPixmap SpriteSet::Get(const string &name)
 
     QPixmap image;
 
-    QString baseName((root + name).c_str());
+    QString baseName = root + name;
     QFileInfo jpg(baseName + ".jpg");
     if(jpg.exists())
         image.load(jpg.filePath());

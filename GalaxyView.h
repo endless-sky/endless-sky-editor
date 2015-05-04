@@ -31,8 +31,8 @@ public:
     explicit GalaxyView(Map &mapData, QTabWidget *tabs, QWidget *parent = 0);
 
     void SetSystemView(SystemView *view);
-    void SetCommodity(const std::string &name);
-    void SetGovernment(const std::string &name);
+    void SetCommodity(const QString &name);
+    void SetGovernment(const QString &name);
 
 signals:
 
@@ -63,8 +63,8 @@ private:
     QVector2D clickOff;
 
     // Color systems by:
-    std::string commodity;
-    std::string government;
+    QString commodity;
+    QString government;
 };
 
 

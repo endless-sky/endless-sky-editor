@@ -45,14 +45,14 @@ void Planet::Load(const DataNode &node)
         }
         else if(child.Token(0) == "description" && child.Size() >= 2)
         {
-            if(!description.empty() && !child.Token(1).empty() && child.Token(1)[0] > ' ')
+            if(!description.isEmpty() && !child.Token(1).isEmpty() && child.Token(1)[0] > ' ')
                 description += '\t';
             description += child.Token(1);
             description += '\n';
         }
         else if(child.Token(0) == "spaceport" && child.Size() >= 2)
         {
-            if(!spaceport.empty() && !child.Token(1).empty() && child.Token(1)[0] > ' ')
+            if(!spaceport.isEmpty() && !child.Token(1).isEmpty() && child.Token(1)[0] > ' ')
                 spaceport += '\t';
             spaceport += child.Token(1);
             spaceport += '\n';
@@ -82,7 +82,7 @@ void Planet::Save(DataWriter &file) const
         if(!attributes.empty())
         {
             file.WriteToken("attributes");
-            for(const string &it : attributes)
+            for(const QString &it : attributes)
                 file.WriteToken(it);
             file.Write();
         }
@@ -90,34 +90,22 @@ void Planet::Save(DataWriter &file) const
         file.Write("landscape", landscape);
 
         // Break the descriptions into paragraphs.
-        for(size_t pos = 0; pos < description.length(); ++pos)
+        for(const QString &str : description.split('\n', QString::SkipEmptyParts))
         {
-            size_t nextPos = description.find('\n', pos);
-            if(nextPos == string::npos)
-                nextPos = description.length();
-
             file.WriteToken("description");
-            file.WriteToken(description.substr(pos, nextPos - pos), '`');
+            file.WriteToken(str, '`');
             file.Write();
-
-            pos = nextPos;
         }
-        for(size_t pos = 0; pos < spaceport.length(); ++pos)
+        for(const QString &str : spaceport.split('\n', QString::SkipEmptyParts))
         {
-            size_t nextPos = spaceport.find('\n', pos);
-            if(nextPos == string::npos)
-                nextPos = spaceport.length();
-
             file.WriteToken("spaceport");
-            file.WriteToken(spaceport.substr(pos, nextPos - pos), '`');
+            file.WriteToken(str, '`');
             file.Write();
-
-            pos = nextPos;
         }
 
-        for(const string &it : shipyard)
+        for(const QString &it : shipyard)
             file.Write("shipyard", it);
-        for(const string &it : outfitter)
+        for(const QString &it : outfitter)
             file.Write("outfitter", it);
 
         if(!std::isnan(requiredReputation))
@@ -136,7 +124,7 @@ void Planet::Save(DataWriter &file) const
 
 
 // Get the name of the planet.
-const string &Planet::Name() const
+const QString &Planet::Name() const
 {
     return name;
 }
@@ -144,7 +132,7 @@ const string &Planet::Name() const
 
 
 // Get the planet's descriptive text.
-const string &Planet::Description() const
+const QString &Planet::Description() const
 {
     return description;
 }
@@ -152,7 +140,7 @@ const string &Planet::Description() const
 
 
 // Get the landscape sprite.
-const string &Planet::Landscape() const
+const QString &Planet::Landscape() const
 {
     return landscape;
 }
@@ -160,7 +148,7 @@ const string &Planet::Landscape() const
 
 
 // Get the list of "attributes" of the planet.
-const vector<string> &Planet::Attributes() const
+const vector<QString> &Planet::Attributes() const
 {
     return attributes;
 }
@@ -171,13 +159,13 @@ const vector<string> &Planet::Attributes() const
 // jobs, banking, and hiring).
 bool Planet::HasSpaceport() const
 {
-    return !spaceport.empty();
+    return !spaceport.isEmpty();
 }
 
 
 
 // Get the spaceport's descriptive text.
-const string &Planet::SpaceportDescription() const
+const QString &Planet::SpaceportDescription() const
 {
     return spaceport;
 }
@@ -193,7 +181,7 @@ bool Planet::HasShipyard() const
 
 
 // Get the list of ships in the shipyard.
-const vector<string> &Planet::Shipyard() const
+const vector<QString> &Planet::Shipyard() const
 {
     return shipyard;
 }
@@ -209,7 +197,7 @@ bool Planet::HasOutfitter() const
 
 
 // Get the list of outfits available from the outfitter.
-const vector<string> &Planet::Outfitter() const
+const vector<QString> &Planet::Outfitter() const
 {
     return outfitter;
 }

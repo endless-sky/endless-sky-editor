@@ -91,11 +91,10 @@ void MainWindow::CreateWidgets()
 void MainWindow::Open()
 {
     // TODO: ask about saving changes.
-    QString dir = QString::fromStdString(map.DataDirectory());
-    QString fileName = QFileDialog::getOpenFileName(this, "Open map file", dir);
-    if(!fileName.isEmpty())
+    QString dir = map.DataDirectory();
+    QString path = QFileDialog::getOpenFileName(this, "Open map file", dir);
+    if(!path.isEmpty())
     {
-        string path(fileName.toUtf8());
         map.Load(path);
         systemView->Select(nullptr);
         update();
@@ -106,13 +105,10 @@ void MainWindow::Open()
 
 void MainWindow::Save()
 {
-    QString dir = QString::fromStdString(map.DataDirectory());
-    QString fileName = QFileDialog::getSaveFileName(this, "Save map file", dir);
-    if(!fileName.isEmpty())
-    {
-        string path(fileName.toUtf8());
+    QString dir = map.DataDirectory();
+    QString path = QFileDialog::getSaveFileName(this, "Save map file", dir);
+    if(!path.isEmpty())
         map.Save(path);
-    }
 }
 
 

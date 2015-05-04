@@ -27,35 +27,35 @@ class DataNode;
 
 class Map {
 public:
-    void Load(const std::string &path);
-    void Save(const std::string &path) const;
-    const std::string &DataDirectory() const;
+    void Load(const QString &path);
+    void Save(const QString &path) const;
+    const QString &DataDirectory() const;
 
     std::list<Galaxy> &Galaxies();
     const std::list<Galaxy> &Galaxies() const;
 
-    std::map<std::string, System> &Systems();
-    const std::map<std::string, System> &Systems() const;
+    std::map<QString, System> &Systems();
+    const std::map<QString, System> &Systems() const;
 
-    std::map<std::string, Planet> &Planets();
-    const std::map<std::string, Planet> &Planets() const;
+    std::map<QString, Planet> &Planets();
+    const std::map<QString, Planet> &Planets() const;
 
     // Access the commodity data:
-    struct Commodity { std::string name; int low; int high; };
+    struct Commodity { QString name; int low; int high; };
     const std::vector<Commodity> &Commodities() const;
     // Map a price to a value between 0 and 1 (lowest vs. highest).
-    double MapPrice(std::string &commodity, int price) const;
+    double MapPrice(QString &commodity, int price) const;
 
 
 private:
-    std::string dataDirectory;
+    QString dataDirectory;
 
     std::list<Galaxy> galaxies;
-    std::map<std::string, System> systems;
-    std::map<std::string, Planet> planets;
+    std::map<QString, System> systems;
+    std::map<QString, Planet> planets;
     std::vector<Commodity> commodities;
 
-    std::string comments;
+    QString comments;
     std::list<DataNode> unparsed;
 };
 

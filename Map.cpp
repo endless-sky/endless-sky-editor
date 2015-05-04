@@ -21,12 +21,12 @@ using namespace std;
 
 
 
-void Map::Load(const string &path)
+void Map::Load(const QString &path)
 {
     // Clear everything first.
     *this = Map();
 
-    dataDirectory = path.substr(0, path.rfind('/') + 1);
+    dataDirectory = path.left(path.lastIndexOf('/') + 1);
     DataFile data(path);
     comments = data.Comments();
 
@@ -45,7 +45,7 @@ void Map::Load(const string &path)
             unparsed.push_back(node);
     }
 
-    string commodityPath = dataDirectory + "commodities.txt";
+    QString commodityPath = dataDirectory + "commodities.txt";
     DataFile tradeData(commodityPath);
 
     for(const DataNode &node : tradeData)
@@ -61,7 +61,7 @@ void Map::Load(const string &path)
 
 
 
-void Map::Save(const string &path) const
+void Map::Save(const QString &path) const
 {
     DataWriter file(path);
     file.WriteRaw(comments);
@@ -91,7 +91,7 @@ void Map::Save(const string &path) const
 
 
 
-const string &Map::DataDirectory() const
+const QString &Map::DataDirectory() const
 {
     return dataDirectory;
 }
@@ -112,28 +112,28 @@ const list<Galaxy> &Map::Galaxies() const
 
 
 
-map<string, System> &Map::Systems()
+map<QString, System> &Map::Systems()
 {
     return systems;
 }
 
 
 
-const map<string, System> &Map::Systems() const
+const map<QString, System> &Map::Systems() const
 {
     return systems;
 }
 
 
 
-map<string, Planet> &Map::Planets()
+map<QString, Planet> &Map::Planets()
 {
     return planets;
 }
 
 
 
-const map<string, Planet> &Map::Planets() const
+const map<QString, Planet> &Map::Planets() const
 {
     return planets;
 }
@@ -148,7 +148,7 @@ const vector<Map::Commodity> &Map::Commodities() const
 
 
 // Map a price to a value between 0 and 1 (lowest vs. highest).
-double Map::MapPrice(std::string &commodity, int price) const
+double Map::MapPrice(QString &commodity, int price) const
 {
     for(const Commodity &it : commodities)
         if(it.name == commodity)

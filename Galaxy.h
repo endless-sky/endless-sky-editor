@@ -14,9 +14,9 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #define GALAXY_H
 
 #include <QVector2D>
+#include <QString>
 
 #include <list>
-#include <string>
 
 class DataNode;
 class DataWriter;
@@ -29,13 +29,13 @@ public:
     void Save(DataWriter &file) const;
 
     const QVector2D &Position() const;
-    const std::string &Sprite() const;
+    const QString &Sprite() const;
 
 
 private:
-    std::string name;
+    QString name;
     QVector2D position;
-    std::string sprite;
+    QString sprite;
 
     std::list<DataNode> unparsed;
 };

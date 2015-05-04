@@ -50,7 +50,7 @@ DetailView::DetailView(Map &mapData, GalaxyView *galaxyView, QWidget *parent) :
     for(const auto &it : mapData.Commodities())
     {
         QTreeWidgetItem *item = new QTreeWidgetItem;
-        item->setText(0, QString::fromStdString(it.name));
+        item->setText(0, it.name);
         item->setText(1, QString::number((it.low + it.high) / 2));
         item->setText(2, "medium");
         //item->setFlags(Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
@@ -75,8 +75,8 @@ void DetailView::SetSystem(System *system)
     this->system = system;
     if(system)
     {
-        name->setText(QString::fromStdString(system->Name()));
-        government->setText(QString::fromStdString(system->Government()));
+        name->setText(system->Name());
+        government->setText(system->Government());
 
         QList<QTreeWidgetItem *>::iterator item = trade.begin();
         for(const auto &it : mapData.Commodities())
@@ -108,7 +108,7 @@ void DetailView::SetSystem(System *system)
 bool DetailView::eventFilter(QObject* object, QEvent* event)
 {
     if(object == government && event->type() == QEvent::FocusIn)
-        galaxyView->SetGovernment(string(government->text().toUtf8()));
+        galaxyView->SetGovernment(government->text());
     return false;
 }
 
@@ -118,6 +118,6 @@ void DetailView::CommodityClicked(QTreeWidgetItem *item, int /*column*/)
 {
     if(galaxyView)
     {
-        galaxyView->SetCommodity(string(item->text(0).toUtf8()));
+        galaxyView->SetCommodity(item->text(0));
     }
 }

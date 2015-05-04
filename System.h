@@ -16,8 +16,8 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include "StellarObject.h"
 
 #include <QVector2D>
+#include <QString>
 
-#include <string>
 #include <vector>
 
 class DataNode;
@@ -32,8 +32,8 @@ class Planet;
 // objects in each system, and the hyperspace links between systems.
 class System {
 public:
-    struct Asteroid { std::string type; int count; double energy; };
-    struct Fleet { std::string name; int period; };
+    struct Asteroid { QString type; int count; double energy; };
+    struct Fleet { QString name; int period; };
 
 
 public:
@@ -42,13 +42,13 @@ public:
     void Save(DataWriter &file) const;
 
     // Get this system's name and position (in the star map).
-    const std::string &Name() const;
+    const QString &Name() const;
     const QVector2D &Position() const;
     // Get this system's government.
-    const std::string &Government() const;
+    const QString &Government() const;
 
     // Get a list of systems you can travel to through hyperspace from here.
-    const std::vector<std::string> &Links() const;
+    const std::vector<QString> &Links() const;
 
     // Get the stellar object locations on the most recently set date.
     const std::vector<StellarObject> &Objects() const;
@@ -59,7 +59,7 @@ public:
     const std::vector<Asteroid> &Asteroids() const;
 
     // Get the price of the given commodity in this system.
-    int Trade(const std::string &commodity) const;
+    int Trade(const QString &commodity) const;
 
     // Get the probabilities of various fleets entering this system.
     const std::vector<Fleet> &Fleets() const;
@@ -75,12 +75,12 @@ private:
 
 private:
     // Name and position (within the star map) of this system.
-    std::string name;
+    QString name;
     QVector2D position;
-    std::string government;
+    QString government;
 
     // Hyperspace links to other systems.
-    std::vector<std::string> links;
+    std::vector<QString> links;
 
     // Stellar objects, listed in such an order that an object's parents are
     // guaranteed to appear before it (so that if we traverse the vector in
@@ -90,7 +90,7 @@ private:
     double habitable;
 
     std::vector<Asteroid> asteroids;
-    std::map<std::string, int> trade;
+    std::map<QString, int> trade;
     std::vector<Fleet> fleets;
 
     std::list<DataNode> unparsed;

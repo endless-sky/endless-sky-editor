@@ -26,7 +26,7 @@ int DataNode::Size() const
 
 
 
-const string &DataNode::Token(int index) const
+const QString &DataNode::Token(int index) const
 {
     return tokens[index];
 }
@@ -35,10 +35,7 @@ const string &DataNode::Token(int index) const
 
 double DataNode::Value(int index) const
 {
-    double value = numeric_limits<double>::quiet_NaN();
-    istringstream(tokens[index]) >> value;
-
-    return value;
+    return tokens[index].toDouble();
 }
 
 

@@ -15,8 +15,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include "SpriteSet.h"
 
 #include <QApplication>
-
-#include <string>
+#include <QString>
 
 using namespace std;
 
@@ -27,10 +26,10 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     Map mapData;
 
-    string path = argc > 1 ? argv[1] : "/usr/share/games/endless-sky/data/map.txt";
-    string dataDir = path.substr(0, path.rfind('/'));
-    string rootDir = dataDir.substr(0, dataDir.rfind('/') + 1);
-    SpriteSet::SetRootPath(rootDir + "images/");
+    QString path = argc > 1 ? argv[1] : "/usr/share/games/endless-sky/data/map.txt";
+    QString dataDir = path.left(path.lastIndexOf('/'));
+    QString rootDir = dataDir.left(dataDir.lastIndexOf('/'));
+    SpriteSet::SetRootPath(rootDir + "/images/");
 
     mapData.Load(path);
 

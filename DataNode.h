@@ -13,9 +13,10 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #ifndef DATA_NODE_H_
 #define DATA_NODE_H_
 
+#include <QString>
+
 #include <list>
 #include <string>
-#include <vector>
 
 
 
@@ -28,7 +29,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 class DataNode {
 public:
     int Size() const;
-    const std::string &Token(int index) const;
+    const QString &Token(int index) const;
     double Value(int index) const;
 
     bool HasChildren() const;
@@ -37,9 +38,8 @@ public:
 
 
 private:
-    std::string raw;
     std::list<DataNode> children;
-    std::vector<std::string> tokens;
+    std::vector<QString> tokens;
 
     friend class DataFile;
 };

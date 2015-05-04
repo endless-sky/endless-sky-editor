@@ -18,15 +18,18 @@ using namespace std;
 
 
 
-const string DataWriter::space = " ";
+const QString DataWriter::space = " ";
 
 
 
-DataWriter::DataWriter(const string &path)
-    : before(&indent)
+DataWriter::DataWriter(const QString &path)
+    : before(&indent), file(path)
 {
-    out.open(path);
-    out.precision(8);
+    if(file.open(QFile::WriteOnly | QFile::Text))
+    {
+        out.setDevice(&file);
+        out.setCodec("UTF-8");
+    }
 }
 
 
@@ -34,14 +37,16 @@ DataWriter::DataWriter(const string &path)
 void DataWriter::Write(const DataNode &node)
 {
     for(int i = 0; i < node.Size(); ++i)
-        WriteToken(node.Token(i).c_str());
+        WriteToken(node.Token(i));
     Write();
 
     if(node.begin() != node.end())
     {
         BeginChild();
-        for(const DataNode &child : node)
-            Write(child);
+        {
+            for(const DataNode &child : node)
+                Write(child);
+        }
         EndChild();
     }
 }
@@ -65,48 +70,41 @@ void DataWriter::BeginChild()
 
 void DataWriter::EndChild()
 {
-    indent.erase(indent.length() - 1);
+    indent.chop(1);
 }
 
 
 
-void DataWriter::WriteComment(const string &str)
+void DataWriter::WriteComment(const QString &str)
 {
     out << indent << "# " << str << '\n';
 }
 
 
 
-void DataWriter::WriteRaw(const string &str)
+void DataWriter::WriteRaw(const QString &str)
 {
     out << str;
 }
 
 
 
-void DataWriter::WriteToken(const string &str, char quote)
+void DataWriter::WriteToken(const QString &str, QChar quote)
 {
-    WriteToken(str.c_str(), quote);
-}
-
-
-
-void DataWriter::WriteToken(const char *a, char quote)
-{
-    bool hasSpace = !*a || (quote == '"');
+    bool hasSpace = str.isEmpty() || (quote == '"');
     bool hasQuote = (quote == '`');
-    for(const char *it = a; *it; ++it)
+    for(QChar c : str)
     {
-        hasSpace |= (*it <= ' ');
-        hasQuote |= (*it == '"');
+        hasSpace |= (c <= ' ');
+        hasQuote |= (c == '"');
     }
 
     out << *before;
     if(hasSpace && hasQuote)
-        out << '`' << a << '`';
+        out << '`' << str << '`';
     else if(hasSpace)
-        out << '"' << a << '"';
+        out << '"' << str << '"';
     else
-        out << a;
+        out << str;
     before = &space;
 }

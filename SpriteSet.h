@@ -14,15 +14,14 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #define SPRITESET_H
 
 #include <QPixmap>
-
-#include <string>
+#include <QString>
 
 
 
 class SpriteSet {
 public:
-    static void SetRootPath(const std::string &path);
-    static QPixmap Get(const std::string &name);
+    static void SetRootPath(const QString &path);
+    static QPixmap Get(const QString &name);
 };
 
 

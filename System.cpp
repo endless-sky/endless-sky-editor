@@ -62,10 +62,10 @@ void System::Save(DataWriter &file) const
     file.BeginChild();
     {
         file.Write("pos", position.x(), position.y());
-        if(!government.empty())
+        if(!government.isEmpty())
             file.Write("government", government);
         file.Write("habitable", habitable);
-        for(const string &it : links)
+        for(const QString &it : links)
             file.Write("link", it);
         for(const Asteroid &it : asteroids)
             file.Write("asteroids", it.type, it.count, it.energy);
@@ -84,7 +84,7 @@ void System::Save(DataWriter &file) const
 
 
 // Get this system's name and position (in the star map).
-const string &System::Name() const
+const QString &System::Name() const
 {
     return name;
 }
@@ -99,7 +99,7 @@ const QVector2D &System::Position() const
 
 
 // Get this system's government.
-const string &System::Government() const
+const QString &System::Government() const
 {
     return government;
 }
@@ -107,7 +107,7 @@ const string &System::Government() const
 
 
 // Get a list of systems you can travel to through hyperspace from here.
-const vector<string> &System::Links() const
+const vector<QString> &System::Links() const
 {
     return links;
 }
@@ -139,7 +139,7 @@ const vector<System::Asteroid> &System::Asteroids() const
 
 
 // Get the price of the given commodity in this system.
-int System::Trade(const string &commodity) const
+int System::Trade(const QString &commodity) const
 {
     auto it = trade.find(commodity);
     return (it == trade.end()) ? 0 : it->second;
@@ -187,11 +187,7 @@ void System::LoadObject(const DataNode &node, int parent)
     for(const DataNode &child : node)
     {
         if(child.Token(0) == "sprite" && child.Size() >= 2)
-        {
-            // Save the full animation information, if any.
             object.sprite = child.Token(1);
-            object.animation = child;
-        }
         else if(child.Token(0) == "distance" && child.Size() >= 2)
             object.distance = child.Value(1);
         else if(child.Token(0) == "period" && child.Size() >= 2)
@@ -217,13 +213,13 @@ void System::SaveObject(DataWriter &file, const StellarObject &object) const
         ++level;
         parent = objects[parent].parent;
     }
-    if(!object.planet.empty())
+    if(!object.planet.isEmpty())
         file.Write("object", object.planet);
     else
         file.Write("object");
     file.BeginChild();
     {
-        if(!object.sprite.empty())
+        if(!object.sprite.isEmpty())
             file.Write("sprite", object.sprite);
         if(object.distance)
             file.Write("distance", object.distance);

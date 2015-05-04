@@ -39,7 +39,7 @@ void Galaxy::Load(const DataNode &node)
 
 void Galaxy::Save(DataWriter &file) const
 {
-    if(name.empty())
+    if(name.isEmpty())
         file.Write("galaxy");
     else
         file.Write("galaxy", name);
@@ -62,7 +62,7 @@ const QVector2D &Galaxy::Position() const
 
 
 
-const string &Galaxy::Sprite() const
+const QString &Galaxy::Sprite() const
 {
     return sprite;
 }

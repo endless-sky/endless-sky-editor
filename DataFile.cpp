@@ -12,7 +12,8 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 #include "DataFile.h"
 
-#include <fstream>
+#include <QFile>
+#include <QTextStream>
 
 using namespace std;
 
@@ -24,42 +25,33 @@ DataFile::DataFile()
 
 
 
-DataFile::DataFile(const string &path)
+DataFile::DataFile(const QString &path)
 {
     Load(path);
 }
 
 
 
-DataFile::DataFile(istream &in)
+void DataFile::Load(const QString &path)
 {
-    Load(in);
-}
+    QFile file(path);
+    if(!file.open(QFile::ReadOnly | QFile::Text))
+        return;
+    QTextStream in(&file);
+    in.setCodec("UTF-8");
 
-
-
-void DataFile::Load(const string &path)
-{
-    ifstream in(path);
-    Load(in);
-}
-
-
-
-void DataFile::Load(istream &in)
-{
     vector<DataNode *> stack(1, &root);
     vector<int> whiteStack(1, -1);
 
-    string line;
-    while(getline(in, line))
+    while(!in.atEnd())
     {
+        QString line = in.readLine();
         int length = line.length();
 
         int white = 0;
-        while(white < length && line[white] <= ' ')
+        while(white < length && line[white].isSpace())
             ++white;
-        
+
         // Skip comments and empty lines.
         if(white == length || line[white] == '#')
         {
@@ -87,23 +79,21 @@ void DataFile::Load(istream &in)
         int i = white;
         while(i != length)
         {
-            char endQuote = line[i];
+            QChar endQuote = line[i];
             bool isQuoted = (endQuote == '"' || endQuote == '`');
             i += isQuoted;
 
-            node.tokens.push_back(string());
+            node.tokens.push_back(QString());
             while(i != length && (isQuoted ? (line[i] != endQuote) : (line[i] > ' ')))
                 node.tokens.back() += line[i++];
 
             if(i != length)
             {
                 i += isQuoted;
-                while(i != length && line[i] <= ' ')
+                while(i != length && line[i].isSpace())
                     ++i;
             }
         }
-
-        children.back().raw.swap(line);
     }
 }
 
@@ -122,7 +112,7 @@ list<DataNode>::const_iterator DataFile::end() const
 }
 
 // Get all the comments that were stripped out when reading.
-const string &DataFile::Comments() const
+const QString &DataFile::Comments() const
 {
     return comments;
 }

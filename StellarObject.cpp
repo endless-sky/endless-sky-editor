@@ -22,7 +22,7 @@ using namespace std;
 
 namespace {
     struct Info { int radius; int info; };
-    const map<string, Info> INFO = {
+    const map<QString, Info> INFO = {
         {"planet/callisto", {47, 0}},
         {"planet/cloud0", {76, 0}},
         {"planet/cloud1", {100, 0}},
@@ -171,7 +171,7 @@ namespace {
 
 // Some objects do not have sprites, because they are just an orbital
 // center for two or more other objects.
-const string &StellarObject::Sprite() const
+const QString &StellarObject::Sprite() const
 {
     return sprite;
 }
@@ -199,7 +199,7 @@ double StellarObject::Radius() const
 // If it is possible to land on this planet, this returns the Planet
 // objects that gives more information about it. Otherwise, this
 // function will just return nullptr.
-const string &StellarObject::GetPlanet() const
+const QString &StellarObject::GetPlanet() const
 {
     return planet;
 }

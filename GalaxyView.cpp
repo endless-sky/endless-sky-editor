@@ -71,7 +71,7 @@ void GalaxyView::SetSystemView(SystemView *view)
 
 
 
-void GalaxyView::SetCommodity(const string &name)
+void GalaxyView::SetCommodity(const QString &name)
 {
     if(commodity != name)
     {
@@ -83,7 +83,7 @@ void GalaxyView::SetCommodity(const string &name)
 
 
 
-void GalaxyView::SetGovernment(const string &name)
+void GalaxyView::SetGovernment(const QString &name)
 {
     if(government != name)
     {
@@ -184,19 +184,19 @@ void GalaxyView::paintEvent(QPaintEvent */*event*/)
     for(const auto &it : mapData.Systems())
     {
         QPointF pos = it.second.Position().toPointF();
-        for(const string &link : it.second.Links())
+        for(const QString &link : it.second.Links())
         {
             auto lit = mapData.Systems().find(link);
             if(lit == mapData.Systems().end())
                 continue;
 
             double value = 0.;
-            if(!commodity.empty())
+            if(!commodity.isEmpty())
             {
                 int difference = abs(it.second.Trade(commodity) - lit->second.Trade(commodity));
                 value = (difference - 50) / 50.;
             }
-            else if(!government.empty())
+            else if(!government.isEmpty())
                 value = (it.second.Government() != lit->second.Government());
             // Set the link color based on the "value".
             QPen pen(MapGrey(value));
@@ -212,9 +212,9 @@ void GalaxyView::paintEvent(QPaintEvent */*event*/)
         //bool isSelected = (systemView && &it.second == systemView->Selected());
         //painter.setBrush(isSelected ? brightBrush : mediumBrush);
         double value = 0.;
-        if(!commodity.empty())
+        if(!commodity.isEmpty())
             value = mapData.MapPrice(commodity, it.second.Trade(commodity)) * 2. - 1.;
-        else if(!government.empty())
+        else if(!government.isEmpty())
             value = (it.second.Government() == government);
         // Set the link color based on the "value".
         QBrush brush(MapColor(value));
@@ -222,7 +222,7 @@ void GalaxyView::paintEvent(QPaintEvent */*event*/)
         painter.drawEllipse(pos, 5, 5);
 
         painter.setPen(brightPen);
-        painter.drawText(pos + QPointF(5, 5), QString::fromStdString(it.first));
+        painter.drawText(pos + QPointF(5, 5), it.first);
     }
 
     painter.setPen(brightPen);

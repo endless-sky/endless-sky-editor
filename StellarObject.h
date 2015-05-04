@@ -16,6 +16,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include "DataNode.h"
 
 #include <QVector2D>
+#include <QString>
 
 
 
@@ -28,7 +29,7 @@ class StellarObject {
 public:
     // Some objects do not have sprites, because they are just an orbital
     // center for two or more other objects.
-    const std::string &Sprite() const;
+    const QString &Sprite() const;
     // Get this object's position on the date most recently passed to this
     // system's SetDate() function.
     const QVector2D &Position() const;
@@ -37,18 +38,17 @@ public:
     // If it is possible to land on this planet, this returns the Planet
     // objects that gives more information about it. Otherwise, this
     // function will just return nullptr.
-    const std::string &GetPlanet() const;
+    const QString &GetPlanet() const;
 
     // Get the index of the parent object.
     int Parent() const;
 
 
 private:
-    std::string sprite;
-    DataNode animation;
+    QString sprite;
 
     QVector2D position;
-    std::string planet;
+    QString planet;
 
     double distance = 0.;
     double period = 0.;
