@@ -36,17 +36,34 @@ signals:
 
 public slots:
     void NameChanged();
+    void AttributesChanged();
     void DescriptionChanged();
     void SpaceportDescriptionChanged();
+    void ShipyardChanged();
+    void OutfitterChanged();
+    void ReputationChanged();
+    void BribeChanged();
+    void SecurityChanged();
+
+private:
+    static QString ToString(const std::vector<QString> &list);
+    static std::vector<QString> ToList(const QString &str);
+
 
 private:
     Map &mapData;
     StellarObject *object = nullptr;
 
     QLineEdit *name;
+    QLineEdit *attributes;
     LandscapeView *landscape;
     QPlainTextEdit *description;
     QPlainTextEdit *spaceport;
+    QLineEdit *shipyard;
+    QLineEdit *outfitter;
+    QLineEdit *reputation;
+    QLineEdit *bribe;
+    QLineEdit *security;
 };
 
 #endif // PLANETVIEW_H

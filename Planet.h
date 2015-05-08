@@ -74,6 +74,12 @@ public:
     void SetLandscape(const QString &sprite);
     void SetDescription(const QString &text);
     void SetSpaceportDescription(const QString &text);
+    std::vector<QString> &Attributes();
+    std::vector<QString> &Shipyard();
+    std::vector<QString> &Outfitter();
+    void SetRequiredReputation(double value);
+    void SetBribe(double value);
+    void SetSecurity(double value);
 
 
 private:

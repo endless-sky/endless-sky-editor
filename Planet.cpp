@@ -249,3 +249,45 @@ void Planet::SetSpaceportDescription(const QString &text)
 {
     spaceport = text;
 }
+
+
+
+vector<QString> &Planet::Attributes()
+{
+    return attributes;
+}
+
+
+
+vector<QString> &Planet::Shipyard()
+{
+    return shipyard;
+}
+
+
+
+vector<QString> &Planet::Outfitter()
+{
+    return outfitter;
+}
+
+
+
+void Planet::SetRequiredReputation(double value)
+{
+    requiredReputation = value;
+}
+
+
+
+void Planet::SetBribe(double value)
+{
+    bribe = value;
+}
+
+
+
+void Planet::SetSecurity(double value)
+{
+    security = value;
+}
