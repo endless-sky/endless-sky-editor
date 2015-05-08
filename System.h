@@ -54,6 +54,10 @@ public:
     const std::vector<StellarObject> &Objects() const;
     // Get the habitable zone's center.
     double HabitableZone() const;
+    // Get the radius of the zone occupied by the given stellar object. This
+    // zone includes the object and anything that orbits around it. If this
+    // object is in orbit around something else, this function returns 0.
+    double OccupiedRadius(const StellarObject &object);
 
     // Get the specification of how many asteroids of each type there are.
     const std::vector<Asteroid> &Asteroids() const;

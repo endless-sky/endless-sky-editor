@@ -170,6 +170,10 @@ void MainWindow::CreateMenus()
     addStation->setShortcut(QKeySequence("S"));
     QAction *deleteObject = systemMenu->addAction("Delete Object");
     deleteObject->setShortcut(QKeySequence("X"));
+    systemMenu->addSeparator();
+    QAction *pause = systemMenu->addAction("Pause/Unpause");
+    connect(pause, SIGNAL(triggered()), systemView, SLOT(Pause()));
+    pause->setShortcut(QKeySequence(Qt::Key_Space));
 
     // Activate only the menu for the current tab.
     TabChanged(0);

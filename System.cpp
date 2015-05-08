@@ -131,6 +131,26 @@ double System::HabitableZone() const
 
 
 
+// Get the radius of the zone occupied by the given stellar object. This
+// zone includes the object and anything that orbits around it. If this
+// object is in orbit around something else, this function returns 0.
+double System::OccupiedRadius(const StellarObject &object)
+{
+    // Make sure the object is part of this system and is a primary object.
+    if(&object < &objects.front() || &object > &objects.back() || object.Parent() >= 0)
+        return 0.;
+
+    double radius = object.Radius();
+    int index = &object - &objects.front();
+    for(const StellarObject &other : objects)
+        if(other.Parent() == index)
+            radius = max(radius, other.Distance() + other.Radius());
+
+    return radius;
+}
+
+
+
 // Get the specification of how many asteroids of each type there are.
 const vector<System::Asteroid> &System::Asteroids() const
 {

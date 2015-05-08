@@ -18,6 +18,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include "System.h"
 
 #include <QPainter>
+#include <QPainterPath>
 #include <QPalette>
 #include <QMouseEvent>
 #include <QTabWidget>
@@ -79,7 +80,7 @@ QSize SystemView::sizeHint() const
 
 void SystemView::step()
 {
-    if(tabs && tabs->currentWidget() != this)
+    if(isPaused || (tabs && tabs->currentWidget() != this))
         return;
 
     timeStep += .1;
@@ -87,6 +88,13 @@ void SystemView::step()
     if(system)
         system->SetDay(timeStep);
     update();
+}
+
+
+
+void SystemView::Pause()
+{
+    isPaused = !isPaused;
 }
 
 
@@ -101,6 +109,8 @@ void SystemView::mousePressEvent(QMouseEvent *event)
 void SystemView::mouseMoveEvent(QMouseEvent *event)
 {
     offset = QVector2D(event->pos()) - clickOff;
+    if(isPaused)
+        update();
 }
 
 
@@ -117,6 +127,9 @@ void SystemView::wheelEvent(QWheelEvent *event)
 
     // We want: point = origin * scale + offset + center.
     offset = point - origin * scale - center;
+
+    if(isPaused)
+        update();
 }
 
 
@@ -133,6 +146,26 @@ void SystemView::paintEvent(QPaintEvent */*event*/)
     painter.translate(.5 * width(), .5 * height());
     painter.translate(offset.x(), offset.y());
     painter.scale(scale, scale);
+
+    // Draw faint circles showing the region occupied by each planet.
+    painter.setPen(Qt::NoPen);
+    for(const StellarObject &object : system->Objects())
+    {
+        double radius = system->OccupiedRadius(object);
+        if(!radius)
+            continue;
+
+        QBrush brush(QColor(20, 20, 20));
+        painter.setBrush(brush);
+
+        QPainterPath outside;
+        outside.addEllipse(QPointF(), object.Distance() + radius, object.Distance() + radius);
+        QPainterPath inside;
+        outside.addEllipse(QPointF(), object.Distance() - radius, object.Distance() - radius);
+        QPainterPath ring = outside.subtracted(inside);
+
+        painter.drawPath(ring);
+    }
 
     // Draw circles indicating the center and edges of the habitable zone.
     {

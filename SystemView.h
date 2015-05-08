@@ -43,6 +43,7 @@ signals:
 
 public slots:
     void step();
+    void Pause();
 
 protected:
     virtual void mousePressEvent(QMouseEvent *event) override;
@@ -63,6 +64,7 @@ private:
     // Time:
     QTimer timer;
     double timeStep = 1000.;
+    bool isPaused = false;
 
     // Dragging:
     QVector2D clickOff;
