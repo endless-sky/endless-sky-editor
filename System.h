@@ -68,6 +68,8 @@ public:
     void SetDay(double day);
 
     // Modify the system:
+    void Init(const QString &name, const QVector2D &position);
+    void SetName(const QString &name);
     void SetPosition(const QVector2D &pos);
     void ToggleLink(System *other);
 

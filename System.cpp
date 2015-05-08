@@ -238,6 +238,23 @@ void System::SaveObject(DataWriter &file, const StellarObject &object) const
 
 
 
+void System::Init(const QString &name, const QVector2D &position)
+{
+    this->name = name;
+    this->position = position;
+
+    // TODO: initialize with random planets, asteroids, etc.
+}
+
+
+
+void System::SetName(const QString &name)
+{
+    this->name = name;
+}
+
+
+
 void System::SetPosition(const QVector2D &pos)
 {
     position = pos;

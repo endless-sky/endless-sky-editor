@@ -16,6 +16,8 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include "SpriteSet.h"
 #include "SystemView.h"
 
+#include <QInputDialog>
+#include <QMessageBox>
 #include <QPainter>
 #include <QPalette>
 #include <QMouseEvent>
@@ -95,6 +97,30 @@ void GalaxyView::SetGovernment(const QString &name)
 
 
 
+void GalaxyView::KeyPress(QKeyEvent *event)
+{
+    if(event->key() == Qt::Key_Delete || event->key() == Qt::Key_Backspace)
+    {
+        if(!systemView || !systemView->Selected())
+            return;
+
+        System *system = systemView->Selected();
+        QMessageBox::StandardButton button = QMessageBox::question(this, "Delete system",
+            "Are you sure you want to delete \"" + system->Name() + "\"?");
+        if(button == QMessageBox::Yes)
+        {
+            systemView->Select(nullptr);
+            while(!system->Links().empty())
+                system->ToggleLink(&mapData.Systems().find(system->Links().front())->second);
+
+            auto it = mapData.Systems().find(system->Name());
+            mapData.Systems().erase(it);
+        }
+    }
+}
+
+
+
 void GalaxyView::mousePressEvent(QMouseEvent *event)
 {
     clickOff = QVector2D(event->pos()) - offset;
@@ -109,7 +135,28 @@ void GalaxyView::mousePressEvent(QMouseEvent *event)
         }
 
     if(!dragSystem)
+    {
+        if(event->button() == Qt::RightButton)
+        {
+            QString text = QInputDialog::getText(this, "New system", "Name:");
+            if(!text.isEmpty())
+            {
+                auto it = mapData.Systems().find(text);
+                if(it != mapData.Systems().end())
+                    QMessageBox::warning(this, "Duplicate name",
+                        "A system named \"" + text + "\" already exists.");
+                else
+                {
+                    System &system = mapData.Systems()[text];
+                    system.Init(text, origin);
+                    if(systemView)
+                        systemView->Select(&system);
+                    update();
+                }
+            }
+        }
         return;
+    }
     if(event->button() == Qt::LeftButton)
     {
         dragTime.start();
@@ -167,7 +214,7 @@ void GalaxyView::mouseMoveEvent(QMouseEvent *event)
         if(dragTime.elapsed() < 1000 && distance.length() < 5.)
             return;
 
-        dragSystem->SetPosition(dragSystem->Position() + distance);
+        dragSystem->SetPosition(dragSystem->Position() + distance / scale);
         clickOff = QVector2D(event->pos());
     }
     update();

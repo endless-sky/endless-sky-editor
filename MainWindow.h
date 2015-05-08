@@ -20,6 +20,8 @@ class DetailView;
 class GalaxyView;
 class SystemView;
 
+class QTabWidget;
+
 
 
 class MainWindow : public QMainWindow
@@ -35,6 +37,9 @@ public slots:
     void Save();
     void Quit();
 
+protected:
+    virtual void keyPressEvent(QKeyEvent *event) override;
+
 private:
     void CreateMenus();
     void CreateWidgets();
@@ -43,6 +48,7 @@ private:
 private:
     Map &map;
 
+    QTabWidget *tabs;
     DetailView *detailView;
     GalaxyView *galaxyView;
     SystemView *systemView;

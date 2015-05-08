@@ -35,6 +35,7 @@ public:
     void SetSystemView(SystemView *view);
     void SetCommodity(const QString &name);
     void SetGovernment(const QString &name);
+    void KeyPress(QKeyEvent *event);
 
 signals:
 
