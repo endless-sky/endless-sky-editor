@@ -35,6 +35,8 @@ public:
     const QVector2D &Position() const;
     // Get this object's distance from its parent.
     double Distance() const;
+    // Get the number of days it takes for this object to complete one orbit.
+    double Period() const;
     // Get the radius of this planet, i.e. how close you must be to land.
     double Radius() const;
     // If it is possible to land on this planet, this returns the Planet

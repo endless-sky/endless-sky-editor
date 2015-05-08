@@ -196,6 +196,14 @@ double StellarObject::Distance() const
 
 
 
+// Get the number of days it takes for this object to complete one orbit.
+double StellarObject::Period() const
+{
+    return period;
+}
+
+
+
 // Get the radius of this planet, i.e. how close you must be to land.
 double StellarObject::Radius() const
 {

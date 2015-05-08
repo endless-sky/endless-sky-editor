@@ -204,7 +204,7 @@ void SystemView::paintEvent(QPaintEvent */*event*/)
         if(sprite.width() && sprite.height())
         {
             QVector2D pos = object.Position();
-            double angle = pos.isNull() ? 0. : atan2(pos.x(), pos.y());
+            double angle = pos.isNull() ? (-2. * M_PI * timeStep / object.Period()) : atan2(pos.x(), pos.y());
             angle *= 180. / M_PI;
             angle += 180.;
 
