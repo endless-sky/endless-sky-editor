@@ -158,6 +158,8 @@ void GalaxyView::mousePressEvent(QMouseEvent *event)
                 {
                     System &system = mapData.Systems()[text];
                     system.Init(text, origin);
+                    for(const Map::Commodity &commodity : mapData.Commodities())
+                        system.SetTrade(commodity.name, (commodity.low + commodity.high) / 2);
                     if(systemView)
                         systemView->Select(&system);
                     update();
@@ -286,12 +288,12 @@ void GalaxyView::paintEvent(QPaintEvent */*event*/)
             if(!commodity.isEmpty())
             {
                 int difference = abs(it.second.Trade(commodity) - lit->second.Trade(commodity));
-                value = (difference - 50) / 50.;
+                value = (difference - 60) / 60.;
             }
             else if(!government.isEmpty())
                 value = (it.second.Government() != lit->second.Government());
             // Set the link color based on the "value".
-            QPen pen(MapGrey(value));
+            QPen pen(value < 1. ? MapGrey(value) : QColor(255, 0, 0));
             painter.setPen(pen);
             painter.drawLine(pos, lit->second.Position().toPointF());
         }

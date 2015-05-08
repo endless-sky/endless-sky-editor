@@ -79,6 +79,7 @@ public:
     void SetGovernment(const QString &gov);
     void ToggleLink(System *other);
     void ChangeLink(const QString &from, const QString &to);
+    void SetTrade(const QString &commodity, int value);
 
 
 private:

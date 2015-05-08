@@ -25,6 +25,16 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 using namespace std;
 
+namespace {
+    static const QString LEVEL[] = {
+                "(very low)",
+                "(low)",
+                "(medium)",
+                "(high)",
+                "(very high)"
+            };
+}
+
 
 
 DetailView::DetailView(Map &mapData, GalaxyView *galaxyView, QWidget *parent) :
@@ -56,10 +66,11 @@ DetailView::DetailView(Map &mapData, GalaxyView *galaxyView, QWidget *parent) :
         item->setText(0, it.name);
         item->setText(1, QString::number((it.low + it.high) / 2));
         item->setText(2, "medium");
-        //item->setFlags(Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
         trade.append(item);
         connect(tradeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
             this, SLOT(CommodityClicked(QTreeWidgetItem *, int)));
+        connect(tradeWidget, SIGNAL(itemChanged(QTreeWidgetItem*,int)),
+            this, SLOT(CommodityChanged(QTreeWidgetItem *, int)));
     }
     tradeWidget->setColumnWidth(1, 50);
     tradeWidget->insertTopLevelItems(0, trade);
@@ -84,13 +95,6 @@ void DetailView::SetSystem(System *system)
         QList<QTreeWidgetItem *>::iterator item = trade.begin();
         for(const auto &it : mapData.Commodities())
         {
-            static const QString LEVEL[] = {
-                "(very low)",
-                "(low)",
-                "(medium)",
-                "(high)",
-                "(very high)"
-            };
             int price = system->Trade(it.name);
             int level = max(0, min(4, ((price - it.low) * 5) / (it.high - it.low)));
             (*item)->setText(1, QString::number(price));
@@ -117,12 +121,32 @@ bool DetailView::eventFilter(QObject* object, QEvent* event)
 
 
 
-void DetailView::CommodityClicked(QTreeWidgetItem *item, int /*column*/)
+void DetailView::CommodityClicked(QTreeWidgetItem *item, int column)
 {
     if(galaxyView)
-    {
         galaxyView->SetCommodity(item->text(0));
-    }
+
+    if(column == 1)
+        item->setFlags(item->flags() | Qt::ItemIsEditable);
+    else
+        item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+}
+
+
+
+void DetailView::CommodityChanged(QTreeWidgetItem *item, int column)
+{
+    if(system && column == 1)
+        for(const auto &it : mapData.Commodities())
+            if(it.name == item->text(0))
+            {
+                int price = item->text(1).toInt();
+                system->SetTrade(it.name, price);
+                int level = max(0, min(4, ((price - it.low) * 5) / (it.high - it.low)));
+                item->setText(2, LEVEL[level]);
+                galaxyView->update();
+                break;
+            }
 }
 
 

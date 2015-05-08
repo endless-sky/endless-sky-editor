@@ -326,3 +326,10 @@ void System::ChangeLink(const QString &from, const QString &to)
     if(it != links.end())
         *it = to;
 }
+
+
+
+void System::SetTrade(const QString &commodity, int value)
+{
+    trade[commodity] = value;
+}
