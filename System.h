@@ -67,6 +67,10 @@ public:
     // Position the planets, etc.
     void SetDay(double day);
 
+    // Modify the system:
+    void SetPosition(const QVector2D &pos);
+    void ToggleLink(System *other);
+
 
 private:
     void LoadObject(const DataNode &node, int parent = -1);

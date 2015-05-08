@@ -16,8 +16,10 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include <QWidget>
 
 #include <QVector2D>
+#include <QElapsedTimer>
 
 class Map;
+class System;
 class SystemView;
 
 class QTabWidget;
@@ -61,6 +63,8 @@ private:
 
     // Dragging:
     QVector2D clickOff;
+    System *dragSystem = nullptr;
+    QElapsedTimer dragTime;
 
     // Color systems by:
     QString commodity;

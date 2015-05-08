@@ -99,22 +99,45 @@ void GalaxyView::mousePressEvent(QMouseEvent *event)
 {
     clickOff = QVector2D(event->pos()) - offset;
 
-    if(!systemView)
-        return;
+    dragSystem = nullptr;
     QVector2D origin = MapPoint(event->pos());
     for(auto &it : mapData.Systems())
         if(origin.distanceToPoint(it.second.Position()) < 10.)
         {
-            systemView->Select(&it.second);
-            update();
-            return;
+            dragSystem = &it.second;
+            break;
         }
+
+    if(!dragSystem)
+        return;
+    if(event->button() == Qt::LeftButton)
+    {
+        dragTime.start();
+        clickOff = QVector2D(event->pos());
+        if(systemView)
+        {
+            systemView->Select(dragSystem);
+            update();
+        }
+    }
+    else if(event->button() == Qt::RightButton)
+    {
+        if(systemView && systemView->Selected())
+        {
+            systemView->Selected()->ToggleLink(dragSystem);
+            update();
+        }
+        dragSystem = nullptr;
+    }
 }
 
 
 
 void GalaxyView::mouseDoubleClickEvent(QMouseEvent *event)
 {
+    if(event->button() != Qt::LeftButton)
+        return;
+
     clickOff = QVector2D(event->pos()) - offset;
     if(!tabs || !systemView)
         return;
@@ -133,7 +156,20 @@ void GalaxyView::mouseDoubleClickEvent(QMouseEvent *event)
 
 void GalaxyView::mouseMoveEvent(QMouseEvent *event)
 {
-    offset = QVector2D(event->pos()) - clickOff;
+    if(!(event->buttons() & Qt::LeftButton))
+        return;
+
+    QVector2D distance = QVector2D(event->pos()) - clickOff;
+    if(!dragSystem)
+        offset = distance;
+    else
+    {
+        if(dragTime.elapsed() < 1000 && distance.length() < 5.)
+            return;
+
+        dragSystem->SetPosition(dragSystem->Position() + distance);
+        clickOff = QVector2D(event->pos());
+    }
     update();
 }
 

@@ -16,6 +16,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include "DataWriter.h"
 #include "Planet.h"
 
+#include <algorithm>
 #include <limits>
 
 using namespace std;
@@ -233,4 +234,34 @@ void System::SaveObject(DataWriter &file, const StellarObject &object) const
     file.EndChild();
     while(level--)
         file.EndChild();
+}
+
+
+
+void System::SetPosition(const QVector2D &pos)
+{
+    position = pos;
+}
+
+
+
+void System::ToggleLink(System *other)
+{
+    if(!other || other == this)
+        return;
+
+    auto it = find(links.begin(), links.end(), other->name);
+    auto oit = find(other->links.begin(), other->links.end(), name);
+    if(it == links.end())
+    {
+        links.push_back(other->name);
+        if(oit == other->links.end())
+            other->links.push_back(name);
+    }
+    else
+    {
+        links.erase(it);
+        if(oit != other->links.end())
+            other->links.erase(oit);
+    }
 }
