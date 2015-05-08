@@ -56,16 +56,22 @@ LandscapeView::~LandscapeView()
 void LandscapeView::SetPlanet(Planet *planet)
 {
     this->planet = planet;
-    showGallery = planet && planet->Landscape().isEmpty();
+    if(planet)
+        landscape = planet->Landscape();
+    showGallery = !planet || planet->Landscape().isEmpty();
+}
+
+
+
+const QString &LandscapeView::Landscape() const
+{
+    return planet ? planet->Landscape() : landscape;
 }
 
 
 
 void LandscapeView::mousePressEvent(QMouseEvent *event)
 {
-    if(!planet)
-        return;
-
     showGallery = !showGallery;
     if(!showGallery)
     {
@@ -79,7 +85,11 @@ void LandscapeView::mousePressEvent(QMouseEvent *event)
         {
             unsigned index = x / thumbWidth + cols * (y / thumbHeight);
             if(index < loader.Available().size())
-                planet->SetLandscape(loader.Available()[index]);
+            {
+                landscape = loader.Available()[index];
+                if(planet)
+                    planet->SetLandscape(landscape);
+            }
         }
     }
     update();
@@ -90,18 +100,16 @@ void LandscapeView::mousePressEvent(QMouseEvent *event)
 void LandscapeView::paintEvent(QPaintEvent */*event*/)
 {
     loader.Update();
-    if(!planet)
-        return;
 
     QPainter painter(this);
     painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
 
     if(!showGallery)
     {
-        if(planet->Landscape().isEmpty())
+        if(landscape.isEmpty())
             return;
 
-        QPixmap image = SpriteSet::Get(planet->Landscape());
+        QPixmap image = SpriteSet::Get(landscape);
         if(image.isNull())
             return;
 

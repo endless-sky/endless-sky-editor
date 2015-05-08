@@ -18,7 +18,8 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 #include <QLabel>
 #include <QLineEdit>
-#include <QTextEdit>
+#include <QMessageBox>
+#include <QPlainTextEdit>
 #include <QGridLayout>
 
 
@@ -27,13 +28,16 @@ PlanetView::PlanetView(Map &mapData, QWidget *parent) :
     QWidget(parent), mapData(mapData)
 {
     name = new QLineEdit;
+    connect(name, SIGNAL(editingFinished()), this, SLOT(NameChanged()));
     landscape = new LandscapeView(this);
     landscape->setMinimumHeight(360);
     landscape->setMaximumHeight(360);
-    description = new QTextEdit;
+    description = new QPlainTextEdit;
     description->setTabStopWidth(20);
-    spaceport = new QTextEdit;
+    connect(description, SIGNAL(textChanged()), this, SLOT(DescriptionChanged()));
+    spaceport = new QPlainTextEdit;
     spaceport->setTabStopWidth(20);
+    connect(spaceport, SIGNAL(textChanged()), this, SLOT(SpaceportDescriptionChanged()));
 
     QGridLayout *layout = new QGridLayout;
     layout->addWidget(new QLabel("Planet:"), 0, 0);
@@ -67,7 +71,46 @@ void PlanetView::SetPlanet(StellarObject *object)
     {
         name->setText(it->second.Name());
         landscape->SetPlanet(&it->second);
-        description->setText(it->second.Description());
-        spaceport->setText(it->second.SpaceportDescription());
+        description->setPlainText(it->second.Description());
+        spaceport->setPlainText(it->second.SpaceportDescription());
     }
+}
+
+
+
+void PlanetView::NameChanged()
+{
+    if(!object || object->GetPlanet() == name->text() || name->text().isEmpty())
+        return;
+
+    auto it = mapData.Planets().find(name->text());
+    if(it != mapData.Planets().end())
+    {
+        QMessageBox::warning(this, "Duplicate name",
+            "A planet named \"" + name->text() + "\" already exists.");
+    }
+    else
+    {
+        mapData.RenamePlanet(object, name->text());
+        Planet &planet = mapData.Planets()[name->text()];
+        planet.SetLandscape(landscape->Landscape());
+        planet.SetDescription(description->toPlainText());
+        planet.SetSpaceportDescription(spaceport->toPlainText());
+    }
+}
+
+
+
+void PlanetView::DescriptionChanged()
+{
+    if(object && !object->GetPlanet().isEmpty())
+        mapData.Planets()[object->GetPlanet()].SetDescription(description->toPlainText());
+}
+
+
+
+void PlanetView::SpaceportDescriptionChanged()
+{
+    if(object && !object->GetPlanet().isEmpty())
+        mapData.Planets()[object->GetPlanet()].SetSpaceportDescription(spaceport->toPlainText());
 }

@@ -63,6 +63,9 @@ public:
     // Check if this is a star.
     bool IsStar() const;
 
+    // Editing a stellar object:
+    void SetPlanet(const QString &name);
+
 
 private:
     static StellarObject Planet(int minRadius, int maxRadius = 1000, bool skipHabitable = false);

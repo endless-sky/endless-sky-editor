@@ -16,7 +16,6 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include "DataWriter.h"
 
 #include <algorithm>
-#include <limits>
 
 using namespace std;
 
@@ -28,11 +27,6 @@ void Planet::Load(const DataNode &node)
     if(node.Size() < 2)
         return;
     name = node.Token(1);
-
-    // Use NaN to mark optional fields.
-    requiredReputation = numeric_limits<double>::quiet_NaN();
-    bribe = numeric_limits<double>::quiet_NaN();
-    security = numeric_limits<double>::quiet_NaN();
 
     for(const DataNode &child : node)
     {
@@ -230,7 +224,28 @@ double Planet::Security() const
 
 
 
+void Planet::SetName(const QString &name)
+{
+    this->name = name;
+}
+
+
+
 void Planet::SetLandscape(const QString &sprite)
 {
     landscape = sprite;
+}
+
+
+
+void Planet::SetDescription(const QString &text)
+{
+    description = text;
+}
+
+
+
+void Planet::SetSpaceportDescription(const QString &text)
+{
+    spaceport = text;
 }

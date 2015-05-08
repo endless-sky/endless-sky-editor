@@ -27,6 +27,7 @@ public:
     ~LandscapeView();
 
     void SetPlanet(Planet *planet);
+    const QString &Landscape() const;
 
 signals:
 
@@ -39,6 +40,7 @@ protected:
 private:
     Planet *planet = nullptr;
     bool showGallery = false;
+    QString landscape;
 };
 
 #endif // LANDSCAPEVIEW_H

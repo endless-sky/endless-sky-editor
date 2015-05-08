@@ -15,6 +15,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 #include <QString>
 
+#include <limits>
 #include <list>
 #include <vector>
 
@@ -69,7 +70,10 @@ public:
     double Security() const;
 
     // Editing a planet:
+    void SetName(const QString &name);
     void SetLandscape(const QString &sprite);
+    void SetDescription(const QString &text);
+    void SetSpaceportDescription(const QString &text);
 
 
 private:
@@ -83,9 +87,9 @@ private:
     std::vector<QString> shipyard;
     std::vector<QString> outfitter;
 
-    double requiredReputation;
-    double bribe;
-    double security;
+    double requiredReputation = std::numeric_limits<double>::quiet_NaN();
+    double bribe = std::numeric_limits<double>::quiet_NaN();
+    double security = std::numeric_limits<double>::quiet_NaN();
 
     std::list<DataNode> unparsed;
 };

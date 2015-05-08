@@ -16,7 +16,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include <QWidget>
 
 class QLineEdit;
-class QTextEdit;
+class QPlainTextEdit;
 
 class LandscapeView;
 class Map;
@@ -35,6 +35,9 @@ public:
 signals:
 
 public slots:
+    void NameChanged();
+    void DescriptionChanged();
+    void SpaceportDescriptionChanged();
 
 private:
     Map &mapData;
@@ -42,8 +45,8 @@ private:
 
     QLineEdit *name;
     LandscapeView *landscape;
-    QTextEdit *description;
-    QTextEdit *spaceport;
+    QPlainTextEdit *description;
+    QPlainTextEdit *spaceport;
 };
 
 #endif // PLANETVIEW_H

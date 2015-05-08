@@ -177,3 +177,20 @@ void Map::RenameSystem(const QString &from, const QString &to)
     }
     systems.erase(it);
 }
+
+
+
+void Map::RenamePlanet(StellarObject *object, const QString &name)
+{
+    if(!object || systems.find(name) != systems.end())
+        return;
+
+    auto it = planets.find(object->GetPlanet());
+    if(it != planets.end())
+    {
+        planets[name] = it->second;
+        planets.erase(it);
+    }
+    planets[name].SetName(name);
+    object->SetPlanet(name);
+}

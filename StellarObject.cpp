@@ -323,6 +323,13 @@ bool StellarObject::IsStar() const
 
 
 
+void StellarObject::SetPlanet(const QString &name)
+{
+    planet = name;
+}
+
+
+
 StellarObject StellarObject::Planet(int minRadius, int maxRadius, bool skipHabitable)
 {
     int count = 0;

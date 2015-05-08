@@ -22,6 +22,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include <string>
 
 class DataNode;
+class StellarObject;
 
 
 
@@ -49,6 +50,7 @@ public:
     // Rename a system. This involves changing all the systems that link to it
     // and moving it to a new place in the map.
     void RenameSystem(const QString &from, const QString &to);
+    void RenamePlanet(StellarObject *object, const QString &name);
 
 
 private:
