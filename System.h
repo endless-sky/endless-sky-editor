@@ -71,7 +71,9 @@ public:
     void Init(const QString &name, const QVector2D &position);
     void SetName(const QString &name);
     void SetPosition(const QVector2D &pos);
+    void SetGovernment(const QString &gov);
     void ToggleLink(System *other);
+    void ChangeLink(const QString &from, const QString &to);
 
 
 private:

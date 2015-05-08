@@ -262,6 +262,13 @@ void System::SetPosition(const QVector2D &pos)
 
 
 
+void System::SetGovernment(const QString &gov)
+{
+    government = gov;
+}
+
+
+
 void System::ToggleLink(System *other)
 {
     if(!other || other == this)
@@ -281,4 +288,13 @@ void System::ToggleLink(System *other)
         if(oit != other->links.end())
             other->links.erase(oit);
     }
+}
+
+
+
+void System::ChangeLink(const QString &from, const QString &to)
+{
+    auto it = find(links.begin(), links.end(), from);
+    if(it != links.end())
+        *it = to;
 }

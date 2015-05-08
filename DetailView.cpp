@@ -17,10 +17,11 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include "System.h"
 
 #include <QEvent>
-#include <QVBoxLayout>
+#include <QMessageBox>
 #include <QLabel>
 #include <QLineEdit>
 #include <QTreeWidget>
+#include <QVBoxLayout>
 
 using namespace std;
 
@@ -30,7 +31,9 @@ DetailView::DetailView(Map &mapData, GalaxyView *galaxyView, QWidget *parent) :
     QWidget(parent), mapData(mapData), galaxyView(galaxyView)
 {
     name = new QLineEdit;
+    connect(name, SIGNAL(editingFinished()), this, SLOT(NameChanged()));
     government = new QLineEdit;
+    connect(government, SIGNAL(editingFinished()), this, SLOT(GovernmentChanged()));
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(new QLabel("System Name:"));
@@ -120,4 +123,35 @@ void DetailView::CommodityClicked(QTreeWidgetItem *item, int /*column*/)
     {
         galaxyView->SetCommodity(item->text(0));
     }
+}
+
+
+
+void DetailView::NameChanged()
+{
+    if(!system || system->Name() == name->text() || name->text().isEmpty())
+        return;
+
+    auto it = mapData.Systems().find(name->text());
+    if(it != mapData.Systems().end())
+    {
+        QMessageBox::warning(this, "Duplicate name",
+            "A system named \"" + name->text() + "\" already exists.");
+    }
+    else
+    {
+        mapData.RenameSystem(system->Name(), name->text());
+        galaxyView->update();
+    }
+}
+
+
+
+void DetailView::GovernmentChanged()
+{
+    if(!system || system->Government() == government->text() || government->text().isEmpty())
+        return;
+
+    system->SetGovernment(government->text());
+    galaxyView->SetGovernment(government->text());
 }

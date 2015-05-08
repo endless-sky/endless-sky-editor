@@ -39,6 +39,8 @@ signals:
 
 public slots:
     void CommodityClicked(QTreeWidgetItem *item, int column);
+    void NameChanged();
+    void GovernmentChanged();
 
 private:
 

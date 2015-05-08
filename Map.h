@@ -46,6 +46,10 @@ public:
     // Map a price to a value between 0 and 1 (lowest vs. highest).
     double MapPrice(QString &commodity, int price) const;
 
+    // Rename a system. This involves changing all the systems that link to it
+    // and moving it to a new place in the map.
+    void RenameSystem(const QString &from, const QString &to);
+
 
 private:
     QString dataDirectory;

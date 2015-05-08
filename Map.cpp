@@ -156,3 +156,24 @@ double Map::MapPrice(QString &commodity, int price) const
 
     return .5;
 }
+
+
+
+// Rename a system. This involves changing all the systems that link to it
+// and moving it to a new place in the map.
+void Map::RenameSystem(const QString &from, const QString &to)
+{
+    auto it = systems.find(from);
+    if(it == systems.end() || systems.find(to) != systems.end())
+        return;
+
+    System &renamed = systems[to] = it->second;
+    renamed.SetName(to);
+    for(const QString &link : it->second.Links())
+    {
+        auto oit = systems.find(link);
+        if(oit != systems.end())
+            oit->second.ChangeLink(from, to);
+    }
+    systems.erase(it);
+}
