@@ -15,6 +15,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include "Planet.h"
 
 #include <algorithm>
+#include <cstdint>
 #include <map>
 #include <string>
 
@@ -187,6 +188,14 @@ const QVector2D &StellarObject::Position() const
 
 
 
+// Get this object's distance from its parent.
+double StellarObject::Distance() const
+{
+    return distance;
+}
+
+
+
 // Get the radius of this planet, i.e. how close you must be to land.
 double StellarObject::Radius() const
 {
@@ -210,4 +219,122 @@ const QString &StellarObject::GetPlanet() const
 int StellarObject::Parent() const
 {
     return parent;
+}
+
+
+
+// Get a random star, based on a probability distribution of stars.
+StellarObject StellarObject::Star()
+{
+    int r = rand() % 100;
+    auto it = INFO.lower_bound("star");
+    while(it != INFO.end() && r >= it->second.info)
+    {
+        r -= it->second.info;
+        ++it;
+    }
+
+    // This should never happen, because the weights add up to 100. But, just
+    // for the sake of defensive programming:
+    if(it == INFO.end())
+        it = INFO.find("star/wr");
+
+    StellarObject object;
+    object.sprite = it->first;
+    return object;
+}
+
+
+
+// Get a random "moon." It may also be used as a stand-alone planet.
+StellarObject StellarObject::Moon()
+{
+    return Planet(0, 50);
+}
+
+
+
+// Get a random (non-giant) planet. It may or may not be habitable.
+StellarObject StellarObject::Planet()
+{
+    return Planet(50, 120);
+}
+
+
+
+// Get a random planet that can exist outside the habitable zone.
+StellarObject StellarObject::Uninhabited()
+{
+    return Planet(50, 120, true);
+}
+
+
+
+// Get a random gas giant.
+StellarObject StellarObject::Giant()
+{
+    return Planet(120);
+}
+
+
+
+// Get a random station.
+StellarObject StellarObject::Station()
+{
+    static int count = 0;
+    if(!count)
+    {
+        // Skip stars and anything bigger than a radius of 50 pixels.
+        for(const auto &it : INFO)
+            if(it.second.info == 4 && it.first[0] == 'p')
+                ++count;
+    }
+
+    StellarObject object;
+    int r = rand() % count;
+    for(const auto &it : INFO)
+        if(it.second.info == 4 && it.first[0] == 'p')
+        {
+            if(!r)
+            {
+                object.sprite = it.first;
+                break;
+            }
+            --r;
+        }
+    return object;
+}
+
+
+
+// Check if this is a star.
+bool StellarObject::IsStar() const
+{
+    return sprite.startsWith("star");
+}
+
+
+
+StellarObject StellarObject::Planet(int minRadius, int maxRadius, bool skipHabitable)
+{
+    int count = 0;
+    for(const auto &it : INFO)
+        if(it.second.radius >= minRadius && it.second.radius < maxRadius)
+            if(it.first[0] == 'p' && !(skipHabitable && it.second.info))
+                ++count;
+
+    StellarObject object;
+    int r = rand() % count;
+    for(const auto &it : INFO)
+        if(it.second.radius >= minRadius && it.second.radius < maxRadius)
+            if(it.first[0] == 'p' && !(skipHabitable && it.second.info))
+            {
+                if(!r)
+                {
+                    object.sprite = it.first;
+                    break;
+                }
+                --r;
+            }
+    return object;
 }

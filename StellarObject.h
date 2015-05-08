@@ -33,6 +33,8 @@ public:
     // Get this object's position on the date most recently passed to this
     // system's SetDate() function.
     const QVector2D &Position() const;
+    // Get this object's distance from its parent.
+    double Distance() const;
     // Get the radius of this planet, i.e. how close you must be to land.
     double Radius() const;
     // If it is possible to land on this planet, this returns the Planet
@@ -42,6 +44,26 @@ public:
 
     // Get the index of the parent object.
     int Parent() const;
+
+    // Get a random star, based on a probability distribution of stars.
+    static StellarObject Star();
+    // Get a random "moon." It may also be used as a stand-alone planet.
+    static StellarObject Moon();
+    // Get a random (non-giant) planet. It may or may not be habitable.
+    static StellarObject Planet();
+    // Get a random planet that can exist outside the habitable zone.
+    static StellarObject Uninhabited();
+    // Get a random gas giant.
+    static StellarObject Giant();
+    // Get a random station.
+    static StellarObject Station();
+
+    // Check if this is a star.
+    bool IsStar() const;
+
+
+private:
+    static StellarObject Planet(int minRadius, int maxRadius = 1000, bool skipHabitable = false);
 
 
 private:
