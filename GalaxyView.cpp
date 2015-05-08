@@ -251,11 +251,9 @@ void GalaxyView::wheelEvent(QWheelEvent *event)
 
 void GalaxyView::paintEvent(QPaintEvent */*event*/)
 {
-    QPen mediumPen(QColor(80, 80, 80));
-    QPen brightPen(QColor(160, 160, 160));
-
-    QBrush mediumBrush(QColor(160, 160, 160));
-    QBrush brightBrush(QColor(240, 240, 240));
+    QPen blackPen;
+    QPen mediumPen(QColor(120, 120, 120));
+    QPen brightPen(QColor(180, 180, 180));
 
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
@@ -273,7 +271,6 @@ void GalaxyView::paintEvent(QPaintEvent */*event*/)
         painter.drawPixmap(pos, sprite);
     }
 
-    painter.setPen(mediumPen);
     painter.setBrush(Qt::NoBrush);
     for(const auto &it : mapData.Systems())
     {
@@ -302,24 +299,27 @@ void GalaxyView::paintEvent(QPaintEvent */*event*/)
     for(const auto &it : mapData.Systems())
     {
         QPointF pos = it.second.Position().toPointF();
-        painter.setPen(Qt::NoPen);
-        //bool isSelected = (systemView && &it.second == systemView->Selected());
-        //painter.setBrush(isSelected ? brightBrush : mediumBrush);
+        bool isSelected = (systemView && &it.second == systemView->Selected());
         double value = 0.;
         if(!commodity.isEmpty())
             value = mapData.MapPrice(commodity, it.second.Trade(commodity)) * 2. - 1.;
         else if(!government.isEmpty())
             value = (it.second.Government() == government);
         // Set the link color based on the "value".
-        QBrush brush(MapColor(value));
+        QColor color = MapColor(value);
+        if(isSelected)
+            color.setRgbF(color.redF() * 1.5, color.greenF() * 1.5, color.blueF() * 1.5);
+        QBrush brush(color);
         painter.setBrush(brush);
+        painter.setPen(blackPen);
         painter.drawEllipse(pos, 5, 5);
 
+        painter.drawText(pos + QPointF(6, 6), it.first);
         painter.setPen(brightPen);
         painter.drawText(pos + QPointF(5, 5), it.first);
     }
 
-    painter.setPen(brightPen);
+    painter.setPen(mediumPen);
     painter.setBrush(Qt::NoBrush);
     if(systemView && systemView->Selected())
     {
