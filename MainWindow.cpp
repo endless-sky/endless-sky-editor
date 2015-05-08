@@ -34,8 +34,8 @@ using namespace std;
 MainWindow::MainWindow(Map &map, QWidget *parent)
     : QMainWindow(parent), map(map)
 {
-    CreateMenus();
     CreateWidgets();
+    CreateMenus();
 }
 
 MainWindow::~MainWindow()
@@ -78,6 +78,16 @@ void MainWindow::Quit()
 
 
 
+void MainWindow::TabChanged(int)
+{
+    if(tabs)
+    {
+        galaxyMenu->setEnabled(tabs->currentWidget() == galaxyView);
+    }
+}
+
+
+
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
     if(tabs)
@@ -85,19 +95,6 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         if(tabs->currentWidget() == galaxyView)
             galaxyView->KeyPress(event);
     }
-}
-
-
-
-void MainWindow::CreateMenus()
-{
-    QMenu *fileMenu = menuBar()->addMenu("File");
-    QAction *openAction = fileMenu->addAction("Open...", this, SLOT(Open()));
-    openAction->setShortcut(QKeySequence::Open);
-    QAction *saveAction = fileMenu->addAction("Save...", this, SLOT(Save()));
-    saveAction->setShortcut(QKeySequence::Save);
-    QAction *quitAction = fileMenu->addAction("Quit", this, SLOT(Quit()));
-    quitAction->setShortcut(QKeySequence::Quit);
 }
 
 
@@ -129,4 +126,24 @@ void MainWindow::CreateWidgets()
     tabs->addTab(galaxyView, "Galaxy");
     tabs->addTab(systemView, "System");
     layout->addWidget(tabs);
+
+    connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(TabChanged(int)));
+}
+
+
+
+void MainWindow::CreateMenus()
+{
+    QMenu *fileMenu = menuBar()->addMenu("File");
+    QAction *openAction = fileMenu->addAction("Open...", this, SLOT(Open()));
+    openAction->setShortcut(QKeySequence::Open);
+    QAction *saveAction = fileMenu->addAction("Save...", this, SLOT(Save()));
+    saveAction->setShortcut(QKeySequence::Save);
+    QAction *quitAction = fileMenu->addAction("Quit", this, SLOT(Quit()));
+    quitAction->setShortcut(QKeySequence::Quit);
+
+    galaxyMenu = menuBar()->addMenu("Galaxy");
+    QAction *deleteSystemAction = galaxyMenu->addAction("Delete");
+    connect(deleteSystemAction, SIGNAL(triggered()), galaxyView, SLOT(DeleteSystem()));
+    deleteSystemAction->setShortcut(QKeySequence("X"));
 }

@@ -20,6 +20,7 @@ class DetailView;
 class GalaxyView;
 class SystemView;
 
+class QMenu;
 class QTabWidget;
 
 
@@ -37,12 +38,14 @@ public slots:
     void Save();
     void Quit();
 
+    void TabChanged(int);
+
 protected:
     virtual void keyPressEvent(QKeyEvent *event) override;
 
 private:
-    void CreateMenus();
     void CreateWidgets();
+    void CreateMenus();
 
 
 private:
@@ -52,6 +55,8 @@ private:
     DetailView *detailView;
     GalaxyView *galaxyView;
     SystemView *systemView;
+
+    QMenu *galaxyMenu;
 };
 
 #endif // MAINWINDOW_H

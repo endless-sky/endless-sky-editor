@@ -100,22 +100,27 @@ void GalaxyView::SetGovernment(const QString &name)
 void GalaxyView::KeyPress(QKeyEvent *event)
 {
     if(event->key() == Qt::Key_Delete || event->key() == Qt::Key_Backspace)
+        DeleteSystem();
+}
+
+
+
+void GalaxyView::DeleteSystem()
+{
+    if(!systemView || !systemView->Selected())
+        return;
+
+    System *system = systemView->Selected();
+    QMessageBox::StandardButton button = QMessageBox::question(this, "Delete system",
+        "Are you sure you want to delete \"" + system->Name() + "\"?");
+    if(button == QMessageBox::Yes)
     {
-        if(!systemView || !systemView->Selected())
-            return;
+        systemView->Select(nullptr);
+        while(!system->Links().empty())
+            system->ToggleLink(&mapData.Systems().find(system->Links().front())->second);
 
-        System *system = systemView->Selected();
-        QMessageBox::StandardButton button = QMessageBox::question(this, "Delete system",
-            "Are you sure you want to delete \"" + system->Name() + "\"?");
-        if(button == QMessageBox::Yes)
-        {
-            systemView->Select(nullptr);
-            while(!system->Links().empty())
-                system->ToggleLink(&mapData.Systems().find(system->Links().front())->second);
-
-            auto it = mapData.Systems().find(system->Name());
-            mapData.Systems().erase(it);
-        }
+        auto it = mapData.Systems().find(system->Name());
+        mapData.Systems().erase(it);
     }
 }
 

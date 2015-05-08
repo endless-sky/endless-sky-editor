@@ -40,6 +40,7 @@ public:
 signals:
 
 public slots:
+    void DeleteSystem();
 
 protected:
     virtual void mousePressEvent(QMouseEvent *event) override;
