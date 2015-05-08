@@ -83,6 +83,7 @@ void MainWindow::TabChanged(int)
     if(tabs)
     {
         galaxyMenu->setEnabled(tabs->currentWidget() == galaxyView);
+        systemMenu->setEnabled(tabs->currentWidget() == systemView);
     }
 }
 
@@ -139,11 +140,37 @@ void MainWindow::CreateMenus()
     openAction->setShortcut(QKeySequence::Open);
     QAction *saveAction = fileMenu->addAction("Save...", this, SLOT(Save()));
     saveAction->setShortcut(QKeySequence::Save);
+    fileMenu->addSeparator();
     QAction *quitAction = fileMenu->addAction("Quit", this, SLOT(Quit()));
     quitAction->setShortcut(QKeySequence::Quit);
 
     galaxyMenu = menuBar()->addMenu("Galaxy");
-    QAction *deleteSystemAction = galaxyMenu->addAction("Delete");
+    QAction *deleteSystemAction = galaxyMenu->addAction("Delete System");
     connect(deleteSystemAction, SIGNAL(triggered()), galaxyView, SLOT(DeleteSystem()));
     deleteSystemAction->setShortcut(QKeySequence("X"));
+
+    systemMenu = menuBar()->addMenu("System");
+    QAction *randomInhabited = systemMenu->addAction("Randomize (Inhabited)");
+    randomInhabited->setShortcut(QKeySequence("I"));
+    QAction *randomSystem = systemMenu->addAction("Randomize");
+    randomSystem->setShortcut(QKeySequence("R"));
+    QAction *randomUninhabited = systemMenu->addAction("Randomize (Uninhabited)");
+    randomUninhabited->setShortcut(QKeySequence("U"));
+    systemMenu->addSeparator();
+    QAction *changeAsteroids = systemMenu->addAction("Change Asteroids");
+    changeAsteroids->setShortcut(QKeySequence("A"));
+    systemMenu->addSeparator();
+    QAction *changeStar = systemMenu->addAction("Change Star");
+    changeStar->setShortcut(QKeySequence("C"));
+    QAction *addPlanet = systemMenu->addAction("Add/Change Planet");
+    addPlanet->setShortcut(QKeySequence("P"));
+    QAction *addMoon = systemMenu->addAction("Add/Change Moon");
+    addMoon->setShortcut(QKeySequence("M"));
+    QAction *addStation = systemMenu->addAction("Add/Change Station");
+    addStation->setShortcut(QKeySequence("S"));
+    QAction *deleteObject = systemMenu->addAction("Delete Object");
+    deleteObject->setShortcut(QKeySequence("X"));
+
+    // Activate only the menu for the current tab.
+    TabChanged(0);
 }

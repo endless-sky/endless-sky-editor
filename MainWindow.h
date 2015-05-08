@@ -51,12 +51,13 @@ private:
 private:
     Map &map;
 
-    QTabWidget *tabs;
-    DetailView *detailView;
-    GalaxyView *galaxyView;
-    SystemView *systemView;
+    QTabWidget *tabs = nullptr;
+    DetailView *detailView = nullptr;
+    GalaxyView *galaxyView = nullptr;
+    SystemView *systemView = nullptr;
 
-    QMenu *galaxyMenu;
+    QMenu *galaxyMenu = nullptr;
+    QMenu *systemMenu = nullptr;
 };
 
 #endif // MAINWINDOW_H
