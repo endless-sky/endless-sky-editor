@@ -1,4 +1,4 @@
-/* PlanetView.h
+/* LandscapeView.h
 Copyright (c) 2015 by Michael Zahniser
 
 Endless Sky is free software: you can redistribute it and/or modify it under the
@@ -10,40 +10,32 @@ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 */
 
-#ifndef PLANETVIEW_H
-#define PLANETVIEW_H
+#ifndef LANDSCAPEVIEW_H
+#define LANDSCAPEVIEW_H
 
 #include <QWidget>
 
-class QLineEdit;
-class QTextEdit;
-
-class LandscapeView;
-class Map;
-class StellarObject;
+class Planet;
 
 
 
-class PlanetView : public QWidget
+class LandscapeView : public QWidget
 {
     Q_OBJECT
 public:
-    explicit PlanetView(Map &mapData, QWidget *parent = 0);
+    explicit LandscapeView(QWidget *parent = 0);
 
-    void SetPlanet(StellarObject *object);
+    void SetPlanet(Planet *planet);
 
 signals:
 
 public slots:
 
-private:
-    Map &mapData;
-    StellarObject *object = nullptr;
+protected:
+    virtual void paintEvent(QPaintEvent *event) override;
 
-    QLineEdit *name;
-    LandscapeView *landscape;
-    QTextEdit *description;
-    QTextEdit *spaceport;
+private:
+    Planet *planet = nullptr;
 };
 
-#endif // PLANETVIEW_H
+#endif // LANDSCAPEVIEW_H

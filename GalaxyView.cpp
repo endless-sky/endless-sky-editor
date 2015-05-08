@@ -62,6 +62,10 @@ GalaxyView::GalaxyView(Map &mapData, QTabWidget *tabs, QWidget *parent) :
     QPalette p = palette();
     p.setColor(backgroundRole(), QColor(0, 0, 0));
     setPalette(p);
+
+    for(const auto &it : mapData.Systems())
+        offset -= it.second.Position();
+    offset /= mapData.Systems().size();
 }
 
 

@@ -12,6 +12,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 #include "PlanetView.h"
 
+#include "LandscapeView.h"
 #include "Map.h"
 #include "StellarObject.h"
 
@@ -26,15 +27,21 @@ PlanetView::PlanetView(Map &mapData, QWidget *parent) :
     QWidget(parent), mapData(mapData)
 {
     name = new QLineEdit;
+    landscape = new LandscapeView(this);
+    landscape->setMinimumHeight(360);
+    landscape->setMaximumHeight(360);
     description = new QTextEdit;
+    description->setTabStopWidth(20);
     spaceport = new QTextEdit;
+    spaceport->setTabStopWidth(20);
 
     QGridLayout *layout = new QGridLayout;
     layout->addWidget(new QLabel("Planet:"), 0, 0);
     layout->addWidget(name, 0, 1);
-    layout->addWidget(description, 1, 0, 1, 2);
-    layout->addWidget(new QLabel("Spaceport description:"), 2, 0, 1, 2);
-    layout->addWidget(spaceport, 3, 0, 1, 2);
+    layout->addWidget(landscape, 1, 0, 1, 2);
+    layout->addWidget(description, 2, 0, 1, 2);
+    layout->addWidget(new QLabel("Spaceport description:"), 3, 0, 1, 2);
+    layout->addWidget(spaceport, 4, 0, 1, 2);
 
     setLayout(layout);
 }
@@ -52,12 +59,14 @@ void PlanetView::SetPlanet(StellarObject *object)
     if(it == mapData.Planets().end())
     {
         name->clear();
+        landscape->SetPlanet(nullptr);
         description->clear();
         spaceport->clear();
     }
     else
     {
         name->setText(it->second.Name());
+        landscape->SetPlanet(&it->second);
         description->setText(it->second.Description());
         spaceport->setText(it->second.SpaceportDescription());
     }
