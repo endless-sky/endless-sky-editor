@@ -19,6 +19,7 @@ class Map;
 class DetailView;
 class GalaxyView;
 class SystemView;
+class PlanetView;
 
 class QMenu;
 class QTabWidget;
@@ -55,6 +56,7 @@ private:
     DetailView *detailView = nullptr;
     GalaxyView *galaxyView = nullptr;
     SystemView *systemView = nullptr;
+    PlanetView *planetView = nullptr;
 
     QMenu *galaxyMenu = nullptr;
     QMenu *systemMenu = nullptr;

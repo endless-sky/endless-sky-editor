@@ -13,6 +13,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include "SystemView.h"
 
 #include "DetailView.h"
+#include "PlanetView.h"
 #include "SpriteSet.h"
 #include "StellarObject.h"
 #include "System.h"
@@ -64,6 +65,13 @@ System *SystemView::Selected() const
 
 
 
+void SystemView::SetPlanetView(PlanetView *view)
+{
+    planetView = view;
+}
+
+
+
 QSize SystemView::minimumSizeHint() const
 {
     return QSize(400, 300);
@@ -102,6 +110,23 @@ void SystemView::Pause()
 void SystemView::mousePressEvent(QMouseEvent *event)
 {
     clickOff = QVector2D(event->pos()) - offset;
+}
+
+
+
+
+void SystemView::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    clickOff = QVector2D(event->pos()) - offset;
+
+    QVector2D pos = MapPoint(event->pos());
+    for(StellarObject &object : system->Objects())
+        if(pos.distanceToPoint(object.Position()) < object.Radius())
+        {
+            planetView->SetPlanet(&object);
+            tabs->setCurrentWidget(planetView);
+            return;
+        }
 }
 
 
@@ -222,3 +247,15 @@ void SystemView::paintEvent(QPaintEvent */*event*/)
     }
     asteroids.Draw(painter);
 }
+
+
+
+// Figure out where in the 100% scale image the click occurred.
+QVector2D SystemView::MapPoint(QPoint pos) const
+{
+    QVector2D point(pos);
+    QVector2D center(.5 * width(), .5 * height());
+    // point = origin * scale + offset + center.
+    return (point - offset - center) / scale;
+}
+

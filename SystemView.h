@@ -21,6 +21,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include <QTimer>
 
 class DetailView;
+class PlanetView;
 class System;
 
 class QTabWidget;
@@ -36,6 +37,8 @@ public:
     void Select(System *system);
     System *Selected() const;
 
+    void SetPlanetView(PlanetView *view);
+
     virtual QSize minimumSizeHint() const override;
     virtual QSize sizeHint() const override;
 
@@ -47,14 +50,20 @@ public slots:
 
 protected:
     virtual void mousePressEvent(QMouseEvent *event) override;
+    virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
     virtual void mouseMoveEvent(QMouseEvent *event) override;
     virtual void wheelEvent(QWheelEvent *event) override;
 
     virtual void paintEvent(QPaintEvent *event) override;
 
 private:
+    QVector2D MapPoint(QPoint pos) const;
+
+
+private:
     DetailView *detailView;
     QTabWidget *tabs;
+    PlanetView *planetView;
     System *system = nullptr;
 
     // Center and scale of the view:

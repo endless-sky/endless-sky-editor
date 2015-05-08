@@ -116,6 +116,14 @@ const vector<QString> &System::Links() const
 
 
 // Get the stellar object locations on the most recently set date.
+vector<StellarObject> &System::Objects()
+{
+    return objects;
+}
+
+
+
+// Get the stellar object locations on the most recently set date.
 const vector<StellarObject> &System::Objects() const
 {
     return objects;

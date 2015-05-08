@@ -51,6 +51,7 @@ public:
     const std::vector<QString> &Links() const;
 
     // Get the stellar object locations on the most recently set date.
+    std::vector<StellarObject> &Objects();
     const std::vector<StellarObject> &Objects() const;
     // Get the habitable zone's center.
     double HabitableZone() const;

@@ -15,6 +15,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include "DetailView.h"
 #include "GalaxyView.h"
 #include "Map.h"
+#include "PlanetView.h"
 #include "SystemView.h"
 
 #include <QAction>
@@ -122,10 +123,14 @@ void MainWindow::CreateWidgets()
         systemView->Select(&it->second);
     galaxyView->SetSystemView(systemView);
 
+    planetView = new PlanetView(map, tabs);
+    systemView->SetPlanetView(planetView);
+
     layout->addWidget(detailView);
 
     tabs->addTab(galaxyView, "Galaxy");
     tabs->addTab(systemView, "System");
+    tabs->addTab(planetView, "Planet");
     layout->addWidget(tabs);
 
     connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(TabChanged(int)));
