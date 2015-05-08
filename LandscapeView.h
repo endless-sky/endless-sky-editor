@@ -24,6 +24,7 @@ class LandscapeView : public QWidget
     Q_OBJECT
 public:
     explicit LandscapeView(QWidget *parent = 0);
+    ~LandscapeView();
 
     void SetPlanet(Planet *planet);
 
@@ -32,10 +33,12 @@ signals:
 public slots:
 
 protected:
+    virtual void mousePressEvent(QMouseEvent *event) override;
     virtual void paintEvent(QPaintEvent *event) override;
 
 private:
     Planet *planet = nullptr;
+    bool showGallery = false;
 };
 
 #endif // LANDSCAPEVIEW_H

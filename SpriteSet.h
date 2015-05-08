@@ -21,7 +21,12 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 class SpriteSet {
 public:
     static void SetRootPath(const QString &path);
+    static const QString &RootPath();
+
     static QPixmap Get(const QString &name);
+
+    // Set an entry in the set (using an image loaded elsewhere).
+    static void Set(const QString &name, QImage image);
 };
 
 

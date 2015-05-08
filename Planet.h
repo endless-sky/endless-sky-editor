@@ -68,6 +68,9 @@ public:
     // doing something illegal.
     double Security() const;
 
+    // Editing a planet:
+    void SetLandscape(const QString &sprite);
+
 
 private:
     QString name;

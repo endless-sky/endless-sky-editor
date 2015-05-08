@@ -227,3 +227,10 @@ double Planet::Security() const
 {
     return security;
 }
+
+
+
+void Planet::SetLandscape(const QString &sprite)
+{
+    landscape = sprite;
+}

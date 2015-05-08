@@ -34,6 +34,13 @@ void SpriteSet::SetRootPath(const QString &path)
 
 
 
+const QString &SpriteSet::RootPath()
+{
+    return root;
+}
+
+
+
 QPixmap SpriteSet::Get(const QString &name)
 {
     auto it = sprite.find(name);
@@ -54,4 +61,16 @@ QPixmap SpriteSet::Get(const QString &name)
     }
     sprite[name] = image;
     return image;
+}
+
+
+
+// Set an entry in the set (using an image loaded elsewhere).
+void SpriteSet::Set(const QString &name, QImage image)
+{
+    auto it = sprite.find(name);
+    if(it != sprite.end())
+        return;
+
+    sprite[name] = QPixmap::fromImage(image);
 }
