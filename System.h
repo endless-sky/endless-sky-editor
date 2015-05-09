@@ -80,6 +80,7 @@ public:
     void ToggleLink(System *other);
     void ChangeLink(const QString &from, const QString &to);
     void SetTrade(const QString &commodity, int value);
+    void Move(StellarObject *object, double dDistance, double dAngle);
 
 
 private:
@@ -108,6 +109,9 @@ private:
     std::vector<Fleet> fleets;
 
     std::list<DataNode> unparsed;
+
+    // Keep track of the current time step.
+    double timeStep;
 };
 
 

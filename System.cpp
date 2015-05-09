@@ -187,9 +187,10 @@ const vector<System::Fleet> &System::Fleets() const
 // Position the planets, etc.
 void System::SetDay(double day)
 {
+    timeStep = day;
     for(StellarObject &object : objects)
     {
-        double angle = !object.period ? 0. : day * 360. / object.period + object.offset;
+        double angle = (!object.period ? 0. : day * 360. / object.period) + object.offset;
         angle *= M_PI / 180.;
 
         object.position = object.distance * QVector2D(sin(angle), -cos(angle));
@@ -332,4 +333,26 @@ void System::ChangeLink(const QString &from, const QString &to)
 void System::SetTrade(const QString &commodity, int value)
 {
     trade[commodity] = value;
+}
+
+
+
+void System::Move(StellarObject *object, double dDistance, double dAngle)
+{
+    if(!object || !object->period)
+        return;
+
+    object->distance += dDistance;
+
+    double mass = habitable * 25.;
+    if(object->Parent() >= 0)
+    {
+        double r = objects[object->Parent()].Radius();
+        mass = r * r * r * .06;
+    }
+    double newPeriod = sqrt(pow(object->distance, 3) / (.25 * mass));
+    double delta = timeStep / object->period - timeStep / newPeriod;
+    object->offset += 360. * (delta - floor(delta)) - dAngle;
+    object->offset = fmod(object->offset, 360.);
+    object->period = newPeriod;
 }

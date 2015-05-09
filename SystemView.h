@@ -22,6 +22,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 class DetailView;
 class PlanetView;
+class StellarObject;
 class System;
 
 class QTabWidget;
@@ -77,6 +78,7 @@ private:
 
     // Dragging:
     QVector2D clickOff;
+    StellarObject *dragObject = nullptr;
 
     AsteroidField asteroids;
 };

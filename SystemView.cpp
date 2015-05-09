@@ -109,7 +109,18 @@ void SystemView::Pause()
 
 void SystemView::mousePressEvent(QMouseEvent *event)
 {
+    dragObject = nullptr;
     clickOff = QVector2D(event->pos()) - offset;
+
+    QVector2D pos = MapPoint(event->pos());
+    for(StellarObject &object : system->Objects())
+        if(pos.distanceToPoint(object.Position()) < object.Radius())
+        {
+            dragObject = &object;
+            clickOff = object.Position() - pos;
+            planetView->SetPlanet(&object);
+            return;
+        }
 }
 
 
@@ -133,7 +144,26 @@ void SystemView::mouseDoubleClickEvent(QMouseEvent *event)
 
 void SystemView::mouseMoveEvent(QMouseEvent *event)
 {
-    offset = QVector2D(event->pos()) - clickOff;
+    if(!dragObject)
+        offset = QVector2D(event->pos()) - clickOff;
+    else
+    {
+        QVector2D parentPosition;
+        if(dragObject->Parent() >= 0)
+            parentPosition = system->Objects()[dragObject->Parent()].Position();
+
+        QVector2D oldPosition = dragObject->Position() - parentPosition;
+        QVector2D newPosition = MapPoint(event->pos()) + clickOff - parentPosition;
+
+        double oldAngle = atan2(oldPosition.x(), oldPosition.y());
+        double newAngle = atan2(newPosition.x(), newPosition.y());
+
+        double oldRadius = oldPosition.length();
+        double newRadius = newPosition.length();
+
+        system->Move(dragObject, newRadius - oldRadius, (newAngle - oldAngle) * (180. / M_PI));
+        system->SetDay(timeStep);
+    }
     if(isPaused)
         update();
 }
