@@ -21,6 +21,13 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 using namespace std;
 
+namespace {
+    static const double MIN_GAP = 75.;
+    static const double STAR_MASS_SCALE = .25;
+    static const double PLANET_MASS_SCALE = .015;
+    static const double HABITABLE_SCALE = 6.25;
+}
+
 
 
 // Load a system's description.
@@ -342,17 +349,57 @@ void System::Move(StellarObject *object, double dDistance, double dAngle)
     if(!object || !object->period)
         return;
 
-    object->distance += dDistance;
+    // Find the next object in from this object. Determine what the orbital
+    // radius of that object is. We cannot allow moving objects too close together.
+    auto it = objects.begin() + (object - &objects.front());
+    auto root = (it->Parent() >= 0 ? objects.begin() + it->Parent() : it);
+    auto previous = root;
+    if(previous != objects.begin())
+    {
+        --previous;
+        while(previous != objects.begin() && previous->Parent() >= 0)
+            --previous;
+    }
+    if(previous != objects.begin())
+    {
+        double previousOccupied = OccupiedRadius(*previous);
+        double rootOccupied = OccupiedRadius(*root);
 
-    double mass = habitable * 25.;
-    if(object->Parent() >= 0)
+        double gap = (root->Distance() - rootOccupied) - (previous->Distance() + previousOccupied);
+        double sign = (it == root ? 1. : -1.);
+        gap += sign * dDistance;
+        if(gap < MIN_GAP)
+            dDistance += sign * (MIN_GAP - gap);
+    }
+
+    object->offset -= dAngle;
+
+    double mass = habitable * HABITABLE_SCALE;
+    bool isChild = (object->Parent() >= 0);
+    if(isChild)
     {
         double r = objects[object->Parent()].Radius();
-        mass = r * r * r * .06;
+        mass = r * r * r * PLANET_MASS_SCALE;
     }
-    double newPeriod = sqrt(pow(object->distance, 3) / (.25 * mass));
-    double delta = timeStep / object->period - timeStep / newPeriod;
-    object->offset += 360. * (delta - floor(delta)) - dAngle;
-    object->offset = fmod(object->offset, 360.);
-    object->period = newPeriod;
+
+    // If a root object is moved, every root object beyond it must be moved in
+    // or out by whatever amount its radius changed by. If a child object was
+    // moved, all the children after it must be moved by that amount and then
+    // all root objects after it must be moved by twice that amount.
+    for( ; it != objects.end(); ++it)
+    {
+        bool hasDifferentParent = (it->Parent() != object->Parent());
+        if(it->Parent() >= 0 && hasDifferentParent)
+            continue;
+
+        if(it->Parent() < 0 && isChild)
+            mass = habitable * HABITABLE_SCALE;
+
+        it->distance += dDistance;
+        double newPeriod = sqrt(pow(it->distance, 3) / mass);
+        double delta = timeStep / it->period - timeStep / newPeriod;
+        it->offset += 360. * (delta - floor(delta));
+        it->offset = fmod(it->offset, 360.);
+        it->period = newPeriod;
+    }
 }
