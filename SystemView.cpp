@@ -116,6 +116,7 @@ void SystemView::mousePressEvent(QMouseEvent *event)
     for(StellarObject &object : system->Objects())
         if(!object.IsStar() && pos.distanceToPoint(object.Position()) < object.Radius())
         {
+            dragTime.start();
             dragObject = &object;
             clickOff = object.Position() - pos;
             planetView->SetPlanet(&object);
@@ -154,6 +155,9 @@ void SystemView::mouseMoveEvent(QMouseEvent *event)
 
         QVector2D oldPosition = dragObject->Position() - parentPosition;
         QVector2D newPosition = MapPoint(event->pos()) + clickOff - parentPosition;
+
+        if(dragTime.elapsed() < 1000 && oldPosition.distanceToPoint(newPosition) < 5. * scale)
+            return;
 
         double oldAngle = atan2(oldPosition.x(), oldPosition.y());
         double newAngle = atan2(newPosition.x(), newPosition.y());

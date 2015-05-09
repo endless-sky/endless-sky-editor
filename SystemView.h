@@ -17,6 +17,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 #include <QWidget>
 
+#include <QElapsedTimer>
 #include <QVector2D>
 #include <QTimer>
 
@@ -79,6 +80,7 @@ private:
     // Dragging:
     QVector2D clickOff;
     StellarObject *dragObject = nullptr;
+    QElapsedTimer dragTime;
 
     AsteroidField asteroids;
 };
