@@ -114,7 +114,7 @@ void SystemView::mousePressEvent(QMouseEvent *event)
 
     QVector2D pos = MapPoint(event->pos());
     for(StellarObject &object : system->Objects())
-        if(pos.distanceToPoint(object.Position()) < object.Radius())
+        if(!object.IsStar() && pos.distanceToPoint(object.Position()) < object.Radius())
         {
             dragObject = &object;
             clickOff = object.Position() - pos;
@@ -132,7 +132,7 @@ void SystemView::mouseDoubleClickEvent(QMouseEvent *event)
 
     QVector2D pos = MapPoint(event->pos());
     for(StellarObject &object : system->Objects())
-        if(pos.distanceToPoint(object.Position()) < object.Radius())
+        if(!object.IsStar() && pos.distanceToPoint(object.Position()) < object.Radius())
         {
             planetView->SetPlanet(&object);
             tabs->setCurrentWidget(planetView);
@@ -204,14 +204,15 @@ void SystemView::paintEvent(QPaintEvent */*event*/)
 
     // Draw faint circles showing the region occupied by each planet.
     painter.setPen(Qt::NoPen);
+    QBrush occupiedBrush(QColor(20, 20, 20));
+    painter.setBrush(occupiedBrush);
+    double starRadius = system->StarRadius();
+    painter.drawEllipse(QPointF(), starRadius, starRadius);
     for(const StellarObject &object : system->Objects())
     {
         double radius = system->OccupiedRadius(object);
         if(!radius)
             continue;
-
-        QBrush brush(QColor(20, 20, 20));
-        painter.setBrush(brush);
 
         QPainterPath outside;
         outside.addEllipse(QPointF(), object.Distance() + radius, object.Distance() + radius);

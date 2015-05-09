@@ -149,10 +149,10 @@ double System::HabitableZone() const
 // Get the radius of the zone occupied by the given stellar object. This
 // zone includes the object and anything that orbits around it. If this
 // object is in orbit around something else, this function returns 0.
-double System::OccupiedRadius(const StellarObject &object)
+double System::OccupiedRadius(const StellarObject &object) const
 {
     // Make sure the object is part of this system and is a primary object.
-    if(&object < &objects.front() || &object > &objects.back() || object.Parent() >= 0)
+    if(&object < &objects.front() || &object > &objects.back() || object.Parent() >= 0 || object.IsStar())
         return 0.;
 
     double radius = object.Radius();
@@ -161,6 +161,20 @@ double System::OccupiedRadius(const StellarObject &object)
         if(other.Parent() == index)
             radius = max(radius, other.Distance() + other.Radius());
 
+    return radius;
+}
+
+
+
+double System::StarRadius() const
+{
+    double radius = 0.;
+    for(const StellarObject &other : objects)
+    {
+        if(!other.IsStar())
+            break;
+        radius = max(radius, other.Distance() + other.Radius());
+    }
     return radius;
 }
 
@@ -346,26 +360,24 @@ void System::SetTrade(const QString &commodity, int value)
 
 void System::Move(StellarObject *object, double dDistance, double dAngle)
 {
-    if(!object || !object->period)
+    if(!object || !object->period || object->IsStar())
         return;
 
     // Find the next object in from this object. Determine what the orbital
-    // radius of that object is. We cannot allow moving objects too close together.
+    // radius of that object is. Don't allow objects too close together.
     auto it = objects.begin() + (object - &objects.front());
     auto root = (it->Parent() >= 0 ? objects.begin() + it->Parent() : it);
-    auto previous = root;
-    if(previous != objects.begin())
+    if(root != objects.begin())
     {
-        --previous;
+        auto previous = root - 1;
         while(previous != objects.begin() && previous->Parent() >= 0)
             --previous;
-    }
-    if(previous != objects.begin())
-    {
-        double previousOccupied = OccupiedRadius(*previous);
-        double rootOccupied = OccupiedRadius(*root);
 
-        double gap = (root->Distance() - rootOccupied) - (previous->Distance() + previousOccupied);
+        double previousOccupied = previous->IsStar() ?
+            StarRadius() : (OccupiedRadius(*previous) + previous->Distance());
+        double rootOccupied = root->Distance() - OccupiedRadius(*root);
+
+        double gap = rootOccupied - previousOccupied;
         double sign = (it == root ? 1. : -1.);
         gap += sign * dDistance;
         if(gap < MIN_GAP)

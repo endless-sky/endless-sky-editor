@@ -58,7 +58,8 @@ public:
     // Get the radius of the zone occupied by the given stellar object. This
     // zone includes the object and anything that orbits around it. If this
     // object is in orbit around something else, this function returns 0.
-    double OccupiedRadius(const StellarObject &object);
+    double OccupiedRadius(const StellarObject &object) const;
+    double StarRadius() const;
 
     // Get the specification of how many asteroids of each type there are.
     const std::vector<Asteroid> &Asteroids() const;
