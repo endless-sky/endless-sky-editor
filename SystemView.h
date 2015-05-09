@@ -48,6 +48,15 @@ signals:
 
 public slots:
     void step();
+    void RandomizeInhabited();
+    void Randomize();
+    void RandomizeUninhabited();
+    void ChangeAsteroids();
+    void ChangeStar();
+    void ChangePlanet();
+    void ChangeMoon();
+    void ChangeStation();
+    void DeleteObject();
     void Pause();
 
 protected:
@@ -67,6 +76,7 @@ private:
     QTabWidget *tabs;
     PlanetView *planetView;
     System *system = nullptr;
+    StellarObject *selectedObject = nullptr;
 
     // Center and scale of the view:
     QVector2D offset;

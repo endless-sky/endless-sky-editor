@@ -54,6 +54,8 @@ void SystemView::Select(System *system)
     asteroids.Set(system);
     if(system)
         system->SetDay(timeStep);
+
+    selectedObject = nullptr;
 }
 
 
@@ -100,6 +102,66 @@ void SystemView::step()
 
 
 
+void SystemView::RandomizeInhabited()
+{
+}
+
+
+
+void SystemView::Randomize()
+{
+}
+
+
+
+void SystemView::RandomizeUninhabited()
+{
+}
+
+
+
+void SystemView::ChangeAsteroids()
+{
+    if(system)
+    {
+        system->ChangeAsteroids();
+        asteroids.Set(system);
+        update();
+    }
+}
+
+
+
+void SystemView::ChangeStar()
+{
+}
+
+
+
+void SystemView::ChangePlanet()
+{
+}
+
+
+
+void SystemView::ChangeMoon()
+{
+}
+
+
+
+void SystemView::ChangeStation()
+{
+}
+
+
+
+void SystemView::DeleteObject()
+{
+}
+
+
+
 void SystemView::Pause()
 {
     isPaused = !isPaused;
@@ -117,13 +179,12 @@ void SystemView::mousePressEvent(QMouseEvent *event)
         if(!object.IsStar() && pos.distanceToPoint(object.Position()) < object.Radius())
         {
             dragTime.start();
-            dragObject = &object;
+            selectedObject = dragObject = &object;
             clickOff = object.Position() - pos;
             planetView->SetPlanet(&object);
             return;
         }
 }
-
 
 
 
@@ -281,6 +342,15 @@ void SystemView::paintEvent(QPaintEvent */*event*/)
         }
     }
     asteroids.Draw(painter);
+
+    if(selectedObject)
+    {
+        QPen pen(QColor(255, 255, 255));
+        painter.setPen(pen);
+        painter.setBrush(Qt::NoBrush);
+        double radius = selectedObject->Radius() + 5.;
+        painter.drawEllipse(selectedObject->Position().toPointF(), radius, radius);
+    }
 }
 
 

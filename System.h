@@ -82,6 +82,7 @@ public:
     void ChangeLink(const QString &from, const QString &to);
     void SetTrade(const QString &commodity, int value);
     void Move(StellarObject *object, double dDistance, double dAngle);
+    void ChangeAsteroids();
 
 
 private:

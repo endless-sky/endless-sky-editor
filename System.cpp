@@ -415,3 +415,41 @@ void System::Move(StellarObject *object, double dDistance, double dAngle)
         it->period = newPeriod;
     }
 }
+
+
+
+void System::ChangeAsteroids()
+{
+    asteroids.clear();
+
+    // Pick the total number of asteroids. Bias towards small numbers, with
+    // a few systems with many more.
+    int fullTotal = (rand() % 21) * (rand() % 21) + 1;
+    double energy = (rand() % 21 + 10) * (rand() % 21 + 10) * .01;
+    const QString suffix[2] = {" rock", " metal"};
+    const QString prefix[3] = {"small", "medium", "large"};
+
+    int total[2] = {rand() % fullTotal, 0};
+    total[1] = fullTotal - total[0];
+
+    for(int i = 0; i < 2; ++i)
+    {
+        if(!total[i])
+            continue;
+
+        int count[3] = {0, rand() % total[i], 0};
+        int remaining = total[i] - count[1];
+        if(remaining)
+        {
+            count[0] = rand() % remaining;
+            count[2] = remaining - count[0];
+        }
+
+        for(int j = 0; j < 3; ++j)
+            if(count[j])
+                asteroids.push_back({
+                    prefix[j] + suffix[i],
+                    count[j],
+                    energy * (rand() % 101 + 50) * .01});
+    }
+}
