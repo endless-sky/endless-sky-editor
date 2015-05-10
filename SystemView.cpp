@@ -138,6 +138,7 @@ void SystemView::ChangeStar()
     {
         system->ChangeStar();
         selectedObject = nullptr;
+        system->SetDay(timeStep);
         update();
     }
 }
@@ -164,6 +165,13 @@ void SystemView::ChangeStation()
 
 void SystemView::DeleteObject()
 {
+    if(selectedObject)
+    {
+        system->Delete(selectedObject);
+        selectedObject = nullptr;
+        system->SetDay(timeStep);
+        update();
+    }
 }
 
 
@@ -188,6 +196,7 @@ void SystemView::mousePressEvent(QMouseEvent *event)
             selectedObject = dragObject = &object;
             clickOff = object.Position() - pos;
             planetView->SetPlanet(&object);
+            update();
             return;
         }
 }

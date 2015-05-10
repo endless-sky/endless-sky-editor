@@ -170,6 +170,20 @@ double System::OccupiedRadius(const StellarObject &object) const
 
 
 
+double System::OccupiedRadius() const
+{
+    if(objects.empty())
+        return 0.;
+
+    double radius = objects.back().Radius() + objects.back().Distance();
+    if(objects.back().Parent() >= 0)
+        radius += objects[objects.back().Parent()].Distance();
+
+    return radius;
+}
+
+
+
 double System::StarRadius() const
 {
     double radius = 0.;
@@ -521,4 +535,37 @@ void System::ChangeStar()
         double newStarRadius = StarRadius();
         Move(&objects[stars], newStarRadius - oldStarRadius);
     }
+}
+
+
+
+void System::Delete(StellarObject *object)
+{
+    if(!object || objects.empty())
+        return;
+
+    int index = object - &objects.front();
+    if(index < 0 || static_cast<unsigned>(index) >= objects.size())
+        return;
+
+    double shrink = object->Radius();
+
+    auto it = objects.begin() + index;
+    auto end = it + 1;
+    while(end != objects.end() && end->Parent() == index)
+    {
+        shrink = max(shrink, end->Distance() + end->Radius());
+        ++end;
+    }
+    int parentShift = end - it;
+    objects.erase(it, end);
+
+    it = objects.begin() + index;
+    if(it == objects.end())
+        return;
+
+    Move(&*it, -2. * shrink);
+    for( ; it != objects.end(); ++it)
+        if(it->parent >= 0)
+            it->parent -= parentShift;
 }

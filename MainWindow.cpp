@@ -157,7 +157,7 @@ void MainWindow::CreateMenus()
 
     QAction *deleteSystemAction = galaxyMenu->addAction("Delete System");
     connect(deleteSystemAction, SIGNAL(triggered()), galaxyView, SLOT(DeleteSystem()));
-    deleteSystemAction->setShortcut(QKeySequence("X"));
+    deleteSystemAction->setShortcut(QKeySequence(Qt::Key_Backspace));
 
 
     systemMenu = menuBar()->addMenu("System");

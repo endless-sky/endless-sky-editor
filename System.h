@@ -59,6 +59,7 @@ public:
     // zone includes the object and anything that orbits around it. If this
     // object is in orbit around something else, this function returns 0.
     double OccupiedRadius(const StellarObject &object) const;
+    double OccupiedRadius() const;
     double StarRadius() const;
 
     // Get the specification of how many asteroids of each type there are.
@@ -84,6 +85,7 @@ public:
     void Move(StellarObject *object, double dDistance, double dAngle = 0.);
     void ChangeAsteroids();
     void ChangeStar();
+    void Delete(StellarObject *object);
 
 
 private:
