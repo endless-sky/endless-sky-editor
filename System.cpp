@@ -26,6 +26,10 @@ namespace {
     static const double STAR_MASS_SCALE = .25;
     static const double PLANET_MASS_SCALE = .015;
     static const double HABITABLE_SCALE = 6.25;
+
+    static const int RANDOM_STAR_DISTANCE = 40;
+    static const double MIN_STAR_DISTANCE = 40.;
+    static const double BINARY_STAR_EXTRA_GAP = 50.;
 }
 
 
@@ -389,10 +393,7 @@ void System::Move(StellarObject *object, double dDistance, double dAngle)
     double mass = habitable * HABITABLE_SCALE;
     bool isChild = (object->Parent() >= 0);
     if(isChild)
-    {
-        double r = objects[object->Parent()].Radius();
-        mass = r * r * r * PLANET_MASS_SCALE;
-    }
+        mass = pow(objects[object->Parent()].Radius(), 3.) * PLANET_MASS_SCALE;
 
     // If a root object is moved, every root object beyond it must be moved in
     // or out by whatever amount its radius changed by. If a child object was
@@ -451,5 +452,73 @@ void System::ChangeAsteroids()
                     prefix[j] + suffix[i],
                     count[j],
                     energy * (rand() % 101 + 50) * .01});
+    }
+}
+
+
+
+void System::ChangeStar()
+{
+    double oldStarRadius = StarRadius();
+    unsigned oldStars = 0;
+    while(!objects.empty() && objects.front().IsStar())
+    {
+        objects.erase(objects.begin());
+        ++oldStars;
+    }
+
+    // If the number of stars is changing, all parent indices change.
+    unsigned stars = 1 + !(rand() % 3);
+    if(stars != oldStars)
+        for(StellarObject &object : objects)
+            if(object.parent >= 0)
+                object.parent += stars - oldStars;
+
+    double mass = 0.;
+    if(stars == 1)
+    {
+        StellarObject star = StellarObject::Star();
+        star.period = 10.;
+        mass = pow(star.Radius(), 3.) * STAR_MASS_SCALE;
+
+        objects.insert(objects.begin(), star);
+    }
+    else
+    {
+        StellarObject first = StellarObject::Star();
+        StellarObject second = StellarObject::Star();
+        first.offset = 0.;
+        second.offset = 180.;
+
+        double firstR = first.Radius();
+        double secondR = second.Radius();
+        double firstMass = pow(firstR, 3.) * STAR_MASS_SCALE;
+        double secondMass = pow(secondR, 3.) * STAR_MASS_SCALE;
+        mass = firstMass + secondMass;
+
+        double distance = firstR + secondR + (rand() % RANDOM_STAR_DISTANCE) + MIN_STAR_DISTANCE;
+        // m1 * d1 = m2 * d2
+        // d1 + d2 = d;
+        // m1 * d1 = m2 * (d - d1)
+        // m1 * d1 = m2 * d - m2 * d1
+        // (m1 + m2) * d1 = m2 * d
+        double firstD = (secondMass * distance) / mass;
+        double secondD = (firstMass * distance) / mass;
+        first.distance = firstD;
+        second.distance = secondD;
+
+        double period = sqrt(pow(distance, 3.) / mass);
+        first.period = period;
+        second.period = period;
+
+        objects.insert(objects.begin(), (firstD < secondD) ? second : first);
+        objects.insert(objects.begin(), (firstD < secondD) ? first : second);
+    }
+    habitable = mass / HABITABLE_SCALE;
+
+    if(objects.size() > stars)
+    {
+        double newStarRadius = StarRadius();
+        Move(&objects[stars], newStarRadius - oldStarRadius);
     }
 }

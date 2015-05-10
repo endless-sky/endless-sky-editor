@@ -134,6 +134,12 @@ void SystemView::ChangeAsteroids()
 
 void SystemView::ChangeStar()
 {
+    if(system)
+    {
+        system->ChangeStar();
+        selectedObject = nullptr;
+        update();
+    }
 }
 
 
