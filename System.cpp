@@ -23,6 +23,7 @@ using namespace std;
 
 namespace {
     static const double MIN_GAP = 75.;
+    static const double MIN_MOON_GAP = 20.;
     static const double STAR_MASS_SCALE = .25;
     static const double PLANET_MASS_SCALE = .015;
     static const double HABITABLE_SCALE = 6.25;
@@ -401,34 +402,32 @@ void System::Move(StellarObject *object, double dDistance, double dAngle)
         if(gap < MIN_GAP)
             dDistance += sign * (MIN_GAP - gap);
     }
+    // If this is a moon, we also have to make sure it does not collide with
+    // whatever planet is in one space from it.
+    if(object->Parent() >= 0)
+    {
+        double previousOccupied = it[-1].Radius();
+        if(it[-1].Parent() >= 0)
+            previousOccupied += it[-1].Distance();
+
+        double thisOccupied = it->Distance() - it->Radius();
+        double gap = thisOccupied + dDistance - previousOccupied;
+        if(gap < MIN_MOON_GAP)
+            dDistance += MIN_MOON_GAP - gap;
+    }
 
     object->offset -= dAngle;
-
-    double mass = habitable * HABITABLE_SCALE;
-    bool isChild = (object->Parent() >= 0);
-    if(isChild)
-        mass = pow(objects[object->Parent()].Radius(), 3.) * PLANET_MASS_SCALE;
 
     // If a root object is moved, every root object beyond it must be moved in
     // or out by whatever amount its radius changed by. If a child object was
     // moved, all the children after it must be moved by that amount and then
     // all root objects after it must be moved by twice that amount.
     for( ; it != objects.end(); ++it)
-    {
-        bool hasDifferentParent = (it->Parent() != object->Parent());
-        if(it->Parent() >= 0 && hasDifferentParent)
-            continue;
-
-        if(it->Parent() < 0 && isChild)
-            mass = habitable * HABITABLE_SCALE;
-
-        it->distance += dDistance;
-        double newPeriod = sqrt(pow(it->distance, 3) / mass);
-        double delta = timeStep / it->period - timeStep / newPeriod;
-        it->offset += 360. * (delta - floor(delta));
-        it->offset = fmod(it->offset, 360.);
-        it->period = newPeriod;
-    }
+        if(it->Parent() < 0 || it->Parent() == object->Parent())
+        {
+            it->distance += dDistance;
+            Recompute(*it);
+        }
 }
 
 
@@ -539,6 +538,80 @@ void System::ChangeStar()
 
 
 
+void System::ChangeSprite(StellarObject *object)
+{
+    if(!object || object < &objects.front() || object > &objects.back())
+        return;
+
+    StellarObject newObject;
+    if(object->IsStation())
+        newObject = StellarObject::Station();
+    else if(object->IsMoon())
+        newObject = StellarObject::Moon();
+    else if(object->IsGiant())
+        newObject = StellarObject::Giant();
+    else
+    {
+        double distance = (object->Parent() >= 0 ? objects[object->Parent()].Distance() : object->Distance());
+        if(distance >= .5 * habitable && distance < 2. * habitable)
+            newObject = StellarObject::Planet();
+        else
+            newObject = StellarObject::Uninhabited();
+    }
+
+    // Check how much the radius will change by, then change the sprite.
+    double radiusChange = newObject.Radius() - object->Radius();
+    object->sprite = newObject.sprite;
+
+    // If this object has a parent:
+    // this distance += dRadius
+    // children after distance += 2 * dRadius
+    // parent distance += 2 * dRadius
+    // after distance += 2 * dRadius
+    // Otherwise:
+    // this distance += dRadius
+    // child distance += dRadius
+    // after distance += 2 * dRadius
+
+    // Get the index of this object, for checking if other objects are children.
+    //int index = object - &objects.front();
+
+    // Get an iterator to this object.
+    auto it = objects.begin() + (object - &*objects.begin());
+    // Move this object out by an amount equal to the radius change.
+    it->distance += radiusChange;
+    Recompute(*it);
+
+    // If this object has a parent, the parent's occupied radius will be
+    // expanding by twice the radius change, so it must move out by that amount.
+    // In addition, root objects beyond this one's parent will be moving out by
+    // four times the radius change, instead of two.
+    if(object->Parent() >= 0)
+    {
+        radiusChange *= 2.;
+        objects[object->Parent()].distance += radiusChange;
+        Recompute(objects[object->Parent()]);
+    }
+    // The objects that will be affected are: children of this object, and all
+    // "root" objects outside of this one.
+    bool isChild = true;
+    for(++it; it != objects.end(); ++it)
+    {
+        if(isChild && it->Parent() < 0)
+        {
+            isChild = false;
+            radiusChange *= 2.;
+        }
+        if(isChild || it->Parent() < 0)
+        {
+            it->distance += radiusChange;
+            Recompute(*it);
+        }
+    }
+}
+
+
+
 void System::Delete(StellarObject *object)
 {
     if(!object || objects.empty())
@@ -568,4 +641,19 @@ void System::Delete(StellarObject *object)
     for( ; it != objects.end(); ++it)
         if(it->parent >= 0)
             it->parent -= parentShift;
+}
+
+
+
+void System::Recompute(StellarObject &object)
+{
+    double mass = habitable * HABITABLE_SCALE;
+    if(object.Parent() >= 0.)
+        mass = pow(objects[object.Parent()].Radius(), 3.) * PLANET_MASS_SCALE;
+
+    double newPeriod = sqrt(pow(object.distance, 3) / mass);
+    double delta = timeStep / object.period - timeStep / newPeriod;
+    object.offset += 360. * (delta - floor(delta));
+    object.offset = fmod(object.offset, 360.);
+    object.period = newPeriod;
 }

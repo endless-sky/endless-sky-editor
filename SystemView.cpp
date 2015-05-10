@@ -147,18 +147,36 @@ void SystemView::ChangeStar()
 
 void SystemView::ChangePlanet()
 {
+    if(selectedObject && selectedObject->Parent() < 0 && !selectedObject->IsStation())
+    {
+        system->ChangeSprite(selectedObject);
+        system->SetDay(timeStep);
+        update();
+    }
 }
 
 
 
 void SystemView::ChangeMoon()
 {
+    if(selectedObject && selectedObject->Parent() >= 0 && !selectedObject->IsStation())
+    {
+        system->ChangeSprite(selectedObject);
+        system->SetDay(timeStep);
+        update();
+    }
 }
 
 
 
 void SystemView::ChangeStation()
 {
+    if(selectedObject && selectedObject->IsStation())
+    {
+        system->ChangeSprite(selectedObject);
+        system->SetDay(timeStep);
+        update();
+    }
 }
 
 

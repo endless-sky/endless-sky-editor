@@ -22,6 +22,9 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 using namespace std;
 
 namespace {
+    static const int MOON_RADIUS = 50;
+    static const int GIANT_RADIUS = 120;
+
     struct Info { int radius; int info; };
     const map<QString, Info> INFO = {
         {"planet/callisto", {47, 0}},
@@ -257,7 +260,7 @@ StellarObject StellarObject::Star()
 // Get a random "moon." It may also be used as a stand-alone planet.
 StellarObject StellarObject::Moon()
 {
-    return Planet(0, 50);
+    return Planet(0, MOON_RADIUS);
 }
 
 
@@ -265,7 +268,7 @@ StellarObject StellarObject::Moon()
 // Get a random (non-giant) planet. It may or may not be habitable.
 StellarObject StellarObject::Planet()
 {
-    return Planet(50, 120);
+    return Planet(MOON_RADIUS, GIANT_RADIUS);
 }
 
 
@@ -273,7 +276,7 @@ StellarObject StellarObject::Planet()
 // Get a random planet that can exist outside the habitable zone.
 StellarObject StellarObject::Uninhabited()
 {
-    return Planet(50, 120, true);
+    return Planet(MOON_RADIUS, GIANT_RADIUS, true);
 }
 
 
@@ -281,7 +284,7 @@ StellarObject StellarObject::Uninhabited()
 // Get a random gas giant.
 StellarObject StellarObject::Giant()
 {
-    return Planet(120);
+    return Planet(GIANT_RADIUS);
 }
 
 
@@ -294,14 +297,14 @@ StellarObject StellarObject::Station()
     {
         // Skip stars and anything bigger than a radius of 50 pixels.
         for(const auto &it : INFO)
-            if(it.second.info == 4 && it.first[0] == 'p')
+            if(it.second.info == 3 && it.first[0] == 'p')
                 ++count;
     }
 
     StellarObject object;
     int r = rand() % count;
     for(const auto &it : INFO)
-        if(it.second.info == 4 && it.first[0] == 'p')
+        if(it.second.info == 3 && it.first[0] == 'p')
         {
             if(!r)
             {
@@ -323,6 +326,28 @@ bool StellarObject::IsStar() const
 
 
 
+bool StellarObject::IsMoon() const
+{
+    return (Radius() < MOON_RADIUS);
+}
+
+
+
+bool StellarObject::IsGiant() const
+{
+    return (Radius() >= GIANT_RADIUS);
+}
+
+
+
+// Check if this is a station.
+bool StellarObject::IsStation() const
+{
+    return sprite.startsWith("planet/station");
+}
+
+
+
 void StellarObject::SetPlanet(const QString &name)
 {
     planet = name;
@@ -335,14 +360,14 @@ StellarObject StellarObject::Planet(int minRadius, int maxRadius, bool skipHabit
     int count = 0;
     for(const auto &it : INFO)
         if(it.second.radius >= minRadius && it.second.radius < maxRadius)
-            if(it.first[0] == 'p' && !(skipHabitable && it.second.info))
+            if(it.first[0] == 'p' && !(skipHabitable && it.second.info) && it.second.info != 3)
                 ++count;
 
     StellarObject object;
     int r = rand() % count;
     for(const auto &it : INFO)
         if(it.second.radius >= minRadius && it.second.radius < maxRadius)
-            if(it.first[0] == 'p' && !(skipHabitable && it.second.info))
+            if(it.first[0] == 'p' && !(skipHabitable && it.second.info) && it.second.info != 3)
             {
                 if(!r)
                 {

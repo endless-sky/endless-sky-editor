@@ -62,6 +62,11 @@ public:
 
     // Check if this is a star.
     bool IsStar() const;
+    // Check this object's size.
+    bool IsMoon() const;
+    bool IsGiant() const;
+    // Check if this is a station.
+    bool IsStation() const;
 
     // Editing a stellar object:
     void SetPlanet(const QString &name);

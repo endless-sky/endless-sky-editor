@@ -82,15 +82,19 @@ public:
     void ToggleLink(System *other);
     void ChangeLink(const QString &from, const QString &to);
     void SetTrade(const QString &commodity, int value);
+
+    // Editing the stellar objects and their locations:
     void Move(StellarObject *object, double dDistance, double dAngle = 0.);
     void ChangeAsteroids();
     void ChangeStar();
+    void ChangeSprite(StellarObject *object);
     void Delete(StellarObject *object);
 
 
 private:
     void LoadObject(const DataNode &node, int parent = -1);
     void SaveObject(DataWriter &file, const StellarObject &object) const;
+    void Recompute(StellarObject &object);
 
 
 private:
