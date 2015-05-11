@@ -67,14 +67,24 @@ DetailView::DetailView(Map &mapData, GalaxyView *galaxyView, QWidget *parent) :
         item->setText(1, QString::number((it.low + it.high) / 2));
         item->setText(2, "medium");
         trade.append(item);
-        connect(tradeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
-            this, SLOT(CommodityClicked(QTreeWidgetItem *, int)));
-        connect(tradeWidget, SIGNAL(itemChanged(QTreeWidgetItem*,int)),
-            this, SLOT(CommodityChanged(QTreeWidgetItem *, int)));
     }
+    connect(tradeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
+        this, SLOT(CommodityClicked(QTreeWidgetItem *, int)));
+    connect(tradeWidget, SIGNAL(itemChanged(QTreeWidgetItem *,int)),
+        this, SLOT(CommodityChanged(QTreeWidgetItem *, int)));
     tradeWidget->setColumnWidth(1, 50);
     tradeWidget->insertTopLevelItems(0, trade);
     layout->addWidget(tradeWidget);
+
+    fleets = new QTreeWidget;
+    fleets->setIndentation(0);
+    fleets->setColumnCount(2);
+    QStringList fleetLabels;
+    fleetLabels.append("Fleet Type");
+    fleetLabels.append("Period");
+    fleets->setHeaderLabels(fleetLabels);
+    fleets->setColumnWidth(0, 200);
+    layout->addWidget(fleets);
 
     setLayout(layout);
 }
@@ -101,11 +111,13 @@ void DetailView::SetSystem(System *system)
             (*item)->setText(2, LEVEL[level]);
             ++item;
         }
+        UpdateFleets();
     }
     else
     {
-        name->setText(QString());
-        government->setText(QString());
+        name->clear();
+        government->clear();
+        fleets->clear();
     }
     update();
 }
@@ -117,6 +129,37 @@ bool DetailView::eventFilter(QObject* object, QEvent* event)
     if(object == government && event->type() == QEvent::FocusIn)
         galaxyView->SetGovernment(government->text());
     return false;
+}
+
+
+
+void DetailView::NameChanged()
+{
+    if(!system || system->Name() == name->text() || name->text().isEmpty())
+        return;
+
+    auto it = mapData.Systems().find(name->text());
+    if(it != mapData.Systems().end())
+    {
+        QMessageBox::warning(this, "Duplicate name",
+            "A system named \"" + name->text() + "\" already exists.");
+    }
+    else
+    {
+        mapData.RenameSystem(system->Name(), name->text());
+        galaxyView->update();
+    }
+}
+
+
+
+void DetailView::GovernmentChanged()
+{
+    if(!system || system->Government() == government->text() || government->text().isEmpty())
+        return;
+
+    system->SetGovernment(government->text());
+    galaxyView->SetGovernment(government->text());
 }
 
 
@@ -151,31 +194,53 @@ void DetailView::CommodityChanged(QTreeWidgetItem *item, int column)
 
 
 
-void DetailView::NameChanged()
+void DetailView::FleetChanged(QTreeWidgetItem *item, int column)
 {
-    if(!system || system->Name() == name->text() || name->text().isEmpty())
+    if(!system)
         return;
 
-    auto it = mapData.Systems().find(name->text());
-    if(it != mapData.Systems().end())
-    {
-        QMessageBox::warning(this, "Duplicate name",
-            "A system named \"" + name->text() + "\" already exists.");
-    }
+    unsigned row = item->text(2).toInt();
+    if(row == system->Fleets().size())
+        system->Fleets().push_back({item->text(0), item->text(1).toInt()});
+    else if(item->text(0).isEmpty() && item->text(1).isEmpty())
+        system->Fleets().erase(system->Fleets().begin() + row);
+    else if(column == 0)
+        system->Fleets()[row].name = item->text(0);
+    else if(column == 1)
+        system->Fleets()[row].period = item->text(1).toInt();
     else
-    {
-        mapData.RenameSystem(system->Name(), name->text());
-        galaxyView->update();
-    }
+        return;
+
+    UpdateFleets();
 }
 
 
 
-void DetailView::GovernmentChanged()
+void DetailView::UpdateFleets()
 {
-    if(!system || system->Government() == government->text() || government->text().isEmpty())
+    if(!system || !fleets)
         return;
 
-    system->SetGovernment(government->text());
-    galaxyView->SetGovernment(government->text());
+    disconnect(fleets, SIGNAL(itemChanged(QTreeWidgetItem *,int)),
+        this, SLOT(FleetChanged(QTreeWidgetItem *, int)));
+    fleets->clear();
+    for(const System::Fleet &fleet : system->Fleets())
+    {
+        QTreeWidgetItem *item = new QTreeWidgetItem(fleets);
+        item->setText(0, fleet.name);
+        item->setText(1, QString::number(fleet.period));
+        item->setText(2, QString::number(&fleet - &system->Fleets().front()));
+        item->setFlags(item->flags() | Qt::ItemIsEditable);
+        fleets->addTopLevelItem(item);
+    }
+    {
+        // Add one last item, which is empty, but can be edited to add a row.
+        QTreeWidgetItem *item = new QTreeWidgetItem(fleets);
+        item->setFlags(item->flags() | Qt::ItemIsEditable);
+        item->setText(2, QString::number(system->Fleets().size()));
+        fleets->addTopLevelItem(item);
+    }
+    fleets->setColumnWidth(0, 200);
+    connect(fleets, SIGNAL(itemChanged(QTreeWidgetItem *,int)),
+        this, SLOT(FleetChanged(QTreeWidgetItem *, int)));
 }

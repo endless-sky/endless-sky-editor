@@ -22,6 +22,7 @@ class Map;
 class System;
 
 class QLineEdit;
+class QTreeWidget;
 class QTreeWidgetItem;
 
 
@@ -38,12 +39,14 @@ public:
 signals:
 
 public slots:
-    void CommodityClicked(QTreeWidgetItem *item, int column);
-    void CommodityChanged(QTreeWidgetItem *item, int column);
     void NameChanged();
     void GovernmentChanged();
+    void CommodityClicked(QTreeWidgetItem *item, int column);
+    void CommodityChanged(QTreeWidgetItem *item, int column);
+    void FleetChanged(QTreeWidgetItem *item, int column);
 
 private:
+    void UpdateFleets();
 
 
 private:
@@ -51,10 +54,11 @@ private:
     GalaxyView *galaxyView = nullptr;
     System *system = nullptr;
 
-    QLineEdit *name;
-    QLineEdit *government;
+    QLineEdit *name = nullptr;
+    QLineEdit *government = nullptr;
 
     QList<QTreeWidgetItem *> trade;
+    QTreeWidget *fleets = nullptr;
 };
 
 

@@ -69,6 +69,7 @@ public:
     int Trade(const QString &commodity) const;
 
     // Get the probabilities of various fleets entering this system.
+    std::vector<Fleet> &Fleets();
     const std::vector<Fleet> &Fleets() const;
 
     // Position the planets, etc.
