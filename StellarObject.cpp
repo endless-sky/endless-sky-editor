@@ -328,14 +328,21 @@ bool StellarObject::IsStar() const
 
 bool StellarObject::IsMoon() const
 {
-    return (Radius() < MOON_RADIUS);
+    return (Radius() < MOON_RADIUS) && !IsStation() && !IsStar();
+}
+
+
+
+bool StellarObject::IsTerrestrial() const
+{
+    return !IsMoon() && !IsGiant() && !IsStation() && !IsStar();
 }
 
 
 
 bool StellarObject::IsGiant() const
 {
-    return (Radius() >= GIANT_RADIUS);
+    return (Radius() >= GIANT_RADIUS) && !IsStation() && !IsStar();
 }
 
 
@@ -344,6 +351,19 @@ bool StellarObject::IsGiant() const
 bool StellarObject::IsStation() const
 {
     return sprite.startsWith("planet/station");
+}
+
+
+
+bool StellarObject::IsInhabited() const
+{
+    if(IsStar())
+        return false;
+    if(IsStation())
+        return true;
+
+    auto it = INFO.find(sprite);
+    return(it != INFO.end() && it->second.info == 2);
 }
 
 

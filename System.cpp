@@ -18,12 +18,15 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 #include <algorithm>
 #include <limits>
+#include <set>
 
 using namespace std;
 
 namespace {
-    static const double MIN_GAP = 75.;
+    static const double MIN_GAP = 50.;
+    static const int RANDOM_GAP = 100;
     static const double MIN_MOON_GAP = 20.;
+    static const int RANDOM_MOON_GAP = 50;
     static const double STAR_MASS_SCALE = .25;
     static const double PLANET_MASS_SCALE = .015;
     static const double HABITABLE_SCALE = 6.25;
@@ -552,20 +555,23 @@ void System::ChangeSprite(StellarObject *object)
         return;
 
     StellarObject newObject;
-    if(object->IsStation())
-        newObject = StellarObject::Station();
-    else if(object->IsMoon())
-        newObject = StellarObject::Moon();
-    else if(object->IsGiant())
-        newObject = StellarObject::Giant();
-    else
-    {
-        double distance = (object->Parent() >= 0 ? objects[object->Parent()].Distance() : object->Distance());
-        if(distance >= .5 * habitable && distance < 2. * habitable)
-            newObject = StellarObject::Planet();
+    set<QString> used = Used();
+    do {
+        if(object->IsStation())
+            newObject = StellarObject::Station();
+        else if(object->IsMoon())
+            newObject = StellarObject::Moon();
+        else if(object->IsGiant())
+            newObject = StellarObject::Giant();
         else
-            newObject = StellarObject::Uninhabited();
-    }
+        {
+            double distance = (object->Parent() >= 0 ? objects[object->Parent()].Distance() : object->Distance());
+            if(distance >= .5 * habitable && distance < 2. * habitable)
+                newObject = StellarObject::Planet();
+            else
+                newObject = StellarObject::Uninhabited();
+        }
+    } while(used.find(newObject.Sprite()) != used.end());
 
     // Check how much the radius will change by, then change the sprite.
     double radiusChange = newObject.Radius() - object->Radius();
@@ -620,6 +626,98 @@ void System::ChangeSprite(StellarObject *object)
 
 
 
+void System::AddPlanet()
+{
+    // The spacing between planets grows exponentially.
+    int randomPlanetSpace = RANDOM_GAP;
+    for(const StellarObject &object : objects)
+        if(!object.IsStar() && object.Parent() < 0)
+            randomPlanetSpace += randomPlanetSpace / 2;
+
+    double distance = OccupiedRadius();
+    int space = rand() % randomPlanetSpace;
+    distance += (space * space) * .01 + MIN_GAP;
+
+    set<QString> used = Used();
+
+    StellarObject root;
+    int rootIndex = objects.size();
+    bool isHabitable = (distance > habitable * .5 && distance < habitable * 2. - 120.);
+    bool isSmall = !(rand() % 10);
+    bool isTerrestrial = !isSmall && (rand() % 2000 > distance);
+    // Occasionally, moon-sized objects can be root objects. Otherwise, pick a
+    // giant or a normal planet, with giants more frequent in the outer parts
+    // of the solar system.
+    do {
+        if(isSmall)
+            root = StellarObject::Moon();
+        else if(isTerrestrial)
+            root = isHabitable ? StellarObject::Planet() : StellarObject::Uninhabited();
+        else
+            root = StellarObject::Giant();
+    } while(used.find(root.Sprite()) != used.end());
+    objects.push_back(root);
+    used.insert(root.Sprite());
+
+    int moonCount = rand() % (isTerrestrial ? (rand() % 2 + 1) : (rand() % 3 + 3));
+    if(root.Radius() < 70)
+        moonCount = 0;
+
+    double moonDistance = root.Radius();
+    int randomMoonSpace = RANDOM_MOON_GAP;
+    for(int i = 0; i < moonCount; ++i)
+    {
+        moonDistance += rand() % randomMoonSpace + MIN_MOON_GAP;
+        // Each moon, on average, should be spaced more widely than the one before.
+        randomMoonSpace += 20;
+
+        StellarObject moon;
+        do {
+            moon = StellarObject::Moon();
+        } while(used.find(moon.Sprite()) != used.end());
+        used.insert(moon.Sprite());
+
+        moon.distance = moonDistance + moon.Radius();
+        moon.parent = rootIndex;
+        Recompute(moon, false);
+        objects.push_back(moon);
+        moonDistance += 2. * moon.Radius();
+    }
+    objects[rootIndex].distance = distance + moonDistance;
+    Recompute(objects[rootIndex], false);
+}
+
+
+
+void System::Randomize(bool allowHabitable, bool requireHabitable)
+{
+    // Try to create a system satisfying the given parameters.
+    for(int i = 0; i < 100; ++i)
+    {
+        objects.clear();
+        ChangeStar();
+        while(OccupiedRadius() < 2000.)
+            AddPlanet();
+
+        bool isInhabited = false;
+        bool isHabitable = false;
+        for(const StellarObject &object : objects)
+        {
+            isInhabited |= object.IsInhabited();
+            double d = object.Distance();
+            isHabitable |= object.Parent() < 0 && object.IsTerrestrial()
+                && d > .5 * habitable && d < 2. * habitable;
+        }
+        if(isInhabited && !allowHabitable)
+            continue;
+        if(!isHabitable && requireHabitable)
+            continue;
+        break;
+    }
+}
+
+
+
 void System::Delete(StellarObject *object)
 {
     if(!object || objects.empty())
@@ -653,15 +751,28 @@ void System::Delete(StellarObject *object)
 
 
 
-void System::Recompute(StellarObject &object)
+void System::Recompute(StellarObject &object, bool updateOffset)
 {
     double mass = habitable * HABITABLE_SCALE;
     if(object.Parent() >= 0.)
         mass = pow(objects[object.Parent()].Radius(), 3.) * PLANET_MASS_SCALE;
 
     double newPeriod = sqrt(pow(object.distance, 3) / mass);
-    double delta = timeStep / object.period - timeStep / newPeriod;
-    object.offset += 360. * (delta - floor(delta));
-    object.offset = fmod(object.offset, 360.);
+    if(updateOffset)
+    {
+        double delta = timeStep / object.period - timeStep / newPeriod;
+        object.offset += 360. * (delta - floor(delta));
+        object.offset = fmod(object.offset, 360.);
+    }
     object.period = newPeriod;
+}
+
+
+
+set<QString> System::Used() const
+{
+    set<QString> used;
+    for(const StellarObject &object : objects)
+        used.insert(object.Sprite());
+    return used;
 }

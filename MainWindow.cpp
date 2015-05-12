@@ -116,6 +116,7 @@ void MainWindow::CreateWidgets()
 
     detailView = new DetailView(map, galaxyView, box);
     detailView->setMinimumWidth(300);
+    detailView->setMaximumWidth(300);
 
     systemView = new SystemView(detailView, tabs, tabs);
     auto it = map.Systems().find("Sol");

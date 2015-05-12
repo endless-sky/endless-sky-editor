@@ -64,9 +64,13 @@ public:
     bool IsStar() const;
     // Check this object's size.
     bool IsMoon() const;
+    bool IsTerrestrial() const;
     bool IsGiant() const;
     // Check if this is a station.
     bool IsStation() const;
+    // Check if this object is definitely inhabited (i.e. the sprite includes
+    // city lights).
+    bool IsInhabited() const;
 
     // Editing a stellar object:
     void SetPlanet(const QString &name);

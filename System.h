@@ -18,6 +18,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include <QVector2D>
 #include <QString>
 
+#include <set>
 #include <vector>
 
 class DataNode;
@@ -89,13 +90,17 @@ public:
     void ChangeAsteroids();
     void ChangeStar();
     void ChangeSprite(StellarObject *object);
+    void AddPlanet();
+    void Randomize(bool allowHabitable, bool requireHabitable);
     void Delete(StellarObject *object);
 
 
 private:
     void LoadObject(const DataNode &node, int parent = -1);
     void SaveObject(DataWriter &file, const StellarObject &object) const;
-    void Recompute(StellarObject &object);
+    void Recompute(StellarObject &object, bool updateOffset = true);
+    // Get a list of all sprites that are in use already.
+    std::set<QString> Used() const;
 
 
 private:
