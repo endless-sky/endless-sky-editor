@@ -91,6 +91,7 @@ public:
     void ChangeStar();
     void ChangeSprite(StellarObject *object);
     void AddPlanet();
+    void AddMoon(StellarObject *object, bool isStation = false);
     void Randomize(bool allowHabitable, bool requireHabitable);
     void Delete(StellarObject *object);
 

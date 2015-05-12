@@ -106,6 +106,7 @@ void SystemView::RandomizeInhabited()
 {
     if(system)
     {
+        selectedObject = nullptr;
         system->Randomize(true, true);
         system->SetDay(timeStep);
         update();
@@ -118,6 +119,7 @@ void SystemView::Randomize()
 {
     if(system)
     {
+        selectedObject = nullptr;
         system->Randomize(true, false);
         system->SetDay(timeStep);
         update();
@@ -130,6 +132,7 @@ void SystemView::RandomizeUninhabited()
 {
     if(system)
     {
+        selectedObject = nullptr;
         system->Randomize(false, false);
         system->SetDay(timeStep);
         update();
@@ -195,6 +198,14 @@ void SystemView::ChangeMoon()
         system->SetDay(timeStep);
         update();
     }
+    else if(selectedObject && selectedObject->Parent() < 0)
+    {
+        int index = selectedObject - &system->Objects().front();
+        system->AddMoon(selectedObject);
+        selectedObject = &system->Objects()[index];
+        system->SetDay(timeStep);
+        update();
+    }
 }
 
 
@@ -207,6 +218,14 @@ void SystemView::ChangeStation()
     if(selectedObject && selectedObject->IsStation())
     {
         system->ChangeSprite(selectedObject);
+        system->SetDay(timeStep);
+        update();
+    }
+    else if(selectedObject && selectedObject->Parent() < 0)
+    {
+        int index = selectedObject - &system->Objects().front();
+        system->AddMoon(selectedObject, true);
+        selectedObject = &system->Objects()[index];
         system->SetDay(timeStep);
         update();
     }

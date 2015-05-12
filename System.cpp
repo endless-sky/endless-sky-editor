@@ -25,7 +25,7 @@ using namespace std;
 namespace {
     static const double MIN_GAP = 50.;
     static const int RANDOM_GAP = 100;
-    static const double MIN_MOON_GAP = 20.;
+    static const double MIN_MOON_GAP = 10.;
     static const int RANDOM_MOON_GAP = 50;
     static const double STAR_MASS_SCALE = .25;
     static const double PLANET_MASS_SCALE = .015;
@@ -685,6 +685,51 @@ void System::AddPlanet()
     }
     objects[rootIndex].distance = distance + moonDistance;
     Recompute(objects[rootIndex], false);
+}
+
+
+
+void System::AddMoon(StellarObject *object, bool isStation)
+{
+    if(!object || object < &objects.front() || object > &objects.back())
+        return;
+
+    double originalMoonDistance = object->Radius();
+    int randomMoonSpace = RANDOM_MOON_GAP;
+    int rootIndex = object - &objects.front();
+    auto it = objects.begin() + rootIndex + 1;
+    while(it != objects.end() && it->Parent() == rootIndex)
+    {
+        randomMoonSpace += 20;
+        originalMoonDistance = it->Distance() + it->Radius();
+        ++it;
+    }
+
+    double moonDistance = originalMoonDistance + rand() % randomMoonSpace + MIN_MOON_GAP;
+    set<QString> used = Used();
+    StellarObject moon;
+    do {
+        moon = isStation ? StellarObject::Station() : StellarObject::Moon();
+    } while(used.find(moon.Sprite()) != used.end());
+
+    moon.distance = moonDistance + moon.Radius();
+    moon.parent = rootIndex;
+    Recompute(moon, false);
+
+    // Move the next root planet out from this one farther out.
+    double distanceIncrease = moonDistance + 2. * moon.Radius() - originalMoonDistance;
+    Move(&*it, 2. * distanceIncrease);
+
+    // Move this root planet farther out.
+    objects[rootIndex].distance += distanceIncrease;
+    Recompute(objects[rootIndex]);
+
+    // Insert the new moon, then update the parent indices of all moons farther
+    // out than this one (because their parents' indices have changed).
+    it = objects.insert(it, moon);
+    for( ; it != objects.end(); ++it)
+        if(it->parent > rootIndex)
+            ++it->parent;
 }
 
 
