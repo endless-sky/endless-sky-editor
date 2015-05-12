@@ -103,9 +103,8 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 
 void MainWindow::CreateWidgets()
 {
-    QHBoxLayout *layout = new QHBoxLayout;
     QWidget *box = new QWidget(this);
-    box->setLayout(layout);
+    QHBoxLayout *layout = new QHBoxLayout(box);
     setCentralWidget(box);
 
     tabs = new QTabWidget(box);

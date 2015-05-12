@@ -34,67 +34,66 @@ using namespace std;
 PlanetView::PlanetView(Map &mapData, QWidget *parent) :
     QWidget(parent), mapData(mapData)
 {
-    name = new QLineEdit;
+    name = new QLineEdit(this);
     connect(name, SIGNAL(editingFinished()), this, SLOT(NameChanged()));
-    attributes = new QLineEdit;
+    attributes = new QLineEdit(this);
     connect(attributes, SIGNAL(editingFinished()), this, SLOT(AttributesChanged()));
 
     landscape = new LandscapeView(this);
     landscape->setMinimumHeight(360);
     landscape->setMaximumHeight(360);
 
-    description = new QPlainTextEdit;
+    description = new QPlainTextEdit(this);
     description->setTabStopWidth(20);
     connect(description, SIGNAL(textChanged()), this, SLOT(DescriptionChanged()));
-    spaceport = new QPlainTextEdit;
+    spaceport = new QPlainTextEdit(this);
     spaceport->setTabStopWidth(20);
     connect(spaceport, SIGNAL(textChanged()), this, SLOT(SpaceportDescriptionChanged()));
 
-    shipyard = new QLineEdit;
+    shipyard = new QLineEdit(this);
     connect(shipyard, SIGNAL(editingFinished()), this, SLOT(ShipyardChanged()));
-    outfitter = new QLineEdit;
+    outfitter = new QLineEdit(this);
     connect(outfitter, SIGNAL(editingFinished()), this, SLOT(OutfitterChanged()));
 
-    reputation = new QLineEdit;
+    reputation = new QLineEdit(this);
     reputation->setValidator(new QRegExpValidator(QRegExp("-?\\d*\\.?\\d*"), reputation));
     connect(reputation, SIGNAL(editingFinished()), this, SLOT(ReputationChanged()));
-    bribe = new QLineEdit;
+    bribe = new QLineEdit(this);
     bribe->setValidator(new QRegExpValidator(QRegExp("0||0?\\.\\d*"), bribe));
     connect(bribe, SIGNAL(editingFinished()), this, SLOT(BribeChanged()));
-    security = new QLineEdit;
+    security = new QLineEdit(this);
     security->setValidator(new QRegExpValidator(QRegExp("0||0?\\.\\d*"), security));
     connect(security, SIGNAL(editingFinished()), this, SLOT(SecurityChanged()));
 
-    QGridLayout *layout = new QGridLayout;
+    QGridLayout *layout = new QGridLayout(this);
     int row = 0;
 
-    layout->addWidget(new QLabel("Planet:"), row, 0);
+    layout->addWidget(new QLabel("Planet:", this), row, 0);
     layout->addWidget(name, row++, 1);
-    layout->addWidget(new QLabel("Attributes:"), row, 0);
+    layout->addWidget(new QLabel("Attributes:", this), row, 0);
     layout->addWidget(attributes, row++, 1);
 
     layout->addWidget(landscape, row++, 0, 1, 2);
 
     layout->addWidget(description, row++, 0, 1, 2);
-    layout->addWidget(new QLabel("Spaceport description:"), row++, 0, 1, 2);
+    layout->addWidget(new QLabel("Spaceport description:", this), row++, 0, 1, 2);
     layout->addWidget(spaceport, row++, 0, 1, 2);
 
-    layout->addWidget(new QLabel("Shipyard:"), row, 0);
+    layout->addWidget(new QLabel("Shipyard:", this), row, 0);
     layout->addWidget(shipyard, row++, 1);
-    layout->addWidget(new QLabel("Outfitter:"), row, 0);
+    layout->addWidget(new QLabel("Outfitter:", this), row, 0);
     layout->addWidget(outfitter, row++, 1);
 
-    QWidget *box = new QWidget;
-    QHBoxLayout *hLayout = new QHBoxLayout;
+    QWidget *box = new QWidget(this);
+    QHBoxLayout *hLayout = new QHBoxLayout(box);
     hLayout->setContentsMargins(0, 0, 0, 0);
-    hLayout->addWidget(new QLabel("Required reputation:"));
+    hLayout->addWidget(new QLabel("Required reputation:", this));
     hLayout->addWidget(reputation);
-    hLayout->addWidget(new QLabel("Bribe:"));
+    hLayout->addWidget(new QLabel("Bribe:", this));
     hLayout->addWidget(bribe);
-    hLayout->addWidget(new QLabel("Security:"));
+    hLayout->addWidget(new QLabel("Security:", this));
     hLayout->addWidget(security);
     hLayout->addStretch();
-    box->setLayout(hLayout);
     layout->addWidget(box, row++, 0, 1, 2);
 
     setLayout(layout);

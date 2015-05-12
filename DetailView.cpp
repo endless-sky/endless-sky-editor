@@ -40,19 +40,19 @@ namespace {
 DetailView::DetailView(Map &mapData, GalaxyView *galaxyView, QWidget *parent) :
     QWidget(parent), mapData(mapData), galaxyView(galaxyView)
 {
-    name = new QLineEdit;
+    name = new QLineEdit(this);
     connect(name, SIGNAL(editingFinished()), this, SLOT(NameChanged()));
-    government = new QLineEdit;
+    government = new QLineEdit(this);
     connect(government, SIGNAL(editingFinished()), this, SLOT(GovernmentChanged()));
 
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->addWidget(new QLabel("System Name:"));
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->addWidget(new QLabel("System Name:", this));
     layout->addWidget(name);
-    layout->addWidget(new QLabel("Government:"));
+    layout->addWidget(new QLabel("Government:", this));
     layout->addWidget(government);
     government->installEventFilter(this);
 
-    QTreeWidget *tradeWidget = new QTreeWidget;
+    QTreeWidget *tradeWidget = new QTreeWidget(this);
     tradeWidget->setIndentation(0);
     tradeWidget->setColumnCount(3);
     QStringList tradeLabels;
@@ -62,7 +62,7 @@ DetailView::DetailView(Map &mapData, GalaxyView *galaxyView, QWidget *parent) :
     tradeWidget->setHeaderLabels(tradeLabels);
     for(const auto &it : mapData.Commodities())
     {
-        QTreeWidgetItem *item = new QTreeWidgetItem;
+        QTreeWidgetItem *item = new QTreeWidgetItem(tradeWidget);
         item->setText(0, it.name);
         item->setText(1, QString::number((it.low + it.high) / 2));
         item->setText(2, "medium");
@@ -76,7 +76,7 @@ DetailView::DetailView(Map &mapData, GalaxyView *galaxyView, QWidget *parent) :
     tradeWidget->insertTopLevelItems(0, trade);
     layout->addWidget(tradeWidget);
 
-    fleets = new QTreeWidget;
+    fleets = new QTreeWidget(this);
     fleets->setIndentation(0);
     fleets->setColumnCount(2);
     QStringList fleetLabels;
