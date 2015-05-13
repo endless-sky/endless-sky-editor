@@ -57,6 +57,7 @@ void Map::Load(const QString &path)
                     int high = static_cast<int>(child.Value(3));
                     commodities.push_back({child.Token(1), low, high});
                 }
+    isChanged = false;
 }
 
 
@@ -87,6 +88,7 @@ void Map::Save(const QString &path) const
         file.Write(it);
         file.Write();
     }
+    isChanged = false;
 }
 
 
@@ -94,6 +96,20 @@ void Map::Save(const QString &path) const
 const QString &Map::DataDirectory() const
 {
     return dataDirectory;
+}
+
+
+
+void Map::SetChanged(bool changed)
+{
+    isChanged = changed;
+}
+
+
+
+bool Map::IsChanged() const
+{
+    return isChanged;
 }
 
 

@@ -52,7 +52,7 @@ DetailView::DetailView(Map &mapData, GalaxyView *galaxyView, QWidget *parent) :
     layout->addWidget(government);
     government->installEventFilter(this);
 
-    QTreeWidget *tradeWidget = new QTreeWidget(this);
+    tradeWidget = new QTreeWidget(this);
     tradeWidget->setIndentation(0);
     tradeWidget->setColumnCount(3);
     QStringList tradeLabels;
@@ -102,6 +102,8 @@ void DetailView::SetSystem(System *system)
         name->setText(system->Name());
         government->setText(system->Government());
 
+        disconnect(tradeWidget, SIGNAL(itemChanged(QTreeWidgetItem *,int)),
+            this, SLOT(CommodityChanged(QTreeWidgetItem *, int)));
         QList<QTreeWidgetItem *>::iterator item = trade.begin();
         for(const auto &it : mapData.Commodities())
         {
@@ -111,6 +113,8 @@ void DetailView::SetSystem(System *system)
             (*item)->setText(2, LEVEL[level]);
             ++item;
         }
+        connect(tradeWidget, SIGNAL(itemChanged(QTreeWidgetItem *,int)),
+            this, SLOT(CommodityChanged(QTreeWidgetItem *, int)));
         UpdateFleets();
     }
     else
@@ -147,6 +151,7 @@ void DetailView::NameChanged()
     else
     {
         mapData.RenameSystem(system->Name(), name->text());
+        mapData.SetChanged();
         galaxyView->update();
     }
 }
@@ -160,6 +165,8 @@ void DetailView::GovernmentChanged()
 
     system->SetGovernment(government->text());
     galaxyView->SetGovernment(government->text());
+    mapData.SetChanged();
+    galaxyView->update();
 }
 
 
@@ -187,6 +194,7 @@ void DetailView::CommodityChanged(QTreeWidgetItem *item, int column)
                 system->SetTrade(it.name, price);
                 int level = max(0, min(4, ((price - it.low) * 5) / (it.high - it.low)));
                 item->setText(2, LEVEL[level]);
+                mapData.SetChanged();
                 galaxyView->update();
                 break;
             }
@@ -211,6 +219,7 @@ void DetailView::FleetChanged(QTreeWidgetItem *item, int column)
     else
         return;
 
+    mapData.SetChanged();
     UpdateFleets();
 }
 

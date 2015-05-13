@@ -32,6 +32,10 @@ public:
     void Save(const QString &path) const;
     const QString &DataDirectory() const;
 
+    // Mark this file as changed.
+    void SetChanged(bool changed = true);
+    bool IsChanged() const;
+
     std::list<Galaxy> &Galaxies();
     const std::list<Galaxy> &Galaxies() const;
 
@@ -63,6 +67,8 @@ private:
 
     QString comments;
     std::list<DataNode> unparsed;
+
+    mutable bool isChanged = false;
 };
 
 #endif // MAP_H

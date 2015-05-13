@@ -23,6 +23,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include <QHBoxLayout>
 #include <QMenu>
 #include <QMenuBar>
+#include <QMessageBox>
 #include <QSizePolicy>
 #include <QTabWidget>
 
@@ -101,6 +102,19 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 
 
 
+void MainWindow::closeEvent(QCloseEvent */*event*/)
+{
+    if(map.IsChanged())
+    {
+        QMessageBox::StandardButton button = QMessageBox::question(this, "Save changes?",
+            "Save changes to the map file before quitting?");
+        if(button == QMessageBox::Yes)
+            Save();
+    }
+}
+
+
+
 void MainWindow::CreateWidgets()
 {
     QWidget *box = new QWidget(this);
@@ -117,7 +131,7 @@ void MainWindow::CreateWidgets()
     detailView->setMinimumWidth(300);
     detailView->setMaximumWidth(300);
 
-    systemView = new SystemView(detailView, tabs, tabs);
+    systemView = new SystemView(map, detailView, tabs, tabs);
     auto it = map.Systems().find("Sol");
     if(it != map.Systems().end())
         systemView->Select(&it->second);

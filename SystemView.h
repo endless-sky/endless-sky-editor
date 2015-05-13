@@ -22,6 +22,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include <QTimer>
 
 class DetailView;
+class Map;
 class PlanetView;
 class StellarObject;
 class System;
@@ -34,7 +35,7 @@ class SystemView : public QWidget
 {
     Q_OBJECT
 public:
-    explicit SystemView(DetailView *detailView, QTabWidget *tabs, QWidget *parent = 0);
+    explicit SystemView(Map &mapData, DetailView *detailView, QTabWidget *tabs, QWidget *parent = 0);
 
     void Select(System *system);
     System *Selected() const;
@@ -72,6 +73,7 @@ private:
 
 
 private:
+    Map &mapData;
     DetailView *detailView;
     QTabWidget *tabs;
     PlanetView *planetView;

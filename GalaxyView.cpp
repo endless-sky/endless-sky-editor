@@ -125,6 +125,7 @@ void GalaxyView::DeleteSystem()
 
         auto it = mapData.Systems().find(system->Name());
         mapData.Systems().erase(it);
+        mapData.SetChanged();
     }
 }
 
@@ -162,6 +163,7 @@ void GalaxyView::mousePressEvent(QMouseEvent *event)
                         system.SetTrade(commodity.name, (commodity.low + commodity.high) / 2);
                     if(systemView)
                         systemView->Select(&system);
+                    mapData.SetChanged();
                     update();
                 }
             }
@@ -183,6 +185,7 @@ void GalaxyView::mousePressEvent(QMouseEvent *event)
         if(systemView && systemView->Selected())
         {
             systemView->Selected()->ToggleLink(dragSystem);
+            mapData.SetChanged();
             update();
         }
         dragSystem = nullptr;
@@ -226,6 +229,7 @@ void GalaxyView::mouseMoveEvent(QMouseEvent *event)
             return;
 
         dragSystem->SetPosition(dragSystem->Position() + distance / scale);
+        mapData.SetChanged();
         clickOff = QVector2D(event->pos());
     }
     update();

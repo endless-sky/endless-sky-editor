@@ -13,6 +13,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include "SystemView.h"
 
 #include "DetailView.h"
+#include "Map.h"
 #include "PlanetView.h"
 #include "SpriteSet.h"
 #include "StellarObject.h"
@@ -31,8 +32,8 @@ using namespace std;
 
 
 
-SystemView::SystemView(DetailView *detailView, QTabWidget *tabs, QWidget *parent) :
-    QWidget(parent), detailView(detailView), tabs(tabs)
+SystemView::SystemView(Map &mapData, DetailView *detailView, QTabWidget *tabs, QWidget *parent) :
+    QWidget(parent), mapData(mapData), detailView(detailView), tabs(tabs)
 {
     setAutoFillBackground(true);
     QPalette p = palette();
@@ -109,6 +110,7 @@ void SystemView::RandomizeInhabited()
         selectedObject = nullptr;
         system->Randomize(true, true);
         system->SetDay(timeStep);
+        mapData.SetChanged();
         update();
     }
 }
@@ -122,6 +124,7 @@ void SystemView::Randomize()
         selectedObject = nullptr;
         system->Randomize(true, false);
         system->SetDay(timeStep);
+        mapData.SetChanged();
         update();
     }
 }
@@ -135,6 +138,7 @@ void SystemView::RandomizeUninhabited()
         selectedObject = nullptr;
         system->Randomize(false, false);
         system->SetDay(timeStep);
+        mapData.SetChanged();
         update();
     }
 }
@@ -147,6 +151,7 @@ void SystemView::ChangeAsteroids()
     {
         system->ChangeAsteroids();
         asteroids.Set(system);
+        mapData.SetChanged();
         update();
     }
 }
@@ -160,6 +165,7 @@ void SystemView::ChangeStar()
         system->ChangeStar();
         selectedObject = nullptr;
         system->SetDay(timeStep);
+        mapData.SetChanged();
         update();
     }
 }
@@ -175,12 +181,14 @@ void SystemView::ChangePlanet()
     {
         system->ChangeSprite(selectedObject);
         system->SetDay(timeStep);
+        mapData.SetChanged();
         update();
     }
     else if(!selectedObject)
     {
         system->AddPlanet();
         system->SetDay(timeStep);
+        mapData.SetChanged();
         update();
     }
 }
@@ -196,6 +204,7 @@ void SystemView::ChangeMoon()
     {
         system->ChangeSprite(selectedObject);
         system->SetDay(timeStep);
+        mapData.SetChanged();
         update();
     }
     else if(selectedObject && selectedObject->Parent() < 0)
@@ -204,6 +213,7 @@ void SystemView::ChangeMoon()
         system->AddMoon(selectedObject);
         selectedObject = &system->Objects()[index];
         system->SetDay(timeStep);
+        mapData.SetChanged();
         update();
     }
 }
@@ -219,6 +229,7 @@ void SystemView::ChangeStation()
     {
         system->ChangeSprite(selectedObject);
         system->SetDay(timeStep);
+        mapData.SetChanged();
         update();
     }
     else if(selectedObject && selectedObject->Parent() < 0)
@@ -227,6 +238,7 @@ void SystemView::ChangeStation()
         system->AddMoon(selectedObject, true);
         selectedObject = &system->Objects()[index];
         system->SetDay(timeStep);
+        mapData.SetChanged();
         update();
     }
 }
@@ -240,6 +252,7 @@ void SystemView::DeleteObject()
         system->Delete(selectedObject);
         selectedObject = nullptr;
         system->SetDay(timeStep);
+        mapData.SetChanged();
         update();
     }
 }
@@ -313,6 +326,7 @@ void SystemView::mouseMoveEvent(QMouseEvent *event)
 
         system->Move(dragObject, newRadius - oldRadius, (newAngle - oldAngle) * (180. / M_PI));
         system->SetDay(timeStep);
+        mapData.SetChanged();
     }
     if(isPaused)
         update();

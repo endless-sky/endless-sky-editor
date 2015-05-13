@@ -43,6 +43,7 @@ public slots:
 
 protected:
     virtual void keyPressEvent(QKeyEvent *event) override;
+    virtual void closeEvent(QCloseEvent *event) override;
 
 private:
     void CreateWidgets();

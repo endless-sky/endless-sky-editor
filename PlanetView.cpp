@@ -127,8 +127,15 @@ void PlanetView::SetPlanet(StellarObject *object)
         name->setText(it->second.Name());
         attributes->setText(ToString(it->second.Attributes()));
         landscape->SetPlanet(&it->second);
+
+        disconnect(description, SIGNAL(textChanged()), this, SLOT(DescriptionChanged()));
         description->setPlainText(it->second.Description());
+        connect(description, SIGNAL(textChanged()), this, SLOT(DescriptionChanged()));
+
+        disconnect(spaceport, SIGNAL(textChanged()), this, SLOT(SpaceportDescriptionChanged()));
         spaceport->setPlainText(it->second.SpaceportDescription());
+        connect(spaceport, SIGNAL(textChanged()), this, SLOT(SpaceportDescriptionChanged()));
+
         shipyard->setText(ToString(it->second.Shipyard()));
         outfitter->setText(ToString(it->second.Outfitter()));
         reputation->setText(QString::number(it->second.RequiredReputation()));
@@ -164,6 +171,7 @@ void PlanetView::NameChanged()
             planet.SetBribe(bribe->text().toDouble());
         if(!security->text().isEmpty())
             planet.SetSecurity(security->text().toDouble());
+        mapData.SetChanged();
     }
 }
 
@@ -172,7 +180,15 @@ void PlanetView::NameChanged()
 void PlanetView::AttributesChanged()
 {
     if(object && !object->GetPlanet().isEmpty())
-        mapData.Planets()[object->GetPlanet()].Attributes() = ToList(attributes->text());
+    {
+        vector<QString> list = ToList(attributes->text());
+        Planet &planet = mapData.Planets()[object->GetPlanet()];
+        if(planet.Attributes() != list)
+        {
+            planet.Attributes() = ToList(shipyard->text());
+            mapData.SetChanged();
+        }
+    }
 }
 
 
@@ -180,7 +196,15 @@ void PlanetView::AttributesChanged()
 void PlanetView::DescriptionChanged()
 {
     if(object && !object->GetPlanet().isEmpty())
-        mapData.Planets()[object->GetPlanet()].SetDescription(description->toPlainText());
+    {
+        QString newDescription = description->toPlainText();
+        Planet &planet = mapData.Planets()[object->GetPlanet()];
+        if(planet.Description() != newDescription)
+        {
+            planet.SetDescription(newDescription);
+            mapData.SetChanged();
+        }
+    }
 }
 
 
@@ -188,7 +212,15 @@ void PlanetView::DescriptionChanged()
 void PlanetView::SpaceportDescriptionChanged()
 {
     if(object && !object->GetPlanet().isEmpty())
-        mapData.Planets()[object->GetPlanet()].SetSpaceportDescription(spaceport->toPlainText());
+    {
+        QString newDescription = spaceport->toPlainText();
+        Planet &planet = mapData.Planets()[object->GetPlanet()];
+        if(planet.SpaceportDescription() != newDescription)
+        {
+            planet.SetSpaceportDescription(newDescription);
+            mapData.SetChanged();
+        }
+    }
 }
 
 
@@ -196,7 +228,15 @@ void PlanetView::SpaceportDescriptionChanged()
 void PlanetView::ShipyardChanged()
 {
     if(object && !object->GetPlanet().isEmpty())
-        mapData.Planets()[object->GetPlanet()].Shipyard() = ToList(shipyard->text());
+    {
+        vector<QString> list = ToList(shipyard->text());
+        Planet &planet = mapData.Planets()[object->GetPlanet()];
+        if(planet.Shipyard() != list)
+        {
+            planet.Shipyard() = ToList(shipyard->text());
+            mapData.SetChanged();
+        }
+    }
 }
 
 
@@ -204,7 +244,15 @@ void PlanetView::ShipyardChanged()
 void PlanetView::OutfitterChanged()
 {
     if(object && !object->GetPlanet().isEmpty())
-        mapData.Planets()[object->GetPlanet()].Outfitter() = ToList(outfitter->text());
+    {
+        vector<QString> list = ToList(outfitter->text());
+        Planet &planet = mapData.Planets()[object->GetPlanet()];
+        if(planet.Outfitter() != list)
+        {
+            planet.Outfitter() = ToList(outfitter->text());
+            mapData.SetChanged();
+        }
+    }
 }
 
 
@@ -212,8 +260,17 @@ void PlanetView::OutfitterChanged()
 void PlanetView::ReputationChanged()
 {
     if(object && !object->GetPlanet().isEmpty())
-        mapData.Planets()[object->GetPlanet()].SetRequiredReputation(
-            reputation->text().isEmpty() ? numeric_limits<double>::quiet_NaN() : reputation->text().toDouble());
+    {
+        double value = numeric_limits<double>::quiet_NaN();
+        if(!reputation->text().isEmpty())
+            value = reputation->text().toDouble();
+        Planet &planet = mapData.Planets()[object->GetPlanet()];
+        if(planet.RequiredReputation() != value)
+        {
+            planet.SetRequiredReputation(value);
+            mapData.SetChanged();
+        }
+    }
 }
 
 
@@ -221,8 +278,17 @@ void PlanetView::ReputationChanged()
 void PlanetView::BribeChanged()
 {
     if(object && !object->GetPlanet().isEmpty())
-        mapData.Planets()[object->GetPlanet()].SetBribe(
-            bribe->text().isEmpty() ? numeric_limits<double>::quiet_NaN() : bribe->text().toDouble());
+    {
+        double value = numeric_limits<double>::quiet_NaN();
+        if(!bribe->text().isEmpty())
+            value = bribe->text().toDouble();
+        Planet &planet = mapData.Planets()[object->GetPlanet()];
+        if(planet.Bribe() != value)
+        {
+            planet.SetBribe(value);
+            mapData.SetChanged();
+        }
+    }
 }
 
 
@@ -230,13 +296,22 @@ void PlanetView::BribeChanged()
 void PlanetView::SecurityChanged()
 {
     if(object && !object->GetPlanet().isEmpty())
-        mapData.Planets()[object->GetPlanet()].SetSecurity(
-            security->text().isEmpty() ? numeric_limits<double>::quiet_NaN() : security->text().toDouble());
+    {
+        double value = numeric_limits<double>::quiet_NaN();
+        if(!security->text().isEmpty())
+            value = security->text().toDouble();
+        Planet &planet = mapData.Planets()[object->GetPlanet()];
+        if(planet.Security() != value)
+        {
+            planet.SetSecurity(value);
+            mapData.SetChanged();
+        }
+    }
 }
 
 
 
-QString PlanetView::ToString(const std::vector<QString> &list)
+QString PlanetView::ToString(const vector<QString> &list)
 {
     if(list.empty())
         return "";
@@ -252,7 +327,7 @@ QString PlanetView::ToString(const std::vector<QString> &list)
 
 
 
-std::vector<QString> PlanetView::ToList(const QString &str)
+vector<QString> PlanetView::ToList(const QString &str)
 {
     vector<QString> result;
 

@@ -57,6 +57,7 @@ private:
     QLineEdit *name = nullptr;
     QLineEdit *government = nullptr;
 
+    QTreeWidget *tradeWidget = nullptr;
     QList<QTreeWidgetItem *> trade;
     QTreeWidget *fleets = nullptr;
 };
