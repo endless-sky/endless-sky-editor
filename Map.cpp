@@ -14,6 +14,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 #include "DataFile.h"
 #include "DataWriter.h"
+#include "SpriteSet.h"
 
 #include <algorithm>
 
@@ -26,7 +27,11 @@ void Map::Load(const QString &path)
     // Clear everything first.
     *this = Map();
 
-    dataDirectory = path.left(path.lastIndexOf('/') + 1);
+    dataDirectory = path.left(path.lastIndexOf('/'));
+    QString rootDir = dataDirectory.left(dataDirectory.lastIndexOf('/'));
+    dataDirectory += "/";
+    SpriteSet::SetRootPath(rootDir + "/images/");
+
     DataFile data(path);
     comments = data.Comments();
 

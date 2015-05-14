@@ -32,6 +32,7 @@ class GalaxyView : public QWidget
 public:
     explicit GalaxyView(Map &mapData, QTabWidget *tabs, QWidget *parent = 0);
 
+    void Center();
     void SetSystemView(SystemView *view);
     void SetCommodity(const QString &name);
     void SetGovernment(const QString &name);

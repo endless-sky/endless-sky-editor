@@ -16,6 +16,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include "DataWriter.h"
 
 #include <algorithm>
+#include <cmath>
 
 using namespace std;
 

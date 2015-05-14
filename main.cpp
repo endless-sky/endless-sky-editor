@@ -26,13 +26,6 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     Map mapData;
 
-    QString path = argc > 1 ? argv[1] : "/usr/share/games/endless-sky/data/map.txt";
-    QString dataDir = path.left(path.lastIndexOf('/'));
-    QString rootDir = dataDir.left(dataDir.lastIndexOf('/'));
-    SpriteSet::SetRootPath(rootDir + "/images/");
-
-    mapData.Load(path);
-
     MainWindow w(mapData);
     w.resize(1200, 900);
     w.show();

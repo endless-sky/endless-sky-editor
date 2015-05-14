@@ -17,6 +17,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 #include <list>
 #include <string>
+#include <vector>
 
 
 

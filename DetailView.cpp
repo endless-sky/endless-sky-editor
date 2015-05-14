@@ -60,20 +60,10 @@ DetailView::DetailView(Map &mapData, GalaxyView *galaxyView, QWidget *parent) :
     tradeLabels.append("Price");
     tradeLabels.append("");
     tradeWidget->setHeaderLabels(tradeLabels);
-    for(const auto &it : mapData.Commodities())
-    {
-        QTreeWidgetItem *item = new QTreeWidgetItem(tradeWidget);
-        item->setText(0, it.name);
-        item->setText(1, QString::number((it.low + it.high) / 2));
-        item->setText(2, "medium");
-        trade.append(item);
-    }
     connect(tradeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
         this, SLOT(CommodityClicked(QTreeWidgetItem *, int)));
     connect(tradeWidget, SIGNAL(itemChanged(QTreeWidgetItem *,int)),
         this, SLOT(CommodityChanged(QTreeWidgetItem *, int)));
-    tradeWidget->setColumnWidth(1, 50);
-    tradeWidget->insertTopLevelItems(0, trade);
     layout->addWidget(tradeWidget);
 
     fleets = new QTreeWidget(this);
@@ -104,15 +94,21 @@ void DetailView::SetSystem(System *system)
 
         disconnect(tradeWidget, SIGNAL(itemChanged(QTreeWidgetItem *,int)),
             this, SLOT(CommodityChanged(QTreeWidgetItem *, int)));
-        QList<QTreeWidgetItem *>::iterator item = trade.begin();
+
+        tradeWidget->clear();
         for(const auto &it : mapData.Commodities())
         {
+            QTreeWidgetItem *item = new QTreeWidgetItem(tradeWidget);
             int price = system->Trade(it.name);
             int level = max(0, min(4, ((price - it.low) * 5) / (it.high - it.low)));
-            (*item)->setText(1, QString::number(price));
-            (*item)->setText(2, LEVEL[level]);
-            ++item;
+            item->setText(0, it.name);
+            item->setText(1, QString::number(price));
+            item->setText(2, LEVEL[level]);
+            trade.append(item);
         }
+        tradeWidget->setColumnWidth(1, 50);
+        tradeWidget->insertTopLevelItems(0, trade);
+
         connect(tradeWidget, SIGNAL(itemChanged(QTreeWidgetItem *,int)),
             this, SLOT(CommodityChanged(QTreeWidgetItem *, int)));
         UpdateFleets();

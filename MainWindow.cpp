@@ -54,8 +54,12 @@ void MainWindow::Open()
     if(!path.isEmpty())
     {
         map.Load(path);
+        galaxyView->Center();
         systemView->Select(nullptr);
+        planetView->SetPlanet(nullptr);
         update();
+        tabs->setCurrentWidget(galaxyView);
+        galaxyView->update();
     }
 }
 

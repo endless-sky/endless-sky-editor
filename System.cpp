@@ -17,6 +17,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include "Planet.h"
 
 #include <algorithm>
+#include <cmath>
 #include <limits>
 #include <set>
 
@@ -33,7 +34,6 @@ namespace {
 
     static const int RANDOM_STAR_DISTANCE = 40;
     static const double MIN_STAR_DISTANCE = 40.;
-    static const double BINARY_STAR_EXTRA_GAP = 50.;
 }
 
 

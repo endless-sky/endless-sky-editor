@@ -24,6 +24,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include <QTabWidget>
 
 #include <algorithm>
+#include <cmath>
 
 using namespace std;
 
@@ -63,10 +64,23 @@ GalaxyView::GalaxyView(Map &mapData, QTabWidget *tabs, QWidget *parent) :
     p.setColor(backgroundRole(), QColor(0, 0, 0));
     setPalette(p);
 
+    Center();
+}
+
+
+
+void GalaxyView::Center()
+{
+    if(mapData.Systems().empty())
+        return;
+
+    offset = QVector2D();
     for(const auto &it : mapData.Systems())
         offset -= it.second.Position();
+
     offset /= mapData.Systems().size();
 }
+
 
 
 
