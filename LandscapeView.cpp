@@ -13,6 +13,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include "LandscapeView.h"
 
 #include "LandscapeLoader.h"
+#include "Map.h"
 #include "Planet.h"
 #include "SpriteSet.h"
 
@@ -38,8 +39,8 @@ namespace {
 
 
 
-LandscapeView::LandscapeView(QWidget *parent) :
-    QWidget(parent)
+LandscapeView::LandscapeView(const Map &mapData, QWidget *parent) :
+    QWidget(parent), mapData(mapData)
 {
     loader.Init();
 }
@@ -57,7 +58,7 @@ void LandscapeView::SetPlanet(Planet *planet)
 {
     this->planet = planet;
     if(planet)
-        landscape = planet->Landscape();
+        SetLandscape(planet->Landscape());
     showGallery = !planet || planet->Landscape().isEmpty();
 }
 
@@ -86,7 +87,7 @@ void LandscapeView::mousePressEvent(QMouseEvent *event)
             unsigned index = x / thumbWidth + cols * (y / thumbHeight);
             if(index < loader.Available().size())
             {
-                landscape = loader.Available()[index];
+                SetLandscape(loader.Available()[index]);
                 if(planet)
                     planet->SetLandscape(landscape);
             }
@@ -138,4 +139,19 @@ void LandscapeView::paintEvent(QPaintEvent */*event*/)
             painter.scale(THUMB_SCALE, THUMB_SCALE);
             painter.translate(-x, -y);
         }
+}
+
+
+
+void LandscapeView::SetLandscape(const QString &name)
+{
+    landscape = name;
+    if(name.isEmpty())
+        return;
+
+    int count = 0;
+    for(const auto &it : mapData.Planets())
+        count += (it.second.Landscape() == landscape);
+    setToolTip((count == 1) ? "This is the only planet for which this picture is used." :
+        ("This landscape picture is used for " + QString::number(count) + " planets."));
 }

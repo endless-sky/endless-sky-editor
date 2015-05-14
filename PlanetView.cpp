@@ -39,7 +39,7 @@ PlanetView::PlanetView(Map &mapData, QWidget *parent) :
     attributes = new QLineEdit(this);
     connect(attributes, SIGNAL(editingFinished()), this, SLOT(AttributesChanged()));
 
-    landscape = new LandscapeView(this);
+    landscape = new LandscapeView(mapData, this);
     landscape->setMinimumHeight(360);
     landscape->setMaximumHeight(360);
 

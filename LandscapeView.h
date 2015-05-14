@@ -15,6 +15,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 #include <QWidget>
 
+class Map;
 class Planet;
 
 
@@ -23,7 +24,7 @@ class LandscapeView : public QWidget
 {
     Q_OBJECT
 public:
-    explicit LandscapeView(QWidget *parent = 0);
+    explicit LandscapeView(const Map &mapData, QWidget *parent = 0);
     ~LandscapeView();
 
     void SetPlanet(Planet *planet);
@@ -37,7 +38,13 @@ protected:
     virtual void mousePressEvent(QMouseEvent *event) override;
     virtual void paintEvent(QPaintEvent *event) override;
 
+
 private:
+    void SetLandscape(const QString &name);
+
+
+private:
+    const Map &mapData;
     Planet *planet = nullptr;
     bool showGallery = false;
     QString landscape;
