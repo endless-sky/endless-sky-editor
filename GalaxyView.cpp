@@ -159,8 +159,16 @@ void GalaxyView::mousePressEvent(QMouseEvent *event)
                 {
                     System &system = mapData.Systems()[text];
                     system.Init(text, origin);
-                    for(const Map::Commodity &commodity : mapData.Commodities())
-                        system.SetTrade(commodity.name, (commodity.low + commodity.high) / 2);
+                    if(systemView && systemView->Selected())
+                    {
+                        System &previous = *systemView->Selected();
+                        for(const Map::Commodity &commodity : mapData.Commodities())
+                            system.SetTrade(commodity.name, previous.Trade(commodity.name));
+                        system.SetGovernment(previous.Government());
+                    }
+                    else
+                        for(const Map::Commodity &commodity : mapData.Commodities())
+                            system.SetTrade(commodity.name, (commodity.low + commodity.high) / 2);
                     if(systemView)
                         systemView->Select(&system);
                     mapData.SetChanged();

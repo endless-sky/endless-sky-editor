@@ -323,7 +323,8 @@ void System::Init(const QString &name, const QVector2D &position)
     this->name = name;
     this->position = position;
 
-    // TODO: initialize with random planets, asteroids, etc.
+    Randomize(true, false);
+    ChangeAsteroids();
 }
 
 
