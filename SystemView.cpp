@@ -393,14 +393,17 @@ void SystemView::paintEvent(QPaintEvent */*event*/)
         double radius = system->HabitableZone();
 
         QPen innerPen(QColor(255., 200., 0.));
+        innerPen.setWidthF(1.5);
         painter.setPen(innerPen);
         painter.drawEllipse(QPointF(), .5 * radius, .5 * radius);
 
         QPen centerPen(QColor(0., 255., 0.));
+        centerPen.setWidthF(1.5);
         painter.setPen(centerPen);
         painter.drawEllipse(QPointF(), radius, radius);
 
         QPen outerPen(QColor(0., 150., 255.));
+        outerPen.setWidthF(1.5);
         painter.setPen(outerPen);
         painter.drawEllipse(QPointF(), 2. * radius, 2. * radius);
     }
@@ -409,6 +412,7 @@ void SystemView::paintEvent(QPaintEvent */*event*/)
     QBrush brush(QColor(128, 128, 128));
     painter.setBrush(brush);
     QPen pen(QColor(255, 255, 255));
+    pen.setWidthF(1.5);
     painter.setPen(pen);
     for(const StellarObject &object : system->Objects())
     {
@@ -418,26 +422,27 @@ void SystemView::paintEvent(QPaintEvent */*event*/)
         painter.drawLine(object.Position().toPointF(), parent);
     }
 
+    QPen blue(QColor(0, 128, 255));
+    blue.setWidthF(2.5);
+    painter.setPen(blue);
+    painter.setBrush(Qt::NoBrush);
     for(const StellarObject &object : system->Objects())
     {
         QPixmap sprite = SpriteSet::Get(object.Sprite());
-        if(sprite.width() && sprite.height())
-        {
-            QVector2D pos = object.Position();
-            double angle = pos.isNull() ? (-2. * M_PI * timeStep / object.Period()) : atan2(pos.x(), pos.y());
-            angle *= 180. / M_PI;
-            angle += 180.;
+        QVector2D pos = object.Position();
+        double angle = pos.isNull() ? (-2. * M_PI * timeStep / object.Period()) : atan2(pos.x(), pos.y());
+        angle *= 180. / M_PI;
+        angle += 180.;
 
-            painter.translate(pos.toPointF());
-            painter.rotate(-angle);
-            painter.drawPixmap(QPointF(-.5 * sprite.width(), -.5 * sprite.height()), sprite);
-            painter.rotate(angle);
-            painter.translate(-pos.toPointF());
-        }
-        else
+        painter.translate(pos.toPointF());
+        painter.rotate(-angle);
+        painter.drawPixmap(QPointF(-.5 * sprite.width(), -.5 * sprite.height()), sprite);
+        painter.rotate(angle);
+        painter.translate(-pos.toPointF());
+        if(!object.GetPlanet().isEmpty())
         {
-            double radius = object.Radius();
-            painter.drawEllipse(object.Position().toPointF(), radius, radius);
+            double radius = object.Radius() + 5.;
+            painter.drawEllipse(pos.toPointF(), radius, radius);
         }
     }
     // Get the bounding box of the paint region after scaling and offset.
@@ -448,9 +453,10 @@ void SystemView::paintEvent(QPaintEvent */*event*/)
     if(selectedObject)
     {
         QPen pen(QColor(255, 255, 255));
+        pen.setWidthF(1.5);
         painter.setPen(pen);
         painter.setBrush(Qt::NoBrush);
-        double radius = selectedObject->Radius() + 5.;
+        double radius = selectedObject->Radius() + 10.;
         painter.drawEllipse(selectedObject->Position().toPointF(), radius, radius);
     }
 }
