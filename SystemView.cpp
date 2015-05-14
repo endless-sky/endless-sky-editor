@@ -440,7 +440,10 @@ void SystemView::paintEvent(QPaintEvent */*event*/)
             painter.drawEllipse(object.Position().toPointF(), radius, radius);
         }
     }
-    asteroids.Draw(painter);
+    // Get the bounding box of the paint region after scaling and offset.
+    QVector2D half(.5 * width() / scale, .5 * height() / scale);
+    QRectF bounds((offset / -scale - half).toPointF(), (offset / -scale + half).toPointF());
+    asteroids.Draw(painter, bounds);
 
     if(selectedObject)
     {

@@ -64,14 +64,24 @@ void AsteroidField::Step()
 
 
 
-void AsteroidField::Draw(QPainter &painter) const
+void AsteroidField::Draw(QPainter &painter, const QRectF &bounds) const
 {
-    for(const Asteroid &asteroid : asteroids)
-    {
-        painter.translate(asteroid.position.toPointF());
-        painter.scale(.5, .5);
-        painter.drawPixmap(QPointF(), asteroid.sprite);
-        painter.scale(2., 2.);
-        painter.translate(-asteroid.position.toPointF());
-    }
+    int firstX = round(bounds.left() / 4096.);
+    int lastX = round(bounds.right() / 4096.);
+    int firstY = round(bounds.top() / 4096.);
+    int lastY = round(bounds.bottom() / 4096.);
+    for(int y = firstY; y <= lastY; ++y)
+        for(int x = firstX; x <= lastX; ++x)
+        {
+            QVector2D offset(x * 4096., y * 4096.);
+            for(const Asteroid &asteroid : asteroids)
+            {
+                QPointF thisOffset = (asteroid.position + offset).toPointF();
+                painter.translate(thisOffset);
+                painter.scale(.5, .5);
+                painter.drawPixmap(QPointF(), asteroid.sprite);
+                painter.scale(2., 2.);
+                painter.translate(-thisOffset);
+            }
+        }
 }

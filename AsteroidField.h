@@ -22,6 +22,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 class System;
 
 class QPainter;
+class QRectF;
 
 
 
@@ -29,7 +30,7 @@ class AsteroidField {
 public:
     void Set(const System *system);
     void Step();
-    void Draw(QPainter &painter) const;
+    void Draw(QPainter &painter, const QRectF &bounds) const;
 
 
 private:
