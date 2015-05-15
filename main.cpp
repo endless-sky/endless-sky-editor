@@ -15,6 +15,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include "SpriteSet.h"
 
 #include <QApplication>
+#include <QFileInfo>
 #include <QString>
 
 #include <iostream>
@@ -44,6 +45,18 @@ int main(int argc, char *argv[])
             PrintHelp();
             return 0;
         }
+    }
+    if(path.isEmpty())
+    {
+#if defined __APPLE__
+        path = "/Applications/Endless Sky.app/Contents/Resources/data/map.txt";
+#elif defined _WIN32
+        path = "C:/Program Files/Endless Sky/data/map.txt";
+#else
+        path = "/usr/share/games/endless-sky/data/map.txt";
+#endif
+        if(!path.isEmpty() && !QFileInfo(path).exists())
+            path.clear();
     }
 
     QApplication a(argc, argv);
