@@ -25,7 +25,7 @@ const QString DataWriter::space = " ";
 DataWriter::DataWriter(const QString &path)
     : before(&indent), file(path)
 {
-    if(file.open(QFile::WriteOnly | QFile::Text))
+    if(file.open(QFile::WriteOnly))
     {
         out.setDevice(&file);
         out.setCodec("UTF-8");
