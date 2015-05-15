@@ -12,6 +12,17 @@ TARGET = endless-sky-editor
 TEMPLATE = app
 CONFIG += c++11
 
+target.path = /usr/games/
+INSTALLS += target
+
+desktop.path = /usr/share/applications/
+desktop.files = endless-sky-editor.desktop
+INSTALLS += desktop
+
+manual.path = /usr/share/man/man6/
+manual.files = endless-sky-editor.6
+INSTALLS += manual
+
 
 SOURCES += main.cpp\
 		DataFile.cpp\
