@@ -269,6 +269,11 @@ void SystemView::Pause()
 void SystemView::mousePressEvent(QMouseEvent *event)
 {
     dragObject = nullptr;
+    if(event->button() != Qt::LeftButton)
+    {
+        selectedObject = nullptr;
+        return;
+    }
     clickOff = QVector2D(event->pos()) - offset;
 
     QVector2D pos = MapPoint(event->pos());
@@ -288,6 +293,9 @@ void SystemView::mousePressEvent(QMouseEvent *event)
 
 void SystemView::mouseDoubleClickEvent(QMouseEvent *event)
 {
+    if(event->button() != Qt::LeftButton)
+        return;
+
     clickOff = QVector2D(event->pos()) - offset;
 
     QVector2D pos = MapPoint(event->pos());
@@ -304,6 +312,9 @@ void SystemView::mouseDoubleClickEvent(QMouseEvent *event)
 
 void SystemView::mouseMoveEvent(QMouseEvent *event)
 {
+    if(!(event->buttons() & Qt::LeftButton))
+        return;
+
     if(!dragObject)
         offset = QVector2D(event->pos()) - clickOff;
     else
