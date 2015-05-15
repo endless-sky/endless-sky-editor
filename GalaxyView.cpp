@@ -63,6 +63,9 @@ GalaxyView::GalaxyView(Map &mapData, QTabWidget *tabs, QWidget *parent) :
     QPalette p = palette();
     p.setColor(backgroundRole(), QColor(0, 0, 0));
     setPalette(p);
+    setToolTip("Left click to select a system. Drag to move a system or pan the view.\n"
+        "Right click to create a new system or to toggle links between systems.\n"
+        "Use the scroll wheel to zoom in and out.");
 
     Center();
 }
