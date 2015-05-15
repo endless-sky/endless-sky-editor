@@ -169,13 +169,35 @@ const vector<Map::Commodity> &Map::Commodities() const
 
 
 // Map a price to a value between 0 and 1 (lowest vs. highest).
-double Map::MapPrice(QString &commodity, int price) const
+double Map::MapPrice(const QString &commodity, int price) const
 {
     for(const Commodity &it : commodities)
         if(it.name == commodity)
             return max(0., min(1., static_cast<double>(price - it.low) / (it.high - it.low)));
 
     return .5;
+}
+
+
+
+QString Map::PriceLevel(const QString &commodity, int price) const
+{
+    static const QString LEVEL[] = {
+                "(very low)",
+                "(low)",
+                "(medium)",
+                "(high)",
+                "(very high)"
+            };
+
+    for(const Commodity &it : commodities)
+        if(it.name == commodity)
+        {
+            int level = max(0, min(4, ((price - it.low) * 5) / (it.high - it.low)));
+            return LEVEL[level];
+        }
+
+    return "";
 }
 
 

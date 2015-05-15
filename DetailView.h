@@ -17,11 +17,14 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 #include <QList>
 
+#include <map>
+
 class GalaxyView;
 class Map;
 class System;
 
 class QLineEdit;
+class QObject;
 class QTreeWidget;
 class QTreeWidgetItem;
 
@@ -42,7 +45,7 @@ public slots:
     void NameChanged();
     void GovernmentChanged();
     void CommodityClicked(QTreeWidgetItem *item, int column);
-    void CommodityChanged(QTreeWidgetItem *item, int column);
+    void CommodityChanged(int value);
     void FleetChanged(QTreeWidgetItem *item, int column);
 
 private:
@@ -58,7 +61,7 @@ private:
     QLineEdit *government = nullptr;
 
     QTreeWidget *tradeWidget = nullptr;
-    QList<QTreeWidgetItem *> trade;
+    std::map<QObject *, QTreeWidgetItem *> spinMap;
     QTreeWidget *fleets = nullptr;
 };
 

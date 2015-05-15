@@ -20,20 +20,11 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include <QMessageBox>
 #include <QLabel>
 #include <QLineEdit>
+#include <QSpinBox>
 #include <QTreeWidget>
 #include <QVBoxLayout>
 
 using namespace std;
-
-namespace {
-    static const QString LEVEL[] = {
-                "(very low)",
-                "(low)",
-                "(medium)",
-                "(high)",
-                "(very high)"
-            };
-}
 
 
 
@@ -62,8 +53,6 @@ DetailView::DetailView(Map &mapData, GalaxyView *galaxyView, QWidget *parent) :
     tradeWidget->setHeaderLabels(tradeLabels);
     connect(tradeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
         this, SLOT(CommodityClicked(QTreeWidgetItem *, int)));
-    connect(tradeWidget, SIGNAL(itemChanged(QTreeWidgetItem *,int)),
-        this, SLOT(CommodityChanged(QTreeWidgetItem *, int)));
     layout->addWidget(tradeWidget);
 
     fleets = new QTreeWidget(this);
@@ -92,25 +81,26 @@ void DetailView::SetSystem(System *system)
         name->setText(system->Name());
         government->setText(system->Government());
 
-        disconnect(tradeWidget, SIGNAL(itemChanged(QTreeWidgetItem *,int)),
-            this, SLOT(CommodityChanged(QTreeWidgetItem *, int)));
-
+        spinMap.clear();
         tradeWidget->clear();
+        tradeWidget->setColumnWidth(1, 70);
         for(const auto &it : mapData.Commodities())
         {
             QTreeWidgetItem *item = new QTreeWidgetItem(tradeWidget);
             int price = system->Trade(it.name);
-            int level = max(0, min(4, ((price - it.low) * 5) / (it.high - it.low)));
             item->setText(0, it.name);
-            item->setText(1, QString::number(price));
-            item->setText(2, LEVEL[level]);
-            trade.append(item);
-        }
-        tradeWidget->setColumnWidth(1, 50);
-        tradeWidget->insertTopLevelItems(0, trade);
+            item->setText(2, mapData.PriceLevel(it.name, price));
 
-        connect(tradeWidget, SIGNAL(itemChanged(QTreeWidgetItem *,int)),
-            this, SLOT(CommodityChanged(QTreeWidgetItem *, int)));
+            QSpinBox *spin = new QSpinBox(tradeWidget);
+            spin->setMinimum(0);
+            spin->setMaximum(9999);
+            spin->setValue(price);
+            spin->setSingleStep(10);
+            spinMap[spin] = item;
+            connect(spin, SIGNAL(valueChanged(int)), this, SLOT(CommodityChanged(int)));
+            tradeWidget->insertTopLevelItem(tradeWidget->topLevelItemCount(), item);
+            tradeWidget->setItemWidget(item, 1, spin);
+        }
         UpdateFleets();
     }
     else
@@ -167,33 +157,26 @@ void DetailView::GovernmentChanged()
 
 
 
-void DetailView::CommodityClicked(QTreeWidgetItem *item, int column)
+void DetailView::CommodityClicked(QTreeWidgetItem *item, int /*column*/)
 {
     if(galaxyView)
         galaxyView->SetCommodity(item->text(0));
-
-    if(column == 1)
-        item->setFlags(item->flags() | Qt::ItemIsEditable);
-    else
-        item->setFlags(item->flags() & ~Qt::ItemIsEditable);
 }
 
 
 
-void DetailView::CommodityChanged(QTreeWidgetItem *item, int column)
+void DetailView::CommodityChanged(int value)
 {
-    if(system && column == 1)
-        for(const auto &it : mapData.Commodities())
-            if(it.name == item->text(0))
-            {
-                int price = item->text(1).toInt();
-                system->SetTrade(it.name, price);
-                int level = max(0, min(4, ((price - it.low) * 5) / (it.high - it.low)));
-                item->setText(2, LEVEL[level]);
-                mapData.SetChanged();
-                galaxyView->update();
-                break;
-            }
+    auto it = spinMap.find(sender());
+    if(it == spinMap.end() || !system)
+        return;
+
+    tradeWidget->setCurrentItem(it->second);
+    CommodityClicked(it->second, 0);
+    system->SetTrade(it->second->text(0), value);
+    it->second->setText(2, mapData.PriceLevel(it->second->text(0), value));
+    mapData.SetChanged();
+    galaxyView->update();
 }
 
 
