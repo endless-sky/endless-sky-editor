@@ -23,6 +23,10 @@ manual.path = /usr/share/man/man6/
 manual.files = endless-sky-editor.6
 INSTALLS += manual
 
+icon.path = /usr/share/icons/hicolor/48x48/apps/
+icon.files = endless-sky-editor.png
+INSTALLS += icon
+
 
 SOURCES += main.cpp\
 		DataFile.cpp\

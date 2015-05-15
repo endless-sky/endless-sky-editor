@@ -3,6 +3,7 @@ Name=Endless Sky Editor
 GenericName=Space game editor
 Comment=Universe editor for the game Endless Sky
 Exec=endless-sky-editor %f
+Icon=endless-sky-editor
 Terminal=false
 Type=Application
 Keywords=game;simulator;space;sandbox;rpg;
