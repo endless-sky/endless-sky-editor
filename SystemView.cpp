@@ -14,6 +14,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 #include "DetailView.h"
 #include "Map.h"
+#include "pi.h"
 #include "PlanetView.h"
 #include "SpriteSet.h"
 #include "StellarObject.h"
@@ -335,7 +336,7 @@ void SystemView::mouseMoveEvent(QMouseEvent *event)
         double oldRadius = oldPosition.length();
         double newRadius = newPosition.length();
 
-        system->Move(dragObject, newRadius - oldRadius, (newAngle - oldAngle) * (180. / M_PI));
+        system->Move(dragObject, newRadius - oldRadius, (newAngle - oldAngle) * TO_DEG);
         system->SetDay(timeStep);
         mapData.SetChanged();
     }
@@ -441,8 +442,8 @@ void SystemView::paintEvent(QPaintEvent */*event*/)
     {
         QPixmap sprite = SpriteSet::Get(object.Sprite());
         QVector2D pos = object.Position();
-        double angle = pos.isNull() ? (-2. * M_PI * timeStep / object.Period()) : atan2(pos.x(), pos.y());
-        angle *= 180. / M_PI;
+        double angle = pos.isNull() ? (-2. * PI * timeStep / object.Period()) : atan2(pos.x(), pos.y());
+        angle *= TO_DEG;
         angle += 180.;
 
         painter.translate(pos.toPointF());

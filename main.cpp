@@ -30,9 +30,9 @@ void PrintVersion();
 int main(int argc, char *argv[])
 {
     QString path;
-    for(const char *const *it = argv + 1; *it; ++it)
+    for(int i = 1; i < argc; ++i)
     {
-        QString arg = *it;
+        QString arg = argv[i];
         if(arg == "-v" || arg == "--version")
         {
             PrintVersion();

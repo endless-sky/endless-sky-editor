@@ -63,4 +63,5 @@ HEADERS  += DataFile.h\
     AsteroidField.h \
     PlanetView.h \
     LandscapeView.h \
-    LandscapeLoader.h
+    LandscapeLoader.h \
+    pi.h

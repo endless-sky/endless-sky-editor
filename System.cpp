@@ -14,6 +14,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 #include "DataNode.h"
 #include "DataWriter.h"
+#include "pi.h"
 #include "Planet.h"
 
 #include <algorithm>
@@ -242,7 +243,7 @@ void System::SetDay(double day)
     for(StellarObject &object : objects)
     {
         double angle = (!object.period ? 0. : day * 360. / object.period) + object.offset;
-        angle *= M_PI / 180.;
+        angle *= TO_RAD;
 
         object.position = object.distance * QVector2D(sin(angle), -cos(angle));
 
