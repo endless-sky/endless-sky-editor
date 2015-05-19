@@ -27,6 +27,8 @@ icon.path = /usr/share/icons/hicolor/48x48/apps/
 icon.files = endless-sky-editor.png
 INSTALLS += icon
 
+ICON = endless-sky-editor.icns
+
 
 SOURCES += main.cpp\
 		DataFile.cpp\
