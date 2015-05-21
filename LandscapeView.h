@@ -27,6 +27,7 @@ public:
     explicit LandscapeView(const Map &mapData, QWidget *parent = 0);
     ~LandscapeView();
 
+    void Reinitialize();
     void SetPlanet(Planet *planet);
     const QString &Landscape() const;
 

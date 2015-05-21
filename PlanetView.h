@@ -31,6 +31,7 @@ public:
     explicit PlanetView(Map &mapData, QWidget *parent = 0);
 
     void SetPlanet(StellarObject *object);
+    void Reinitialize();
 
 signals:
 

@@ -54,6 +54,14 @@ LandscapeView::~LandscapeView()
 
 
 
+void LandscapeView::Reinitialize()
+{
+    loader.Quit();
+    loader.Init();
+}
+
+
+
 void LandscapeView::SetPlanet(Planet *planet)
 {
     this->planet = planet;

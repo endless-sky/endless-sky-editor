@@ -21,7 +21,10 @@ class GalaxyView;
 class SystemView;
 class PlanetView;
 
+class QDragEnterEvent;
+class QDropEvent;
 class QMenu;
+class QString;
 class QTabWidget;
 
 
@@ -44,10 +47,13 @@ public slots:
 protected:
     virtual void keyPressEvent(QKeyEvent *event) override;
     virtual void closeEvent(QCloseEvent *event) override;
+    virtual void dragEnterEvent(QDragEnterEvent *event) override;
+    virtual void dropEvent(QDropEvent *event) override;
 
 private:
     void CreateWidgets();
     void CreateMenus();
+    void DoOpen(const QString &path);
 
 
 private:

@@ -19,15 +19,15 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include "SystemView.h"
 
 #include <QAction>
+#include <QDragEnterEvent>
 #include <QFileDialog>
 #include <QHBoxLayout>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QMimeData>
 #include <QSizePolicy>
 #include <QTabWidget>
-
-#include <string>
 
 using namespace std;
 
@@ -38,6 +38,7 @@ MainWindow::MainWindow(Map &map, QWidget *parent)
 {
     CreateWidgets();
     CreateMenus();
+    setAcceptDrops(true);
 }
 
 MainWindow::~MainWindow()
@@ -52,15 +53,7 @@ void MainWindow::Open()
     QString dir = map.DataDirectory();
     QString path = QFileDialog::getOpenFileName(this, "Open map file", dir);
     if(!path.isEmpty())
-    {
-        map.Load(path);
-        galaxyView->Center();
-        systemView->Select(nullptr);
-        planetView->SetPlanet(nullptr);
-        update();
-        tabs->setCurrentWidget(galaxyView);
-        galaxyView->update();
-    }
+        DoOpen(path);
 }
 
 
@@ -78,7 +71,6 @@ void MainWindow::Save()
 
 void MainWindow::Quit()
 {
-    // TODO: ask about saving changes.
     close();
 }
 
@@ -115,6 +107,28 @@ void MainWindow::closeEvent(QCloseEvent */*event*/)
         if(button == QMessageBox::Yes)
             Save();
     }
+}
+
+
+
+void MainWindow::dragEnterEvent(QDragEnterEvent *event)
+{
+    const QMimeData *mime = event->mimeData();
+    if(mime->hasUrls() && mime->urls().size() == 1 && mime->text().startsWith("file://"))
+        event->acceptProposedAction();
+}
+
+
+
+void MainWindow::dropEvent(QDropEvent *event)
+{
+    QString path = event->mimeData()->urls().at(0).path();
+#ifdef _WIN32
+    // Clean up Windows paths.
+    if(path.startsWith("/"))
+        path = path.mid(1);
+#endif
+    DoOpen(path);
 }
 
 
@@ -228,4 +242,20 @@ void MainWindow::CreateMenus()
 
     // Activate only the menu for the current tab.
     TabChanged(0);
+}
+
+
+
+void MainWindow::DoOpen(const QString &path)
+{
+    if(path.isEmpty())
+        return;
+
+    map.Load(path);
+    galaxyView->Center();
+    systemView->Select(nullptr);
+    planetView->Reinitialize();
+    tabs->setCurrentWidget(galaxyView);
+    update();
+    galaxyView->update();
 }

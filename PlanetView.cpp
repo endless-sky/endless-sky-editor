@@ -145,6 +145,13 @@ void PlanetView::SetPlanet(StellarObject *object)
 }
 
 
+void PlanetView::Reinitialize()
+{
+    SetPlanet(nullptr);
+    landscape->Reinitialize();
+}
+
+
 
 void PlanetView::NameChanged()
 {
@@ -163,6 +170,7 @@ void PlanetView::NameChanged()
         Planet &planet = mapData.Planets()[name->text()];
         planet.Attributes() = ToList(attributes->text());
         planet.SetLandscape(landscape->Landscape());
+        landscape->SetPlanet(&planet);
         planet.SetDescription(description->toPlainText());
         planet.SetSpaceportDescription(spaceport->toPlainText());
         if(!reputation->text().isEmpty())
