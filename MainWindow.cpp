@@ -39,10 +39,31 @@ MainWindow::MainWindow(Map &map, QWidget *parent)
     CreateWidgets();
     CreateMenus();
     setAcceptDrops(true);
+
+    resize(1200, 900);
+    show();
 }
+
+
 
 MainWindow::~MainWindow()
 {
+}
+
+
+
+void MainWindow::DoOpen(const QString &path)
+{
+    if(path.isEmpty())
+        return;
+
+    map.Load(path);
+    galaxyView->Center();
+    systemView->Select(nullptr);
+    planetView->Reinitialize();
+    tabs->setCurrentWidget(galaxyView);
+    update();
+    galaxyView->update();
 }
 
 
@@ -242,20 +263,4 @@ void MainWindow::CreateMenus()
 
     // Activate only the menu for the current tab.
     TabChanged(0);
-}
-
-
-
-void MainWindow::DoOpen(const QString &path)
-{
-    if(path.isEmpty())
-        return;
-
-    map.Load(path);
-    galaxyView->Center();
-    systemView->Select(nullptr);
-    planetView->Reinitialize();
-    tabs->setCurrentWidget(galaxyView);
-    update();
-    galaxyView->update();
 }

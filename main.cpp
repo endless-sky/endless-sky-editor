@@ -16,11 +16,32 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 #include <QApplication>
 #include <QFileInfo>
+#include <QFileOpenEvent>
 #include <QString>
 
 #include <iostream>
 
 using namespace std;
+
+class EventFilter: public QObject {
+public:
+    EventFilter(MainWindow &window) : QObject(), window(window) {};
+    ~EventFilter() {};
+
+    bool eventFilter(QObject *obj, QEvent *event)
+    {
+        if(event->type() == QEvent::FileOpen)
+        {
+            window.DoOpen(dynamic_cast<QFileOpenEvent *>(event)->file());
+            return false;
+        }
+        return obj->event(event);
+    }
+
+    MainWindow &window;
+};
+
+
 
 void PrintHelp();
 void PrintVersion();
@@ -59,16 +80,15 @@ int main(int argc, char *argv[])
             path.clear();
     }
 
-    QApplication a(argc, argv);
+    QApplication app(argc, argv);
     Map mapData;
     if(!path.isEmpty())
         mapData.Load(path);
 
-    MainWindow w(mapData);
-    w.resize(1200, 900);
-    w.show();
+    MainWindow window(mapData);
+    app.installEventFilter(new EventFilter(window));
 
-    return a.exec();
+    return app.exec();
 }
 
 

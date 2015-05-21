@@ -37,6 +37,8 @@ public:
     MainWindow(Map &map, QWidget *parent = 0);
     ~MainWindow();
 
+    void DoOpen(const QString &path);
+
 public slots:
     void Open();
     void Save();
@@ -53,7 +55,6 @@ protected:
 private:
     void CreateWidgets();
     void CreateMenus();
-    void DoOpen(const QString &path);
 
 
 private:
