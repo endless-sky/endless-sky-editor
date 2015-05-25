@@ -25,6 +25,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include <QRegExp>
 #include <QRegExpValidator>
 
+#include <cmath>
 #include <limits>
 
 using namespace std;
@@ -138,9 +139,12 @@ void PlanetView::SetPlanet(StellarObject *object)
 
         shipyard->setText(ToString(it->second.Shipyard()));
         outfitter->setText(ToString(it->second.Outfitter()));
-        reputation->setText(QString::number(it->second.RequiredReputation()));
-        bribe->setText(QString::number(it->second.Bribe()));
-        security->setText(QString::number(it->second.Security()));
+        reputation->setText(std::isnan(it->second.RequiredReputation()) ?
+            QString() : QString::number(it->second.RequiredReputation()));
+        bribe->setText(std::isnan(it->second.Bribe()) ?
+            QString() : QString::number(it->second.Bribe()));
+        security->setText(std::isnan(it->second.Security()) ?
+            QString() : QString::number(it->second.Security()));
     }
 }
 
@@ -193,7 +197,7 @@ void PlanetView::AttributesChanged()
         Planet &planet = mapData.Planets()[object->GetPlanet()];
         if(planet.Attributes() != list)
         {
-            planet.Attributes() = ToList(shipyard->text());
+            planet.Attributes() = list;
             mapData.SetChanged();
         }
     }
@@ -241,7 +245,7 @@ void PlanetView::ShipyardChanged()
         Planet &planet = mapData.Planets()[object->GetPlanet()];
         if(planet.Shipyard() != list)
         {
-            planet.Shipyard() = ToList(shipyard->text());
+            planet.Shipyard() = list;
             mapData.SetChanged();
         }
     }
@@ -257,7 +261,7 @@ void PlanetView::OutfitterChanged()
         Planet &planet = mapData.Planets()[object->GetPlanet()];
         if(planet.Outfitter() != list)
         {
-            planet.Outfitter() = ToList(outfitter->text());
+            planet.Outfitter() = list;
             mapData.SetChanged();
         }
     }

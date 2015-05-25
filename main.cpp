@@ -33,9 +33,9 @@ public:
         if(event->type() == QEvent::FileOpen)
         {
             window.DoOpen(dynamic_cast<QFileOpenEvent *>(event)->file());
-            return false;
+            return true;
         }
-        return obj->event(event);
+        return obj->eventFilter(obj, event);
     }
 
     MainWindow &window;
