@@ -400,6 +400,7 @@ void SystemView::paintEvent(QPaintEvent */*event*/)
     }
 
     // Draw circles indicating the center and edges of the habitable zone.
+    if(!std::isnan(system->HabitableZone()))
     {
         painter.setBrush(Qt::NoBrush);
         double radius = system->HabitableZone();

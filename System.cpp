@@ -720,7 +720,8 @@ void System::AddMoon(StellarObject *object, bool isStation)
 
     // Move the next root planet out from this one farther out.
     double distanceIncrease = moonDistance + 2. * moon.Radius() - originalMoonDistance;
-    Move(&*it, 2. * distanceIncrease);
+    if(it != objects.end())
+        Move(&*it, 2. * distanceIncrease);
 
     // Move this root planet farther out.
     objects[rootIndex].distance += distanceIncrease;
