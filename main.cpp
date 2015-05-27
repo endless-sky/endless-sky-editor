@@ -79,6 +79,9 @@ int main(int argc, char *argv[])
         if(!path.isEmpty() && !QFileInfo(path).exists())
             path.clear();
     }
+#if defined _WIN32
+    path.replace('\\', '/');
+#endif
 
     QApplication app(argc, argv);
     Map mapData;
