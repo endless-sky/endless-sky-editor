@@ -27,17 +27,19 @@ icon.path = /usr/share/icons/hicolor/48x48/apps/
 icon.files = endless-sky-editor.png
 INSTALLS += icon
 
-ICON = endless-sky-editor.icns
-
+macx {
+    ICON = endless-sky-editor.icns
+    QMAKE_INFO_PLIST = Info.plist
+}
 
 SOURCES += main.cpp\
-		DataFile.cpp\
-		DataNode.cpp\
-		DataWriter.cpp\
-        MainWindow.cpp\
-        Planet.cpp\
-        StellarObject.cpp\
-        System.cpp \
+    DataFile.cpp\
+    DataNode.cpp\
+    DataWriter.cpp\
+    MainWindow.cpp\
+    Planet.cpp\
+    StellarObject.cpp\
+    System.cpp \
     SystemView.cpp \
     Map.cpp \
     SpriteSet.cpp \
@@ -50,12 +52,12 @@ SOURCES += main.cpp\
     LandscapeLoader.cpp
 
 HEADERS  += DataFile.h\
-		DataNode.h\
-		DataWriter.h\
-        MainWindow.h\
-        Planet.h\
-        StellarObject.h\
-        System.h \
+    DataNode.h\
+    DataWriter.h\
+    MainWindow.h\
+    Planet.h\
+    StellarObject.h\
+    System.h \
     SystemView.h \
     Map.h \
     SpriteSet.h \
