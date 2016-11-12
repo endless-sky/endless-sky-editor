@@ -148,6 +148,8 @@ namespace {
         {"planet/water0",	  {56, 1}},
         {"planet/water1", 	  {96, 1}},
 
+
+        {"planet/station0",   {30, 3}},
         {"planet/station1",   {30, 3}},
 		{"planet/station1k",  {30, 3}},
 		{"planet/station1kd", {30, 3}},
@@ -164,7 +166,11 @@ namespace {
 
 		{"planet/wisp",     {96, 3}},
 		{"planet/wormhole", {120, 3}},
-		
+
+        {"planet/ringworld",{20,3}},
+        {"planet/ringworld left",{20,3}},
+        {"planet/ringworld right",{20,3}},
+
         {"star/b5", {60, 1}},
         {"star/a0", {50, 1}},
         {"star/a5", {45, 2}},
