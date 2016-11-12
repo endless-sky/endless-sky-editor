@@ -365,7 +365,7 @@ void SystemView::wheelEvent(QWheelEvent *event)
 
 
 
-void SystemView::paintEvent(QPaintEvent */*event*/)
+void SystemView::paintEvent(QPaintEvent * /*event*/)
 {
     if(!system)
         return;
