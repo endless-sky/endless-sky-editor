@@ -35,6 +35,7 @@ class System {
 public:
     struct Asteroid { QString type; int count; double energy; };
     struct Fleet { QString name; int period; };
+    struct Minable { QString type; int count; double energy; };
 
 
 public:
@@ -66,12 +67,18 @@ public:
     // Get the specification of how many asteroids of each type there are.
     const std::vector<Asteroid> &Asteroids() const;
 
+    // Get the specification of how many minables of each type there are.
+    std::vector<Minable> &Minables();
+    const std::vector<Minable> &Minables() const;
     // Get the price of the given commodity in this system.
     int Trade(const QString &commodity) const;
 
     // Get the probabilities of various fleets entering this system.
     std::vector<Fleet> &Fleets();
     const std::vector<Fleet> &Fleets() const;
+
+
+
 
     // Position the planets, etc.
     void SetDay(double day);
@@ -123,6 +130,7 @@ private:
     std::vector<Asteroid> asteroids;
     std::map<QString, int> trade;
     std::vector<Fleet> fleets;
+    std::vector<Minable> minables;
 
     std::list<DataNode> unparsed;
 

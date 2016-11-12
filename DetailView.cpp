@@ -65,6 +65,17 @@ DetailView::DetailView(Map &mapData, GalaxyView *galaxyView, QWidget *parent) :
     fleets->setColumnWidth(0, 200);
     layout->addWidget(fleets);
 
+    minables = new QTreeWidget(this);
+    minables->setIndentation(0);
+    minables->setColumnCount(3);
+    QStringList minableLabels;
+    minableLabels.append("Minable Type");
+    minableLabels.append("count");
+    minableLabels.append("energy");
+    minables->setHeaderLabels(minableLabels);
+    minables->setColumnWidth(0, 120);
+    layout->addWidget(minables);
+
     setLayout(layout);
 }
 
@@ -102,6 +113,7 @@ void DetailView::SetSystem(System *system)
             tradeWidget->setItemWidget(item, 1, spin);
         }
         UpdateFleets();
+        UpdateMinables();
     }
     else
     {
@@ -199,10 +211,33 @@ void DetailView::FleetChanged(QTreeWidgetItem *item, int column)
         return;
 
     mapData.SetChanged();
+
     UpdateFleets();
 }
 
+void DetailView::MinableChanged(QTreeWidgetItem *item, int column)
+{
+    if(!system)
+        return;
 
+    unsigned row = item->text(2).toInt();
+    if(row == system->Minables().size())
+        system->Minables().push_back({item->text(0), item->text(1).toInt(), item->text(2).toDouble()});
+    else if(item->text(0).isEmpty() && item->text(1).isEmpty())
+        system->Minables().erase(system->Minables().begin() + row);
+    else if(column == 0)
+        system->Minables()[row].type = item->text(0);
+    else if(column == 1)
+        system->Minables()[row].count = item->text(1).toInt();
+    else if(column == 1)
+        system->Minables()[row].energy = item->text(2).toDouble();
+    else
+        return;
+
+    mapData.SetChanged();
+
+    UpdateMinables();
+}
 
 void DetailView::UpdateFleets()
 {
@@ -212,6 +247,7 @@ void DetailView::UpdateFleets()
     disconnect(fleets, SIGNAL(itemChanged(QTreeWidgetItem *,int)),
         this, SLOT(FleetChanged(QTreeWidgetItem *, int)));
     fleets->clear();
+
     for(const System::Fleet &fleet : system->Fleets())
     {
         QTreeWidgetItem *item = new QTreeWidgetItem(fleets);
@@ -232,3 +268,38 @@ void DetailView::UpdateFleets()
     connect(fleets, SIGNAL(itemChanged(QTreeWidgetItem *,int)),
         this, SLOT(FleetChanged(QTreeWidgetItem *, int)));
 }
+
+void DetailView::UpdateMinables()
+{
+    if(!system || !minables)
+        return;
+
+    disconnect(minables, SIGNAL(itemChanged(QTreeWidgetItem *,int)),
+        this, SLOT(MinableChanged(QTreeWidgetItem *, int)));
+    minables->clear();
+
+    for(const System::Minable &minable : system->Minables())
+    {
+        QTreeWidgetItem *item = new QTreeWidgetItem(minables);
+        item->setText(0, minable.type);
+        item->setText(1, QString::number(minable.count));
+        item->setText(2, QString::number(minable.energy));
+        item->setText(3, QString::number(&minable - &system->Minables().front()));
+
+        item->setFlags(item->flags() | Qt::ItemIsEditable);
+        minables->addTopLevelItem(item);
+    }
+    {
+        // Add one last item, which is empty, but can be edited to add a row.
+        QTreeWidgetItem *item = new QTreeWidgetItem(minables);
+        item->setFlags(item->flags() | Qt::ItemIsEditable);
+
+        item->setText(3, QString::number(system->Minables().size()));
+        minables->addTopLevelItem(item);
+    }
+    minables->setColumnWidth(0, 120);
+    connect(minables, SIGNAL(itemChanged(QTreeWidgetItem *,int)),
+        this, SLOT(MinableChanged(QTreeWidgetItem *, int)));
+
+}
+
