@@ -62,11 +62,32 @@ void Planet::Load(const DataNode &node)
             bribe = child.Value(1);
         else if(child.Token(0) == "security" && child.Size() >= 2)
             security = child.Value(1);
+        else if(child.Token(0) == "tribute" && child.Size() >= 2)
+        {
+            LoadTribute(child);
+        }
         else
             unparsed.push_back(child);
     }
 }
+void  Planet::LoadTribute(const DataNode &node)
+{
+    if(node.Size() >= 2)
+        tribute = node.Value(1);
 
+    for(const DataNode &child : node)
+    {
+        if(child.Token(0) == "threshold" && child.Size() >= 2)
+            tributeThreshold = child.Value(1);
+        else if(child.Token(0) == "fleet" && child.Size() >= 3)
+        {
+            tributeFleetName = child.Token(1);
+            tributeFleetQuanity = child.Value(2);
+        }
+        else
+            unparsed.push_back(child);
+    }
+}
 
 
 void Planet::Save(DataWriter &file) const
@@ -229,7 +250,7 @@ double Planet::Tribute() const
 }
 double Planet::TributeThreshold() const
 {
-    return security;
+    return tributeThreshold;
 }
 
 double Planet::TributeFleetQuanity() const

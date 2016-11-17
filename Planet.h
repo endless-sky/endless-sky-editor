@@ -33,6 +33,7 @@ class Planet {
 public:
     // Load a planet's description from a file.
     void Load(const DataNode &node);
+    void LoadTribute(const DataNode &node);
     void Save(DataWriter &file) const;
 
     // Get the name of the planet.

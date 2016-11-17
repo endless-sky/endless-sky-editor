@@ -74,15 +74,15 @@ PlanetView::PlanetView(Map &mapData, QWidget *parent) :
     connect(tribute, SIGNAL(editingFinished()), this, SLOT(TributeChanged()));
 
     tributeThreshold = new QLineEdit(this);
-    tributeThreshold->setValidator(new QRegExpValidator(QRegExp("0||0?\\.\\d*"), tributeThreshold));
+    tributeThreshold->setValidator(new QRegExpValidator(QRegExp("-?\\d*\\.?\\d*"), tributeThreshold));
     connect(tributeThreshold, SIGNAL(editingFinished()), this, SLOT(TributeThresholdChanged()));
 
     tributeFleetName = new QLineEdit(this);
-    tributeFleetName->setValidator(new QRegExpValidator(QRegExp("0||0?\\.\\d*"), tributeFleetName));
+//    tributeFleetName->setValidator(new QRegExpValidator(QRegExp("0||0?\\.\\d*"), tributeFleetName));
     connect(tributeFleetName, SIGNAL(editingFinished()), this, SLOT(TributeFleetNameChanged()));
 
     tributeFleetQuanity = new QLineEdit(this);
-    tributeFleetQuanity->setValidator(new QRegExpValidator(QRegExp("0||0?\\.\\d*"), tributeFleetQuanity));
+    tributeFleetQuanity->setValidator(new QRegExpValidator(QRegExp("-?\\d*\\.?\\d*"), tributeFleetQuanity));
     connect(tributeFleetQuanity, SIGNAL(editingFinished()), this, SLOT(TributeFleetQuanityChanged()));
 
 
@@ -127,6 +127,7 @@ PlanetView::PlanetView(Map &mapData, QWidget *parent) :
     tributeHLayout->addWidget(tributeThreshold);
     tributeHLayout->addWidget(new QLabel("Fleet:", this));
     tributeHLayout->addWidget(tributeFleetName);
+    tributeHLayout->addWidget(new QLabel("Quanity:", this));
     tributeHLayout->addWidget(tributeFleetQuanity);
     tributeHLayout->addStretch();
 
@@ -157,6 +158,10 @@ void PlanetView::SetPlanet(StellarObject *object)
         reputation->clear();
         bribe->clear();
         security->clear();
+        tribute->clear();
+        tributeThreshold->clear();
+        tributeFleetName->clear();
+        tributeFleetQuanity->clear();
     }
     else
     {
@@ -180,6 +185,14 @@ void PlanetView::SetPlanet(StellarObject *object)
             QString() : QString::number(it->second.Bribe()));
         security->setText(std::isnan(it->second.Security()) ?
             QString() : QString::number(it->second.Security()));
+        tribute->setText(std::isnan(it->second.Tribute()) ?
+            QString() : QString::number(it->second.Tribute()));
+        tributeThreshold->setText(std::isnan(it->second.TributeThreshold()) ?
+            QString() : QString::number(it->second.TributeThreshold()));
+        tributeFleetName->setText(it->second.TributeFleetName());
+        tributeFleetQuanity->setText(std::isnan(it->second.TributeFleetQuanity()) ?
+            QString() : QString::number(it->second.TributeFleetQuanity()));
+
     }
 }
 
