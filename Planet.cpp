@@ -85,7 +85,7 @@ void  Planet::LoadTribute(const DataNode &node)
             tributeFleetQuanity = child.Value(2);
         }
         else
-            unparsed.push_back(child);
+            tributeUnparsed.push_back(child);
     }
 }
 
@@ -130,7 +130,20 @@ void Planet::Save(DataWriter &file) const
             file.Write("bribe", bribe);
         if(!std::isnan(security))
             file.Write("security", security);
+        if(!std::isnan(tribute))
+        {
+            file.Write("tribute",tribute);
+            file.BeginChild();
+            {
+                file.Write("threshold",tributeThreshold);
+                file.Write("fleet",tributeFleetName,tributeFleetQuanity);
+                for(const DataNode &node : tributeUnparsed)
+                    file.Write(node);
 
+            }
+            file.EndChild();
+
+        }
         for(const DataNode &node : unparsed)
             file.Write(node);
     }
