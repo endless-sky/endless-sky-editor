@@ -223,7 +223,24 @@ double Planet::Security() const
     return security;
 }
 
+double Planet::Tribute() const
+{
+    return tribute;
+}
+double Planet::TributeThreshold() const
+{
+    return security;
+}
 
+double Planet::TributeFleetQuanity() const
+{
+    return tributeFleetQuanity;
+}
+const QString &Planet::TributeFleetName() const
+
+{
+    return tributeFleetName;
+}
 
 void Planet::SetName(const QString &name)
 {
@@ -291,4 +308,32 @@ void Planet::SetBribe(double value)
 void Planet::SetSecurity(double value)
 {
     security = value;
+}
+
+
+
+void Planet::SetTribute(double value)
+{
+    tribute = value;
+}
+
+
+
+void Planet::SetTributeThreshold(double value)
+{
+    tributeThreshold = value;
+}
+
+
+
+void Planet::SetTributeFleetName(QString &value)
+{
+    tributeFleetName = value;
+}
+
+
+
+void Planet::SetTributeFleetQuanity(double value)
+{
+    tributeFleetQuanity = value;
 }

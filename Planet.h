@@ -68,6 +68,14 @@ public:
     // This is how likely the planet's authorities are to notice if you are
     // doing something illegal.
     double Security() const;
+    // Stipend for conquering the planet
+    double Tribute() const;
+    // Combat Rating level before you are an actual threat. Balance this with tribute and fleet.
+    double TributeThreshold() const;
+    // Number of Defending Ships
+    double TributeFleetQuanity() const;
+    // Get the fleet assigned to protect planet
+    const QString &TributeFleetName() const;
 
     // Editing a planet:
     void SetName(const QString &name);
@@ -80,13 +88,17 @@ public:
     void SetRequiredReputation(double value);
     void SetBribe(double value);
     void SetSecurity(double value);
-
+    void SetTribute(double value);
+    void SetTributeThreshold(double value);
+    void SetTributeFleetName(QString &value);
+    void SetTributeFleetQuanity(double value);
 
 private:
     QString name;
     QString description;
     QString spaceport;
     QString landscape;
+    QString tributeFleetName;
 
     std::vector<QString> attributes;
 
@@ -97,9 +109,14 @@ private:
     double bribe = std::numeric_limits<double>::quiet_NaN();
     double security = std::numeric_limits<double>::quiet_NaN();
 
+    double tribute = std::numeric_limits<double>::quiet_NaN();
+    double tributeThreshold = std::numeric_limits<double>::quiet_NaN();
+    double tributeFleetQuanity = std::numeric_limits<double>::quiet_NaN();
     std::list<DataNode> unparsed;
 };
 
 
 
 #endif
+
+
