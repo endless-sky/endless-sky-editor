@@ -270,7 +270,9 @@ void System::SetDay(double day)
 
 void System::LoadObject(const DataNode &node, int parent)
 {
-    int index = objects.size();
+    //I seriously doubt this, but the warning was bothering me. - James Stallings
+    int index = objects.size() > INT_MAX ? INT_MAX : (int)objects.size();
+
     objects.push_back(StellarObject());
     StellarObject &object = objects.back();
     object.parent = parent;
@@ -655,7 +657,9 @@ void System::AddPlanet()
     set<QString> used = Used();
 
     StellarObject root;
-    int rootIndex = objects.size();
+    //I seriously doubt this, but the warning was bothering me. - James Stallings
+    int rootIndex = objects.size() > INT_MAX ? INT_MAX : (int)objects.size();
+
     bool isHabitable = (distance > habitable * .5 && distance < habitable * 2. - 120.);
     bool isSmall = !(rand() % 10);
     bool isTerrestrial = !isSmall && (rand() % 2000 > distance);
