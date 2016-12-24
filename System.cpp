@@ -270,8 +270,8 @@ void System::SetDay(double day)
 
 void System::LoadObject(const DataNode &node, int parent)
 {
-    //I seriously doubt this, but the warning was bothering me. - James Stallings
-    int index = objects.size() > INT_MAX ? INT_MAX : (int)objects.size();
+
+    int index = (int)objects.size();
 
     objects.push_back(StellarObject());
     StellarObject &object = objects.back();
@@ -657,12 +657,12 @@ void System::AddPlanet()
     set<QString> used = Used();
 
     StellarObject root;
-    //I seriously doubt this, but the warning was bothering me. - James Stallings
-    int rootIndex = objects.size() > INT_MAX ? INT_MAX : (int)objects.size();
+    int rootIndex = (int)objects.size();
 
     bool isHabitable = (distance > habitable * .5 && distance < habitable * 2. - 120.);
     bool isSmall = !(rand() % 10);
     bool isTerrestrial = !isSmall && (rand() % 2000 > distance);
+
     // Occasionally, moon-sized objects can be root objects. Otherwise, pick a
     // giant or a normal planet, with giants more frequent in the outer parts
     // of the solar system.
