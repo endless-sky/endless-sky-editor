@@ -47,6 +47,7 @@ PlanetView::PlanetView(Map &mapData, QWidget *parent) :
     description = new QPlainTextEdit(this);
     description->setTabStopWidth(20);
     connect(description, SIGNAL(textChanged()), this, SLOT(DescriptionChanged()));
+
     spaceport = new QPlainTextEdit(this);
     spaceport->setTabStopWidth(20);
     connect(spaceport, SIGNAL(textChanged()), this, SLOT(SpaceportDescriptionChanged()));
@@ -59,12 +60,32 @@ PlanetView::PlanetView(Map &mapData, QWidget *parent) :
     reputation = new QLineEdit(this);
     reputation->setValidator(new QRegExpValidator(QRegExp("-?\\d*\\.?\\d*"), reputation));
     connect(reputation, SIGNAL(editingFinished()), this, SLOT(ReputationChanged()));
+
     bribe = new QLineEdit(this);
     bribe->setValidator(new QRegExpValidator(QRegExp("0||0?\\.\\d*"), bribe));
     connect(bribe, SIGNAL(editingFinished()), this, SLOT(BribeChanged()));
+
     security = new QLineEdit(this);
     security->setValidator(new QRegExpValidator(QRegExp("0||0?\\.\\d*"), security));
     connect(security, SIGNAL(editingFinished()), this, SLOT(SecurityChanged()));
+
+    tribute = new QLineEdit(this);
+    tribute->setValidator(new QRegExpValidator(QRegExp("-?\\d*\\.?\\d*"), tribute));
+    connect(tribute, SIGNAL(editingFinished()), this, SLOT(TributeChanged()));
+
+    tributeThreshold = new QLineEdit(this);
+    tributeThreshold->setValidator(new QRegExpValidator(QRegExp("-?\\d*\\.?\\d*"), tributeThreshold));
+    connect(tributeThreshold, SIGNAL(editingFinished()), this, SLOT(TributeThresholdChanged()));
+
+    tributeFleetName = new QLineEdit(this);
+//    tributeFleetName->setValidator(new QRegExpValidator(QRegExp("0||0?\\.\\d*"), tributeFleetName));
+    connect(tributeFleetName, SIGNAL(editingFinished()), this, SLOT(TributeFleetNameChanged()));
+
+    tributeFleetQuanity = new QLineEdit(this);
+    tributeFleetQuanity->setValidator(new QRegExpValidator(QRegExp("-?\\d*\\.?\\d*"), tributeFleetQuanity));
+    connect(tributeFleetQuanity, SIGNAL(editingFinished()), this, SLOT(TributeFleetQuanityChanged()));
+
+
 
     QGridLayout *layout = new QGridLayout(this);
     int row = 0;
@@ -95,7 +116,22 @@ PlanetView::PlanetView(Map &mapData, QWidget *parent) :
     hLayout->addWidget(new QLabel("Security:", this));
     hLayout->addWidget(security);
     hLayout->addStretch();
-    layout->addWidget(box, row++, 0, 1, 2);
+        layout->addWidget(box, row++, 0, 1, 2);
+
+    QWidget *tributeBox = new QWidget(this);
+    QHBoxLayout *tributeHLayout = new QHBoxLayout(tributeBox);
+    tributeHLayout->setContentsMargins(0, 0, 0, 0);
+    tributeHLayout->addWidget(new QLabel("Tribute:", this));
+    tributeHLayout->addWidget(tribute);
+    tributeHLayout->addWidget(new QLabel("Threshold:", this));
+    tributeHLayout->addWidget(tributeThreshold);
+    tributeHLayout->addWidget(new QLabel("Fleet:", this));
+    tributeHLayout->addWidget(tributeFleetName);
+    tributeHLayout->addWidget(new QLabel("Quanity:", this));
+    tributeHLayout->addWidget(tributeFleetQuanity);
+    tributeHLayout->addStretch();
+
+    layout->addWidget(tributeBox, row++, 0, 1, 2);
 
     setLayout(layout);
 }
@@ -122,6 +158,10 @@ void PlanetView::SetPlanet(StellarObject *object)
         reputation->clear();
         bribe->clear();
         security->clear();
+        tribute->clear();
+        tributeThreshold->clear();
+        tributeFleetName->clear();
+        tributeFleetQuanity->clear();
     }
     else
     {
@@ -145,6 +185,14 @@ void PlanetView::SetPlanet(StellarObject *object)
             QString() : QString::number(it->second.Bribe()));
         security->setText(std::isnan(it->second.Security()) ?
             QString() : QString::number(it->second.Security()));
+        tribute->setText(std::isnan(it->second.Tribute()) ?
+            QString() : QString::number(it->second.Tribute()));
+        tributeThreshold->setText(std::isnan(it->second.TributeThreshold()) ?
+            QString() : QString::number(it->second.TributeThreshold()));
+        tributeFleetName->setText(it->second.TributeFleetName());
+        tributeFleetQuanity->setText(std::isnan(it->second.TributeFleetQuanity()) ?
+            QString() : QString::number(it->second.TributeFleetQuanity()));
+
     }
 }
 
@@ -321,7 +369,72 @@ void PlanetView::SecurityChanged()
     }
 }
 
+void PlanetView::TributeChanged()
+{
+    if(object && !object->GetPlanet().isEmpty())
+    {
+        double value = numeric_limits<double>::quiet_NaN();
+        if(!tribute->text().isEmpty())
+            value = tribute->text().toDouble();
+        Planet &planet = mapData.Planets()[object->GetPlanet()];
+        if(planet.Tribute() != value)
+        {
+            planet.SetTribute(value);
+            mapData.SetChanged();
+        }
+    }
+}
 
+
+
+void PlanetView::TributeThresholdChanged()
+{
+    if(object && !object->GetPlanet().isEmpty())
+    {
+        double value = numeric_limits<double>::quiet_NaN();
+        if(!tributeThreshold->text().isEmpty())
+            value = tributeThreshold->text().toDouble();
+        Planet &planet = mapData.Planets()[object->GetPlanet()];
+        if(planet.TributeThreshold() != value)
+        {
+            planet.SetTributeThreshold(value);
+            mapData.SetChanged();
+        }
+    }
+}
+
+
+
+void PlanetView::TributeFleetQuanityChanged()
+{
+    if(object && !object->GetPlanet().isEmpty())
+    {
+        double value = numeric_limits<double>::quiet_NaN();
+        if(!tributeFleetQuanity->text().isEmpty())
+            value = tributeFleetQuanity->text().toDouble();
+        Planet &planet = mapData.Planets()[object->GetPlanet()];
+        if(planet.TributeFleetQuanity() != value)
+        {
+            planet.SetTributeFleetQuanity(value);
+            mapData.SetChanged();
+        }
+    }
+}
+
+
+void PlanetView::TributeFleetNameChanged()
+{
+    if(object && !object->GetPlanet().isEmpty())
+    {
+        QString newDescription = tributeFleetName->text();
+        Planet &planet = mapData.Planets()[object->GetPlanet()];
+        if(planet.TributeFleetName() != newDescription)
+        {
+            planet.SetTributeFleetName(newDescription);
+            mapData.SetChanged();
+        }
+    }
+}
 
 QString PlanetView::ToString(const vector<QString> &list)
 {

@@ -62,11 +62,32 @@ void Planet::Load(const DataNode &node)
             bribe = child.Value(1);
         else if(child.Token(0) == "security" && child.Size() >= 2)
             security = child.Value(1);
+        else if(child.Token(0) == "tribute" && child.Size() >= 2)
+        {
+            LoadTribute(child);
+        }
         else
             unparsed.push_back(child);
     }
 }
+void  Planet::LoadTribute(const DataNode &node)
+{
+    if(node.Size() >= 2)
+        tribute = node.Value(1);
 
+    for(const DataNode &child : node)
+    {
+        if(child.Token(0) == "threshold" && child.Size() >= 2)
+            tributeThreshold = child.Value(1);
+        else if(child.Token(0) == "fleet" && child.Size() >= 3)
+        {
+            tributeFleetName = child.Token(1);
+            tributeFleetQuanity = child.Value(2);
+        }
+        else
+            tributeUnparsed.push_back(child);
+    }
+}
 
 
 void Planet::Save(DataWriter &file) const
@@ -109,7 +130,20 @@ void Planet::Save(DataWriter &file) const
             file.Write("bribe", bribe);
         if(!std::isnan(security))
             file.Write("security", security);
+        if(!std::isnan(tribute))
+        {
+            file.Write("tribute",tribute);
+            file.BeginChild();
+            {
+                file.Write("threshold",tributeThreshold);
+                file.Write("fleet",tributeFleetName,tributeFleetQuanity);
+                for(const DataNode &node : tributeUnparsed)
+                    file.Write(node);
 
+            }
+            file.EndChild();
+
+        }
         for(const DataNode &node : unparsed)
             file.Write(node);
     }
@@ -223,7 +257,24 @@ double Planet::Security() const
     return security;
 }
 
+double Planet::Tribute() const
+{
+    return tribute;
+}
+double Planet::TributeThreshold() const
+{
+    return tributeThreshold;
+}
 
+double Planet::TributeFleetQuanity() const
+{
+    return tributeFleetQuanity;
+}
+const QString &Planet::TributeFleetName() const
+
+{
+    return tributeFleetName;
+}
 
 void Planet::SetName(const QString &name)
 {
@@ -291,4 +342,32 @@ void Planet::SetBribe(double value)
 void Planet::SetSecurity(double value)
 {
     security = value;
+}
+
+
+
+void Planet::SetTribute(double value)
+{
+    tribute = value;
+}
+
+
+
+void Planet::SetTributeThreshold(double value)
+{
+    tributeThreshold = value;
+}
+
+
+
+void Planet::SetTributeFleetName(QString &value)
+{
+    tributeFleetName = value;
+}
+
+
+
+void Planet::SetTributeFleetQuanity(double value)
+{
+    tributeFleetQuanity = value;
 }

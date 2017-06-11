@@ -64,6 +64,8 @@ void System::Load(const DataNode &node)
             trade[child.Token(1)] = child.Value(2);
         else if(child.Token(0) == "fleet" && child.Size() >= 3)
             fleets.push_back({child.Token(1), static_cast<int>(child.Value(2))});
+        else if(child.Token(0) == "minables" && child.Size() >= 3)
+            minables.push_back({child.Token(1), static_cast<int>(child.Value(2)), child.Value(3)});
         else if(child.Token(0) == "object")
             LoadObject(child);
         else
@@ -86,6 +88,8 @@ void System::Save(DataWriter &file) const
             file.Write("link", it);
         for(const Asteroid &it : asteroids)
             file.Write("asteroids", it.type, it.count, it.energy);
+        for(const Minable &it : minables)
+            file.Write("minables", it.type, it.count, it.energy);
         for(const auto &it : trade)
             file.Write("trade", it.first, it.second);
         for(const Fleet &it : fleets)
@@ -227,6 +231,10 @@ vector<System::Fleet> &System::Fleets()
     return fleets;
 }
 
+vector<System::Minable> &System::Minables()
+{
+    return minables;
+}
 
 
 const vector<System::Fleet> &System::Fleets() const
@@ -234,6 +242,10 @@ const vector<System::Fleet> &System::Fleets() const
     return fleets;
 }
 
+const vector<System::Minable> &System::Minables() const
+{
+    return minables;
+}
 
 
 // Position the planets, etc.
@@ -258,7 +270,9 @@ void System::SetDay(double day)
 
 void System::LoadObject(const DataNode &node, int parent)
 {
-    int index = objects.size();
+
+    int index = (int)objects.size();
+
     objects.push_back(StellarObject());
     StellarObject &object = objects.back();
     object.parent = parent;
@@ -643,10 +657,12 @@ void System::AddPlanet()
     set<QString> used = Used();
 
     StellarObject root;
-    int rootIndex = objects.size();
+    int rootIndex = (int)objects.size();
+
     bool isHabitable = (distance > habitable * .5 && distance < habitable * 2. - 120.);
     bool isSmall = !(rand() % 10);
     bool isTerrestrial = !isSmall && (rand() % 2000 > distance);
+
     // Occasionally, moon-sized objects can be root objects. Otherwise, pick a
     // giant or a normal planet, with giants more frequent in the outer parts
     // of the solar system.

@@ -47,9 +47,11 @@ public slots:
     void CommodityClicked(QTreeWidgetItem *item, int column);
     void CommodityChanged(int value);
     void FleetChanged(QTreeWidgetItem *item, int column);
+    void MinableChanged(QTreeWidgetItem *item, int column);
 
 private:
     void UpdateFleets();
+    void UpdateMinables();
 
 
 private:
@@ -63,6 +65,7 @@ private:
     QTreeWidget *tradeWidget = nullptr;
     std::map<QObject *, QTreeWidgetItem *> spinMap;
     QTreeWidget *fleets = nullptr;
+    QTreeWidget *minables = nullptr;
 };
 
 

@@ -46,6 +46,11 @@ public slots:
     void BribeChanged();
     void SecurityChanged();
 
+    void TributeChanged();
+    void TributeThresholdChanged();
+    void TributeFleetNameChanged();
+    void TributeFleetQuanityChanged();
+
 private:
     static QString ToString(const std::vector<QString> &list);
     static std::vector<QString> ToList(const QString &str);
@@ -65,6 +70,10 @@ private:
     QLineEdit *reputation;
     QLineEdit *bribe;
     QLineEdit *security;
+    QLineEdit *tribute;
+    QLineEdit *tributeThreshold;
+    QLineEdit *tributeFleetName;
+    QLineEdit *tributeFleetQuanity;
 };
 
 #endif // PLANETVIEW_H
