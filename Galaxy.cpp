@@ -46,7 +46,8 @@ void Galaxy::Save(DataWriter &file) const
     file.BeginChild();
     {
         file.Write("pos", position.x(), position.y());
-        file.Write("sprite", sprite);
+        if(!sprite.isEmpty())
+            file.Write("sprite", sprite);
         for(const DataNode &node : unparsed)
             file.Write(node);
     }

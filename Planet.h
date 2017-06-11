@@ -96,9 +96,11 @@ public:
 
 private:
     QString name;
+    QString landscape;
     QString description;
     QString spaceport;
-    QString landscape;
+    QString government;
+    QString music;
     QString tributeFleetName;
 
     std::vector<QString> attributes;
@@ -115,7 +117,6 @@ private:
     double tributeFleetQuantity = std::numeric_limits<double>::quiet_NaN();
     std::list<DataNode> unparsed;
     std::list<DataNode> tributeUnparsed;
-
 };
 
 

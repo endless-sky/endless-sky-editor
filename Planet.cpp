@@ -31,13 +31,15 @@ void Planet::Load(const DataNode &node)
 
     for(const DataNode &child : node)
     {
-        if(child.Token(0) == "landscape" && child.Size() >= 2)
-            landscape = child.Token(1);
-        else if(child.Token(0) == "attributes")
+        if(child.Token(0) == "attributes")
         {
             for(int i = 1; i < child.Size(); ++i)
                 attributes.push_back(child.Token(i));
         }
+        else if(child.Token(0) == "landscape" && child.Size() >= 2)
+            landscape = child.Token(1);
+        else if(child.Token(0) == "music" && child.Size() >= 2)
+            music = child.Token(1);
         else if(child.Token(0) == "description" && child.Size() >= 2)
         {
             if(!description.isEmpty() && !child.Token(1).isEmpty() && child.Token(1)[0] > ' ')
@@ -56,6 +58,8 @@ void Planet::Load(const DataNode &node)
             shipyard.push_back(child.Token(1));
         else if(child.Token(0) == "outfitter" && child.Size() >= 2)
             outfitter.push_back(child.Token(1));
+        else if(child.Token(0) == "government" && child.Size() >= 2)
+            government = child.Token(1);
         else if(child.Token(0) == "required reputation" && child.Size() >= 2)
             requiredReputation = child.Value(1);
         else if(child.Token(0) == "bribe" && child.Size() >= 2)
@@ -104,8 +108,10 @@ void Planet::Save(DataWriter &file) const
                 file.WriteToken(it);
             file.Write();
         }
-
-        file.Write("landscape", landscape);
+        if(!landscape.isEmpty())
+            file.Write("landscape", landscape);
+        if(!music.isEmpty())
+            file.Write("music", music);
 
         // Break the descriptions into paragraphs.
         for(const QString &str : description.split('\n', QString::SkipEmptyParts))
@@ -126,6 +132,8 @@ void Planet::Save(DataWriter &file) const
         for(const QString &it : outfitter)
             file.Write("outfitter", it);
 
+        if(!government.isEmpty())
+            file.Write("government", government);
         if(!std::isnan(requiredReputation))
             file.Write("required reputation", requiredReputation);
         if(!std::isnan(bribe))

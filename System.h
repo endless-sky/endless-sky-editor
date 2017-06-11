@@ -124,6 +124,8 @@ private:
     // proper position before that object is updated).
     std::vector<StellarObject> objects;
     double habitable;
+    QString haze;
+    QString music;
 
     std::vector<Asteroid> asteroids;
     std::map<QString, int> trade;

@@ -59,6 +59,10 @@ void System::Load(const DataNode &node)
             habitable = child.Value(1);
         else if(child.Token(0) == "belt" && child.Size() >= 2)
             belt = child.Value(1);
+        else if(child.Token(0) == "haze" && child.Size() >= 2)
+            haze = child.Token(1);
+        else if(child.Token(0) == "music" && child.Size() >= 2)
+            music = child.Token(1);
         else if(child.Token(0) == "link" && child.Size() >= 2)
             links.push_back(child.Token(1));
         else if(child.Token(0) == "asteroids" && child.Size() >= 4)
@@ -89,7 +93,11 @@ void System::Save(DataWriter &file) const
         if(!std::isnan(habitable))
             file.Write("habitable", habitable);
         if(!std::isnan(belt))
-            file.Write("habitable", belt);
+            file.Write("belt", belt);
+        if(!haze.isEmpty())
+            file.Write("haze", haze);
+        if(!music.isEmpty())
+            file.Write("music", music);
         for(const QString &it : links)
             file.Write("link", it);
         for(const Asteroid &it : asteroids)
