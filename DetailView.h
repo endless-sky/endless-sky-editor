@@ -37,6 +37,7 @@ public:
     explicit DetailView(Map &mapData, GalaxyView *galaxyView, QWidget *parent = 0);
 
     void SetSystem(System *system);
+    void UpdateMinables();
     bool eventFilter(QObject* object, QEvent* event);
 
 signals:
@@ -47,11 +48,10 @@ public slots:
     void CommodityClicked(QTreeWidgetItem *item, int column);
     void CommodityChanged(int value);
     void FleetChanged(QTreeWidgetItem *item, int column);
-    void MinableChanged(QTreeWidgetItem *item, int column);
+    void MinablesChanged(QTreeWidgetItem *item, int column);
 
 private:
     void UpdateFleets();
-    void UpdateMinables();
 
 
 private:

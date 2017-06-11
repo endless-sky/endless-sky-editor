@@ -233,6 +233,10 @@ void MainWindow::CreateMenus()
     connect(changeAsteroids, SIGNAL(triggered()), systemView, SLOT(ChangeAsteroids()));
     changeAsteroids->setShortcut(QKeySequence("A"));
 
+    QAction *changeMinables = systemMenu->addAction("Change Minables");
+    connect(changeMinables, SIGNAL(triggered()), systemView, SLOT(ChangeMinables()));
+    changeMinables->setShortcut(QKeySequence("H"));
+
     systemMenu->addSeparator();
 
     QAction *changeStar = systemMenu->addAction("Change Star");

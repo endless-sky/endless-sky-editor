@@ -126,6 +126,42 @@ void DetailView::SetSystem(System *system)
 
 
 
+void DetailView::UpdateMinables()
+{
+    if(!system || !minables)
+        return;
+
+    disconnect(minables, SIGNAL(itemChanged(QTreeWidgetItem *, int)),
+        this, SLOT(MinablesChanged(QTreeWidgetItem *, int)));
+    minables->clear();
+
+    for(const System::Minable &minable : system->Minables())
+    {
+        QTreeWidgetItem *item = new QTreeWidgetItem(minables);
+        item->setText(0, minable.type);
+        item->setText(1, QString::number(minable.count));
+        item->setText(2, QString::number(minable.energy));
+        item->setText(3, QString::number(&minable - &system->Minables().front()));
+
+        item->setFlags(item->flags() | Qt::ItemIsEditable);
+        minables->addTopLevelItem(item);
+    }
+    {
+        // Add one last item, which is empty, but can be edited to add a row.
+        QTreeWidgetItem *item = new QTreeWidgetItem(minables);
+        item->setFlags(item->flags() | Qt::ItemIsEditable);
+
+        item->setText(3, QString::number(system->Minables().size()));
+        minables->addTopLevelItem(item);
+    }
+    minables->setColumnWidth(0, 120);
+    connect(minables, SIGNAL(itemChanged(QTreeWidgetItem *, int)),
+        this, SLOT(MinablesChanged(QTreeWidgetItem *, int)));
+
+}
+
+
+
 bool DetailView::eventFilter(QObject *object, QEvent *event)
 {
     if(object == government && event->type() == QEvent::FocusIn)
@@ -217,7 +253,7 @@ void DetailView::FleetChanged(QTreeWidgetItem *item, int column)
 
 
 
-void DetailView::MinableChanged(QTreeWidgetItem *item, int column)
+void DetailView::MinablesChanged(QTreeWidgetItem *item, int column)
 {
     if(!system)
         return;
@@ -271,40 +307,4 @@ void DetailView::UpdateFleets()
     fleets->setColumnWidth(0, 200);
     connect(fleets, SIGNAL(itemChanged(QTreeWidgetItem *, int)),
         this, SLOT(FleetChanged(QTreeWidgetItem *, int)));
-}
-
-
-
-void DetailView::UpdateMinables()
-{
-    if(!system || !minables)
-        return;
-
-    disconnect(minables, SIGNAL(itemChanged(QTreeWidgetItem *, int)),
-        this, SLOT(MinableChanged(QTreeWidgetItem *, int)));
-    minables->clear();
-
-    for(const System::Minable &minable : system->Minables())
-    {
-        QTreeWidgetItem *item = new QTreeWidgetItem(minables);
-        item->setText(0, minable.type);
-        item->setText(1, QString::number(minable.count));
-        item->setText(2, QString::number(minable.energy));
-        item->setText(3, QString::number(&minable - &system->Minables().front()));
-
-        item->setFlags(item->flags() | Qt::ItemIsEditable);
-        minables->addTopLevelItem(item);
-    }
-    {
-        // Add one last item, which is empty, but can be edited to add a row.
-        QTreeWidgetItem *item = new QTreeWidgetItem(minables);
-        item->setFlags(item->flags() | Qt::ItemIsEditable);
-
-        item->setText(3, QString::number(system->Minables().size()));
-        minables->addTopLevelItem(item);
-    }
-    minables->setColumnWidth(0, 120);
-    connect(minables, SIGNAL(itemChanged(QTreeWidgetItem *, int)),
-        this, SLOT(MinableChanged(QTreeWidgetItem *, int)));
-
 }

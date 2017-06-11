@@ -92,6 +92,7 @@ public:
     // Editing the stellar objects and their locations:
     void Move(StellarObject *object, double dDistance, double dAngle = 0.);
     void ChangeAsteroids();
+    void ChangeMinables();
     void ChangeStar();
     void ChangeSprite(StellarObject *object);
     void AddPlanet();
@@ -128,6 +129,7 @@ private:
     std::map<QString, int> trade;
     std::vector<Fleet> fleets;
     std::vector<Minable> minables;
+    double belt;
 
     std::list<DataNode> unparsed;
 

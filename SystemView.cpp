@@ -159,6 +159,20 @@ void SystemView::ChangeAsteroids()
 
 
 
+void SystemView::ChangeMinables()
+{
+    if(system)
+    {
+        system->ChangeMinables();
+        asteroids.Set(system);
+        mapData.SetChanged();
+        detailView->UpdateMinables();
+        update();
+    }
+}
+
+
+
 void SystemView::ChangeStar()
 {
     if(system)

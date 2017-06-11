@@ -47,6 +47,7 @@ void System::Load(const DataNode &node)
     name = node.Token(1);
 
     habitable = numeric_limits<double>::quiet_NaN();
+    belt = numeric_limits<double>::quiet_NaN();
 
     for(const DataNode &child : node)
     {
@@ -56,6 +57,8 @@ void System::Load(const DataNode &node)
             government = child.Token(1);
         else if(child.Token(0) == "habitable" && child.Size() >= 2)
             habitable = child.Value(1);
+        else if(child.Token(0) == "belt" && child.Size() >= 2)
+            belt = child.Value(1);
         else if(child.Token(0) == "link" && child.Size() >= 2)
             links.push_back(child.Token(1));
         else if(child.Token(0) == "asteroids" && child.Size() >= 4)
@@ -83,7 +86,10 @@ void System::Save(DataWriter &file) const
         file.Write("pos", position.x(), position.y());
         if(!government.isEmpty())
             file.Write("government", government);
-        file.Write("habitable", habitable);
+        if(!std::isnan(habitable))
+            file.Write("habitable", habitable);
+        if(!std::isnan(belt))
+            file.Write("habitable", belt);
         for(const QString &it : links)
             file.Write("link", it);
         for(const Asteroid &it : asteroids)
@@ -345,6 +351,7 @@ void System::Init(const QString &name, const QVector2D &position)
 
     Randomize(true, false);
     ChangeAsteroids();
+    ChangeMinables();
 }
 
 
@@ -497,6 +504,70 @@ void System::ChangeAsteroids()
                     prefix[j] + suffix[i],
                     count[j],
                     energy * (rand() % 101 + 50) * .01});
+    }
+}
+
+
+
+void System::ChangeMinables()
+{
+    // First, change the belt radius.
+    belt = rand() % 1000 + 1000;
+    minables.clear();
+    
+    // Next, figure out the quantity and energy of the ordinary asteroids.
+    int totalCount = 0;
+    double totalEnergy = 0.;
+    for(const Asteroid &asteroid : asteroids)
+    {
+        totalCount += asteroid.count;
+        totalEnergy += asteroid.energy * asteroid.count;
+    }
+    
+    if(!totalCount)
+        return;
+    
+    double meanEnergy = totalEnergy / totalCount;
+    // Minables are much less common than ordinary asteroids.
+    totalCount /= 4;
+    
+    map<QString, double> probability = {
+        {"aluminum",  12},
+        {"copper",  8},
+        {"gold",  2},
+        {"iron",  13},
+        {"lead",  15},
+        {"neodymium",  3},
+        {"platinum",  1},
+        {"silicon",  2},
+        {"silver",  5},
+        {"titanium",  11},
+        {"tungsten",  6},
+        {"uranium",  4}
+    };
+    map<QString, int> choices;
+    for(int i = 0; i < 3; ++i)
+    {
+        // Pick three random minable types, with decreasing quantities.
+        totalCount = rand() % (totalCount + 1);
+        if(!totalCount)
+            break;
+        
+        int choice = rand() % 100;
+        for(const auto &it : probability)
+        {
+            choice -= it.second;
+            if(choice < 0)
+            {
+                choices[it.first] += totalCount;
+                break;
+            }
+        }
+    }
+    for(const auto &it : choices)
+    {
+        double energy = (rand() % 1000 + 1000) * .001 * meanEnergy;
+        minables.push_back({it.first, it.second, energy});
     }
 }
 

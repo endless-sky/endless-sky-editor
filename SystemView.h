@@ -53,6 +53,7 @@ public slots:
     void Randomize();
     void RandomizeUninhabited();
     void ChangeAsteroids();
+    void ChangeMinables();
     void ChangeStar();
     void ChangePlanet();
     void ChangeMoon();
