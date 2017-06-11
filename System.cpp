@@ -231,10 +231,13 @@ vector<System::Fleet> &System::Fleets()
     return fleets;
 }
 
+
+
 vector<System::Minable> &System::Minables()
 {
     return minables;
 }
+
 
 
 const vector<System::Fleet> &System::Fleets() const
@@ -242,10 +245,13 @@ const vector<System::Fleet> &System::Fleets() const
     return fleets;
 }
 
+
+
 const vector<System::Minable> &System::Minables() const
 {
     return minables;
 }
+
 
 
 // Position the planets, etc.
@@ -270,8 +276,7 @@ void System::SetDay(double day)
 
 void System::LoadObject(const DataNode &node, int parent)
 {
-
-    int index = (int)objects.size();
+    int index = static_cast<int>(objects.size());
 
     objects.push_back(StellarObject());
     StellarObject &object = objects.back();

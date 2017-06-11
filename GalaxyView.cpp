@@ -278,7 +278,7 @@ void GalaxyView::wheelEvent(QWheelEvent *event)
 
 
 
-void GalaxyView::paintEvent(QPaintEvent * /*event*/)
+void GalaxyView::paintEvent(QPaintEvent */*event*/)
 {
     QPen blackPen;
     QPen mediumPen(QColor(120, 120, 120));

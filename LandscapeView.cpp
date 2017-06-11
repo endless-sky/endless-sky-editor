@@ -106,7 +106,7 @@ void LandscapeView::mousePressEvent(QMouseEvent *event)
 
 
 
-void LandscapeView::paintEvent(QPaintEvent * /*event*/)
+void LandscapeView::paintEvent(QPaintEvent */*event*/)
 {
     loader.Update();
 

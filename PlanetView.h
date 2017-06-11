@@ -49,7 +49,7 @@ public slots:
     void TributeChanged();
     void TributeThresholdChanged();
     void TributeFleetNameChanged();
-    void TributeFleetQuanityChanged();
+    void TributeFleetQuantityChanged();
 
 private:
     static QString ToString(const std::vector<QString> &list);
@@ -73,7 +73,7 @@ private:
     QLineEdit *tribute;
     QLineEdit *tributeThreshold;
     QLineEdit *tributeFleetName;
-    QLineEdit *tributeFleetQuanity;
+    QLineEdit *tributeFleetQuantity;
 };
 
 #endif // PLANETVIEW_H

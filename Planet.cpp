@@ -63,13 +63,14 @@ void Planet::Load(const DataNode &node)
         else if(child.Token(0) == "security" && child.Size() >= 2)
             security = child.Value(1);
         else if(child.Token(0) == "tribute" && child.Size() >= 2)
-        {
             LoadTribute(child);
-        }
         else
             unparsed.push_back(child);
     }
 }
+
+
+
 void  Planet::LoadTribute(const DataNode &node)
 {
     if(node.Size() >= 2)
@@ -82,12 +83,13 @@ void  Planet::LoadTribute(const DataNode &node)
         else if(child.Token(0) == "fleet" && child.Size() >= 3)
         {
             tributeFleetName = child.Token(1);
-            tributeFleetQuanity = child.Value(2);
+            tributeFleetQuantity = child.Value(2);
         }
         else
             tributeUnparsed.push_back(child);
     }
 }
+
 
 
 void Planet::Save(DataWriter &file) const
@@ -132,17 +134,15 @@ void Planet::Save(DataWriter &file) const
             file.Write("security", security);
         if(!std::isnan(tribute))
         {
-            file.Write("tribute",tribute);
+            file.Write("tribute", tribute);
             file.BeginChild();
             {
-                file.Write("threshold",tributeThreshold);
-                file.Write("fleet",tributeFleetName,tributeFleetQuanity);
+                file.Write("threshold", tributeThreshold);
+                file.Write("fleet", tributeFleetName, tributeFleetQuantity);
                 for(const DataNode &node : tributeUnparsed)
                     file.Write(node);
-
             }
             file.EndChild();
-
         }
         for(const DataNode &node : unparsed)
             file.Write(node);
@@ -257,19 +257,29 @@ double Planet::Security() const
     return security;
 }
 
+
+
 double Planet::Tribute() const
 {
     return tribute;
 }
+
+
+
 double Planet::TributeThreshold() const
 {
     return tributeThreshold;
 }
 
-double Planet::TributeFleetQuanity() const
+
+
+double Planet::TributeFleetQuantity() const
 {
-    return tributeFleetQuanity;
+    return tributeFleetQuantity;
 }
+
+
+
 const QString &Planet::TributeFleetName() const
 
 {
@@ -367,7 +377,7 @@ void Planet::SetTributeFleetName(QString &value)
 
 
 
-void Planet::SetTributeFleetQuanity(double value)
+void Planet::SetTributeFleetQuantity(double value)
 {
-    tributeFleetQuanity = value;
+    tributeFleetQuantity = value;
 }

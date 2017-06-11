@@ -74,7 +74,7 @@ public:
     // Combat Rating level before you are an actual threat. Balance this with tribute and fleet.
     double TributeThreshold() const;
     // Number of Defending Ships
-    double TributeFleetQuanity() const;
+    double TributeFleetQuantity() const;
     // Get the fleet assigned to protect planet
     const QString &TributeFleetName() const;
 
@@ -92,7 +92,7 @@ public:
     void SetTribute(double value);
     void SetTributeThreshold(double value);
     void SetTributeFleetName(QString &value);
-    void SetTributeFleetQuanity(double value);
+    void SetTributeFleetQuantity(double value);
 
 private:
     QString name;
@@ -112,7 +112,7 @@ private:
 
     double tribute = std::numeric_limits<double>::quiet_NaN();
     double tributeThreshold = std::numeric_limits<double>::quiet_NaN();
-    double tributeFleetQuanity = std::numeric_limits<double>::quiet_NaN();
+    double tributeFleetQuantity = std::numeric_limits<double>::quiet_NaN();
     std::list<DataNode> unparsed;
     std::list<DataNode> tributeUnparsed;
 
@@ -121,5 +121,3 @@ private:
 
 
 #endif
-
-

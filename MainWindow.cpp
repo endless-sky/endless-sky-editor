@@ -119,7 +119,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 
 
 
-void MainWindow::closeEvent(QCloseEvent * /*event*/)
+void MainWindow::closeEvent(QCloseEvent */*event*/)
 {
     if(map.IsChanged())
     {

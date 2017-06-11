@@ -126,7 +126,7 @@ void DetailView::SetSystem(System *system)
 
 
 
-bool DetailView::eventFilter(QObject* object, QEvent* event)
+bool DetailView::eventFilter(QObject *object, QEvent *event)
 {
     if(object == government && event->type() == QEvent::FocusIn)
         galaxyView->SetGovernment(government->text());
@@ -215,6 +215,8 @@ void DetailView::FleetChanged(QTreeWidgetItem *item, int column)
     UpdateFleets();
 }
 
+
+
 void DetailView::MinableChanged(QTreeWidgetItem *item, int column)
 {
     if(!system)
@@ -229,7 +231,7 @@ void DetailView::MinableChanged(QTreeWidgetItem *item, int column)
         system->Minables()[row].type = item->text(0);
     else if(column == 1)
         system->Minables()[row].count = item->text(1).toInt();
-    else if(column == 1)
+    else if(column == 2)
         system->Minables()[row].energy = item->text(2).toDouble();
     else
         return;
@@ -239,12 +241,14 @@ void DetailView::MinableChanged(QTreeWidgetItem *item, int column)
     UpdateMinables();
 }
 
+
+
 void DetailView::UpdateFleets()
 {
     if(!system || !fleets)
         return;
 
-    disconnect(fleets, SIGNAL(itemChanged(QTreeWidgetItem *,int)),
+    disconnect(fleets, SIGNAL(itemChanged(QTreeWidgetItem *, int)),
         this, SLOT(FleetChanged(QTreeWidgetItem *, int)));
     fleets->clear();
 
@@ -265,16 +269,18 @@ void DetailView::UpdateFleets()
         fleets->addTopLevelItem(item);
     }
     fleets->setColumnWidth(0, 200);
-    connect(fleets, SIGNAL(itemChanged(QTreeWidgetItem *,int)),
+    connect(fleets, SIGNAL(itemChanged(QTreeWidgetItem *, int)),
         this, SLOT(FleetChanged(QTreeWidgetItem *, int)));
 }
+
+
 
 void DetailView::UpdateMinables()
 {
     if(!system || !minables)
         return;
 
-    disconnect(minables, SIGNAL(itemChanged(QTreeWidgetItem *,int)),
+    disconnect(minables, SIGNAL(itemChanged(QTreeWidgetItem *, int)),
         this, SLOT(MinableChanged(QTreeWidgetItem *, int)));
     minables->clear();
 
@@ -298,8 +304,7 @@ void DetailView::UpdateMinables()
         minables->addTopLevelItem(item);
     }
     minables->setColumnWidth(0, 120);
-    connect(minables, SIGNAL(itemChanged(QTreeWidgetItem *,int)),
+    connect(minables, SIGNAL(itemChanged(QTreeWidgetItem *, int)),
         this, SLOT(MinableChanged(QTreeWidgetItem *, int)));
 
 }
-

@@ -77,9 +77,6 @@ public:
     std::vector<Fleet> &Fleets();
     const std::vector<Fleet> &Fleets() const;
 
-
-
-
     // Position the planets, etc.
     void SetDay(double day);
 

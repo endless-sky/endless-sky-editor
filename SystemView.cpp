@@ -365,7 +365,7 @@ void SystemView::wheelEvent(QWheelEvent *event)
 
 
 
-void SystemView::paintEvent(QPaintEvent * /*event*/)
+void SystemView::paintEvent(QPaintEvent */*event*/)
 {
     if(!system)
         return;
@@ -484,4 +484,3 @@ QVector2D SystemView::MapPoint(QPoint pos) const
     // point = origin * scale + offset + center.
     return (point - offset - center) / scale;
 }
-

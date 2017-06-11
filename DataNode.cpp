@@ -21,7 +21,7 @@ using namespace std;
 
 int DataNode::Size() const
 {
-    return (int)tokens.size();
+    return static_cast<int>(tokens.size());
 }
 
 
