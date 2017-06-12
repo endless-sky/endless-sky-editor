@@ -12,6 +12,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 #include "GalaxyView.h"
 
+#include "DetailView.h"
 #include "Map.h"
 #include "SpriteSet.h"
 #include "SystemView.h"
@@ -25,6 +26,9 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 #include <algorithm>
 #include <cmath>
+#include <map>
+#include <set>
+#include <stack>
 
 using namespace std;
 
@@ -86,10 +90,16 @@ void GalaxyView::Center()
 
 
 
-
 void GalaxyView::SetSystemView(SystemView *view)
 {
     systemView = view;
+}
+
+
+
+void GalaxyView::SetDetailView(DetailView *view)
+{
+    detailView = view;
 }
 
 
@@ -144,6 +154,199 @@ void GalaxyView::DeleteSystem()
         mapData.Systems().erase(it);
         mapData.SetChanged();
     }
+}
+
+
+
+void GalaxyView::RandomizeCommodity()
+{
+    // Randomize the values of the currently selected commodity.
+    
+    // First, make sure a system and a commodity are selected.
+    if(commodity.isEmpty() || !systemView || !systemView->Selected())
+        return;
+    
+    // Next, find all the systems connected via hyperlinks to the current system.
+    set<System *> connected;
+    stack<System *> edge;
+    edge.push(systemView->Selected());
+    while(!edge.empty())
+    {
+        System *system = edge.top();
+        edge.pop();
+        
+        if(connected.count(system))
+            continue;
+        connected.insert(system);
+        
+        for(const QString &name : system->Links())
+        {
+            auto it = mapData.Systems().find(name);
+            if(it != mapData.Systems().end())
+                edge.push(&it->second);
+        }
+    }
+    
+    // Commodity parameters.
+    static const map<QString, int> BASE = {
+        {"Clothing", 140},
+        {"Electronics", 590},
+        {"Equipment", 330},
+        {"Food", 100},
+        {"Heavy Metals", 610},
+        {"Industrial", 520},
+        {"Luxury Goods", 920},
+        {"Medical", 430},
+        {"Metal", 190},
+        {"Plastic", 240}
+    };
+    static const map<QString, vector<int>> BINS = {
+        {"Clothing", {20, 60, 20}},
+        {"Electronics", {30, 40, 30}},
+        {"Equipment", {30, 20, 20, 30}},
+        {"Food", {24, 18, 16, 18, 24}},
+        {"Heavy Metals", {8, 12, 20, 20, 20, 12, 8}},
+        {"Industrial", {20, 30, 30, 20}},
+        {"Luxury Goods", {25, 20, 15, 10, 10, 20}},
+        {"Medical", {20, 20, 20, 20, 20}},
+        {"Metal", {30, 25, 20, 25}},
+        {"Plastic", {40, 20, 40}}
+    };
+    auto baseIt = BASE.find(commodity);
+    auto binIt = BINS.find(commodity);
+    if(baseIt == BASE.end() || binIt == BINS.end())
+        return;
+    
+    // Generate the quotas for each bin level.
+    const int base = baseIt->second;
+    
+    // Try to find a set of bins to assign the systems to such that neighboring
+    // systems only differ by one bin, and the desired distribution is achieved.
+    map<const System *, int> bin;
+    for(int tries = 0; true; ++tries)
+    {
+        // Each time we try 4 times to match the quota and are unable to,
+        // loosen the quota a little bit.
+        vector<int> quota;
+        for(int weight : binIt->second)
+            quota.push_back((connected.size() * weight) / 100 + tries / 4 + 1);
+        
+        vector<const System *> unassigned;
+        map<const System *, int> low;
+        map<const System *, int> high;
+        for(const System *system : connected)
+        {
+            unassigned.push_back(system);
+            low[system] = 0;
+            high[system] = quota.size();
+        }
+        
+        while(!unassigned.empty())
+        {
+            int i = rand() % unassigned.size();
+            const System *system = unassigned[i];
+            unassigned[i] = unassigned.back();
+            unassigned.pop_back();
+            
+            // Pick a bin, based on what is available.
+            int possibilities = 0;
+            for(int i = low[system]; i < high[system]; ++i)
+                possibilities += quota[i];
+            if(!possibilities)
+                break;
+            
+            // Pick a random one of those items to assign to it.
+            int index = rand() % possibilities;
+            int choice = low[system];
+            while(true)
+            {
+                index -= quota[choice];
+                if(index < 0)
+                    break;
+                ++choice;
+            }
+            --quota[choice];
+            
+            // Record our choice.
+            bin[system] = choice;
+            int newLow = low[system] = choice;
+            int newHigh = high[system] = choice + 1;
+            
+            // Starting from this star, trace outwards system by system. Each
+            // neighboring system must be within 1 of this star's level; each
+            // system neighboring those, within 2, and so on.
+            vector<const System *> sources = {system};
+            set<const System *> done = {system};
+            while(!sources.empty())
+            {
+                // For each step outward, expand the allowable range.
+                --newLow;
+                ++newHigh;
+                
+                vector<const System *> next;
+                
+                // Check if any systems adjacent to any of the sources must be
+                // updated.
+                for(const System *source : sources)
+                    for(const QString &name : source->Links())
+                    {
+                        auto it = mapData.Systems().find(name);
+                        if(it == mapData.Systems().end() || done.count(&it->second))
+                            continue;
+                        const System *link = &it->second;
+                        done.insert(link);
+                        
+                        // No need to go further if this system is already at
+                        // least as constrained as the new constraints.
+                        if(low[link] >= newLow && high[link] <= newHigh)
+                            continue;
+                        
+                        low[link] = max(low[link], newLow);
+                        high[link] = min(high[link], newHigh);
+                        next.push_back(link);
+                    }
+                
+                // Now, visit neighbors of those neighbors.
+                next.swap(sources);
+            }
+        }
+        if(unassigned.empty())
+            break;
+    }
+    
+    // Assign each star system a value based on its bin.
+    map<const System *, int> rough;
+    for(auto &it : bin)
+        rough[it.first] = base + (rand() % 100) + 100 * it.second;
+    
+    // Smooth out the values by averaging each system with the average of all
+    // its neighbors.
+    for(System *system : connected)
+    {
+        int count = 0;
+        int sum = 0;
+        for(const QString &link : system->Links())
+        {
+            auto it = mapData.Systems().find(link);
+            if(it == mapData.Systems().end())
+                continue;
+            
+            sum += rough[&it->second];
+            ++count;
+        }
+        if(!count)
+            sum = rough[system];
+        else
+        {
+            sum += count * rough[system];
+            sum = (sum + count) / (2 * count);
+        }
+        system->SetTrade(commodity, sum);
+    }
+    mapData.SetChanged();
+    if(detailView)
+        detailView->UpdateCommodities();
+    update();
 }
 
 

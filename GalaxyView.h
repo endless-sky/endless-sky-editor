@@ -18,6 +18,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include <QVector2D>
 #include <QElapsedTimer>
 
+class DetailView;
 class Map;
 class System;
 class SystemView;
@@ -34,6 +35,7 @@ public:
 
     void Center();
     void SetSystemView(SystemView *view);
+    void SetDetailView(DetailView *view);
     void SetCommodity(const QString &name);
     void SetGovernment(const QString &name);
     void KeyPress(QKeyEvent *event);
@@ -42,6 +44,7 @@ signals:
 
 public slots:
     void DeleteSystem();
+    void RandomizeCommodity();
 
 protected:
     virtual void mousePressEvent(QMouseEvent *event) override;
@@ -57,6 +60,7 @@ private:
 
 private:
     Map &mapData;
+    DetailView *detailView = nullptr;
     SystemView *systemView = nullptr;
     QTabWidget *tabs;
 

@@ -91,27 +91,8 @@ void DetailView::SetSystem(System *system)
     {
         name->setText(system->Name());
         government->setText(system->Government());
-
-        spinMap.clear();
-        tradeWidget->clear();
-        tradeWidget->setColumnWidth(1, 70);
-        for(const auto &it : mapData.Commodities())
-        {
-            QTreeWidgetItem *item = new QTreeWidgetItem(tradeWidget);
-            int price = system->Trade(it.name);
-            item->setText(0, it.name);
-            item->setText(2, mapData.PriceLevel(it.name, price));
-
-            QSpinBox *spin = new QSpinBox(tradeWidget);
-            spin->setMinimum(0);
-            spin->setMaximum(9999);
-            spin->setValue(price);
-            spin->setSingleStep(10);
-            spinMap[spin] = item;
-            connect(spin, SIGNAL(valueChanged(int)), this, SLOT(CommodityChanged(int)));
-            tradeWidget->insertTopLevelItem(tradeWidget->topLevelItemCount(), item);
-            tradeWidget->setItemWidget(item, 1, spin);
-        }
+        
+        UpdateCommodities();
         UpdateFleets();
         UpdateMinables();
     }
@@ -157,7 +138,39 @@ void DetailView::UpdateMinables()
     minables->setColumnWidth(0, 120);
     connect(minables, SIGNAL(itemChanged(QTreeWidgetItem *, int)),
         this, SLOT(MinablesChanged(QTreeWidgetItem *, int)));
+}
 
+
+
+void DetailView::UpdateCommodities()
+{
+    QString current;
+    if(tradeWidget && tradeWidget->currentItem())
+        current = tradeWidget->currentItem()->text(0);
+    
+    spinMap.clear();
+    tradeWidget->clear();
+    tradeWidget->setColumnWidth(1, 70);
+    for(const auto &it : mapData.Commodities())
+    {
+        QTreeWidgetItem *item = new QTreeWidgetItem(tradeWidget);
+        int price = system->Trade(it.name);
+        item->setText(0, it.name);
+        item->setText(2, mapData.PriceLevel(it.name, price));
+
+        QSpinBox *spin = new QSpinBox(tradeWidget);
+        spin->setMinimum(0);
+        spin->setMaximum(9999);
+        spin->setValue(price);
+        spin->setSingleStep(10);
+        spinMap[spin] = item;
+        connect(spin, SIGNAL(valueChanged(int)), this, SLOT(CommodityChanged(int)));
+        tradeWidget->insertTopLevelItem(tradeWidget->topLevelItemCount(), item);
+        tradeWidget->setItemWidget(item, 1, spin);
+        
+        if(it.name == current)
+            tradeWidget->setCurrentItem(item, 0);
+    }
 }
 
 

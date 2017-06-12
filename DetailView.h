@@ -38,6 +38,7 @@ public:
 
     void SetSystem(System *system);
     void UpdateMinables();
+    void UpdateCommodities();
     bool eventFilter(QObject* object, QEvent* event);
 
 signals:

@@ -169,6 +169,7 @@ void MainWindow::CreateWidgets()
     detailView = new DetailView(map, galaxyView, box);
     detailView->setMinimumWidth(300);
     detailView->setMaximumWidth(300);
+    galaxyView->SetDetailView(detailView);
 
     systemView = new SystemView(map, detailView, tabs, tabs);
     auto it = map.Systems().find("Sol");
@@ -212,6 +213,10 @@ void MainWindow::CreateMenus()
     connect(deleteSystemAction, SIGNAL(triggered()), galaxyView, SLOT(DeleteSystem()));
     deleteSystemAction->setShortcut(QKeySequence(Qt::Key_Backspace));
 
+    QAction *randomizeCommodityAction = galaxyMenu->addAction("Randomize Commodity");
+    connect(randomizeCommodityAction, SIGNAL(triggered()), galaxyView, SLOT(RandomizeCommodity()));
+    randomizeCommodityAction->setShortcut(QKeySequence("C"));
+
 
     systemMenu = menuBar()->addMenu("System");
 
@@ -224,8 +229,8 @@ void MainWindow::CreateMenus()
     randomSystem->setShortcut(QKeySequence("R"));
 
     QAction *randomUninhabited = systemMenu->addAction("Randomize (Uninhabited)");
-    randomUninhabited->setShortcut(QKeySequence("U"));
     connect(randomUninhabited, SIGNAL(triggered()), systemView, SLOT(RandomizeUninhabited()));
+    randomUninhabited->setShortcut(QKeySequence("U"));
 
     systemMenu->addSeparator();
 
@@ -241,7 +246,7 @@ void MainWindow::CreateMenus()
 
     QAction *changeStar = systemMenu->addAction("Change Star");
     connect(changeStar, SIGNAL(triggered()), systemView, SLOT(ChangeStar()));
-    changeStar->setShortcut(QKeySequence("C"));
+    changeStar->setShortcut(QKeySequence("T"));
 
     QAction *addPlanet = systemMenu->addAction("Add/Change Planet");
     connect(addPlanet, SIGNAL(triggered()), systemView, SLOT(ChangePlanet()));
