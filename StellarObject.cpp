@@ -235,7 +235,7 @@ double StellarObject::Period() const
 double StellarObject::Radius() const
 {
     auto it = INFO.find(sprite);
-    return (it != INFO.end() ? it->second.radius : 0);
+    return (it != INFO.end() ? it->second.radius : 40);
 }
 
 
