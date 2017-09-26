@@ -18,6 +18,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include <QVector2D>
 #include <QString>
 
+#include <map>
 #include <set>
 #include <vector>
 
