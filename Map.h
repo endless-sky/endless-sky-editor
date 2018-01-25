@@ -28,9 +28,12 @@ class StellarObject;
 
 class Map {
 public:
+    // Load from the given file, and remember which file was read from.
     void Load(const QString &path);
-    void Save(const QString &path) const;
+    // Write all the information, and remember which file was chosen.
+    void Save(const QString &path);
     const QString &DataDirectory() const;
+    const QString &FileName() const;
 
     // Mark this file as changed.
     void SetChanged(bool changed = true);
@@ -63,6 +66,7 @@ public:
 
 private:
     QString dataDirectory;
+    QString fileName;
 
     std::list<Galaxy> galaxies;
     std::map<QString, System> systems;

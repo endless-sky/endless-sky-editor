@@ -69,9 +69,34 @@ void MainWindow::DoOpen(const QString &path)
 
 
 
+void MainWindow::NewMap()
+{
+    // Start in the previous map file's directory.
+    QString dir = map.DataDirectory();
+    QString path = QFileDialog::getSaveFileName(this, "Create map file", dir, "*.txt");
+    if(!path.isEmpty())
+    {
+        // Create the empty map file.
+        map.Save(path);
+        // Initialize the editor with the empty map.
+        DoOpen(path);
+    }
+}
+
+
+
 void MainWindow::Open()
 {
-    // TODO: ask about saving changes.
+    if(map.IsChanged())
+    {
+        QMessageBox::StandardButton button = QMessageBox::question(this, "Save the current map?",
+                "There are unsaved changes. Would you like to save them?");
+        if(button == QMessageBox::Yes)
+            SaveAs();
+        else if(button != QMessageBox::No)
+            return;
+    }
+
     QString dir = map.DataDirectory();
     QString path = QFileDialog::getOpenFileName(this, "Open map file", dir);
     if(!path.isEmpty())
@@ -80,10 +105,25 @@ void MainWindow::Open()
 
 
 
+// Write to the given filename, if possible.
 void MainWindow::Save()
 {
     QString dir = map.DataDirectory();
-    QString path = QFileDialog::getSaveFileName(this, "Save map file", dir);
+    QString file = map.FileName();
+    if(dir.isEmpty() || file.isEmpty())
+        SaveAs();
+    else
+        map.Save(dir + file);
+}
+
+
+
+// Use a dialog to pick the save destination.
+void MainWindow::SaveAs()
+{
+    QString dir = map.DataDirectory();
+    QString file = map.FileName();
+    QString path = QFileDialog::getSaveFileName(this, "Save map file", dir + file, "*.txt");
     if(!path.isEmpty())
         map.Save(path);
 }
@@ -123,10 +163,11 @@ void MainWindow::closeEvent(QCloseEvent */*event*/)
 {
     if(map.IsChanged())
     {
+        // Default to "Yes" when exiting the application.
         QMessageBox::StandardButton button = QMessageBox::question(this, "Save changes?",
-            "Save changes to the map file before quitting?");
+            "Save changes to the map file before quitting?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
         if(button == QMessageBox::Yes)
-            Save();
+            SaveAs();
     }
 }
 
@@ -194,19 +235,27 @@ void MainWindow::CreateWidgets()
 
 void MainWindow::CreateMenus()
 {
+    // File Menu:
     QMenu *fileMenu = menuBar()->addMenu("File");
+    {
+        QAction *newAction = fileMenu->addAction("New...", this, SLOT(NewMap()));
+        newAction->setShortcut(QKeySequence::New);
 
-    QAction *openAction = fileMenu->addAction("Open...", this, SLOT(Open()));
-    openAction->setShortcut(QKeySequence::Open);
+        QAction *openAction = fileMenu->addAction("Open...", this, SLOT(Open()));
+        openAction->setShortcut(QKeySequence::Open);
 
-    QAction *saveAction = fileMenu->addAction("Save...", this, SLOT(Save()));
-    saveAction->setShortcut(QKeySequence::Save);
-    fileMenu->addSeparator();
+        QAction *saveAction = fileMenu->addAction("Save...", this, SLOT(Save()));
+        saveAction->setShortcut(QKeySequence::Save);
 
-    QAction *quitAction = fileMenu->addAction("Quit", this, SLOT(Quit()));
-    quitAction->setShortcut(QKeySequence::Quit);
+        QAction *saveAsAction = fileMenu->addAction("Save As...", this, SLOT(SaveAs()));
+        saveAsAction->setShortcut(QKeySequence::SaveAs);
+        fileMenu->addSeparator();
 
+        QAction *quitAction = fileMenu->addAction("Quit", this, SLOT(Quit()));
+        quitAction->setShortcut(QKeySequence::Quit);
+    }
 
+    // Galaxy Menu:
     galaxyMenu = menuBar()->addMenu("Galaxy");
 
     QAction *deleteSystemAction = galaxyMenu->addAction("Delete System");
@@ -218,6 +267,7 @@ void MainWindow::CreateMenus()
     randomizeCommodityAction->setShortcut(QKeySequence("C"));
 
 
+    // System Menu:
     systemMenu = menuBar()->addMenu("System");
 
     QAction *randomInhabited = systemMenu->addAction("Randomize (Inhabited)");

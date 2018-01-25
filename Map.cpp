@@ -28,6 +28,7 @@ void Map::Load(const QString &path)
     *this = Map();
 
     dataDirectory = path.left(path.lastIndexOf('/'));
+    fileName = path.right(path.lastIndexOf('/'));
     QString rootDir = dataDirectory.left(dataDirectory.lastIndexOf('/'));
     dataDirectory += "/";
     SpriteSet::SetRootPath(rootDir + "/images/");
@@ -63,8 +64,9 @@ void Map::Load(const QString &path)
 
 
 
-void Map::Save(const QString &path) const
+void Map::Save(const QString &path)
 {
+    fileName = path.right(path.lastIndexOf('/'));
     DataWriter file(path);
     file.WriteRaw(comments);
     file.Write();
@@ -97,6 +99,13 @@ void Map::Save(const QString &path) const
 const QString &Map::DataDirectory() const
 {
     return dataDirectory;
+}
+
+
+
+const QString &Map::FileName() const
+{
+    return fileName;
 }
 
 
@@ -198,8 +207,7 @@ QString Map::PriceLevel(const QString &commodity, int price) const
 
 
 
-// Rename a system. This involves changing all the systems that link to it
-// and moving it to a new place in the map.
+// Rename a system. This requires updating all the systems that link to it.
 void Map::RenameSystem(const QString &from, const QString &to)
 {
     auto it = systems.find(from);
@@ -219,6 +227,8 @@ void Map::RenameSystem(const QString &from, const QString &to)
 
 
 
+// Rename a planet. The editor does not support planets sharing a name with
+// a system, or renaming an object to share a planet definition (i.e. wormholes).
 void Map::RenamePlanet(StellarObject *object, const QString &name)
 {
     if(!object || systems.find(name) != systems.end())
@@ -227,7 +237,9 @@ void Map::RenamePlanet(StellarObject *object, const QString &name)
     auto it = planets.find(object->GetPlanet());
     if(it != planets.end())
     {
+        // Copy the existing definition to the new name.
         planets[name] = it->second;
+        // Erase the previous definition.
         planets.erase(it);
     }
     planets[name].SetName(name);
