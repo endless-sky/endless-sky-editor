@@ -209,13 +209,14 @@ void MainWindow::CreateWidgets()
 
     galaxyView = new GalaxyView(map, tabs, tabs);
 
+    // Initialize the sidebar with the system, government, fleet, trade, and minables data.
     detailView = new DetailView(map, galaxyView, box);
     detailView->setMinimumWidth(300);
     detailView->setMaximumWidth(300);
     galaxyView->SetDetailView(detailView);
 
     systemView = new SystemView(map, detailView, tabs, tabs);
-    auto it = map.Systems().find("Sol");
+    const auto &it = map.Systems().find("Sol");
     if(it != map.Systems().end())
         systemView->Select(&it->second);
     galaxyView->SetSystemView(systemView);

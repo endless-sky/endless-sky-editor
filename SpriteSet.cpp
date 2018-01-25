@@ -68,8 +68,7 @@ QPixmap SpriteSet::Get(const QString &name)
 // Set an entry in the set (using an image loaded elsewhere).
 void SpriteSet::Set(const QString &name, QImage image)
 {
-    auto it = sprite.find(name);
-    if(it != sprite.end())
+    if(sprite.count(name))
         return;
 
     sprite[name] = QPixmap::fromImage(image);

@@ -207,22 +207,21 @@ QString Map::PriceLevel(const QString &commodity, int price) const
 
 
 
-// Rename a system. This requires updating all the systems that link to it.
+// Rename a system. This requires updating all the known systems that link to it.
 void Map::RenameSystem(const QString &from, const QString &to)
 {
-    auto it = systems.find(from);
-    if(it == systems.end() || systems.find(to) != systems.end())
+    // If the desired name is taken, or the current name doesn't exist, bail out.
+    if(systems.count(to) || !systems.count(from))
         return;
 
-    System &renamed = systems[to] = it->second;
+    System &renamed = systems[to] = systems[from];
     renamed.SetName(to);
-    for(const QString &link : it->second.Links())
-    {
-        auto oit = systems.find(link);
-        if(oit != systems.end())
-            oit->second.ChangeLink(from, to);
-    }
-    systems.erase(it);
+    for(const QString &link : systems[from].Links())
+        if(systems.count(link))
+            systems[link].ChangeLink(from, to);
+
+    // Erase the original name's system definition.
+    systems.erase(from);
 }
 
 

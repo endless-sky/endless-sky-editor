@@ -170,33 +170,34 @@ void PlanetView::SetPlanet(StellarObject *object)
     }
     else
     {
-        name->setText(it->second.Name());
-        attributes->setText(ToString(it->second.Attributes()));
-        landscape->SetPlanet(&it->second);
+        Planet &planet = it->second;
+        name->setText(planet.Name());
+        attributes->setText(ToString(planet.Attributes()));
+        landscape->SetPlanet(&planet);
 
         disconnect(description, SIGNAL(textChanged()), this, SLOT(DescriptionChanged()));
-        description->setPlainText(it->second.Description());
+        description->setPlainText(planet.Description());
         connect(description, SIGNAL(textChanged()), this, SLOT(DescriptionChanged()));
 
         disconnect(spaceport, SIGNAL(textChanged()), this, SLOT(SpaceportDescriptionChanged()));
-        spaceport->setPlainText(it->second.SpaceportDescription());
+        spaceport->setPlainText(planet.SpaceportDescription());
         connect(spaceport, SIGNAL(textChanged()), this, SLOT(SpaceportDescriptionChanged()));
 
-        shipyard->setText(ToString(it->second.Shipyard()));
-        outfitter->setText(ToString(it->second.Outfitter()));
-        reputation->setText(std::isnan(it->second.RequiredReputation()) ?
-            QString() : QString::number(it->second.RequiredReputation()));
-        bribe->setText(std::isnan(it->second.Bribe()) ?
-            QString() : QString::number(it->second.Bribe()));
-        security->setText(std::isnan(it->second.Security()) ?
-            QString() : QString::number(it->second.Security()));
-        tribute->setText(std::isnan(it->second.Tribute()) ?
-            QString() : QString::number(it->second.Tribute()));
-        tributeThreshold->setText(std::isnan(it->second.TributeThreshold()) ?
-            QString() : QString::number(it->second.TributeThreshold()));
-        tributeFleetName->setText(it->second.TributeFleetName());
-        tributeFleetQuantity->setText(std::isnan(it->second.TributeFleetQuantity()) ?
-            QString() : QString::number(it->second.TributeFleetQuantity()));
+        shipyard->setText(ToString(planet.Shipyard()));
+        outfitter->setText(ToString(planet.Outfitter()));
+        reputation->setText(std::isnan(planet.RequiredReputation()) ?
+            QString() : QString::number(planet.RequiredReputation()));
+        bribe->setText(std::isnan(planet.Bribe()) ?
+            QString() : QString::number(planet.Bribe()));
+        security->setText(std::isnan(planet.Security()) ?
+            QString() : QString::number(planet.Security()));
+        tribute->setText(std::isnan(planet.Tribute()) ?
+            QString() : QString::number(planet.Tribute()));
+        tributeThreshold->setText(std::isnan(planet.TributeThreshold()) ?
+            QString() : QString::number(planet.TributeThreshold()));
+        tributeFleetName->setText(planet.TributeFleetName());
+        tributeFleetQuantity->setText(std::isnan(planet.TributeFleetQuantity()) ?
+            QString() : QString::number(planet.TributeFleetQuantity()));
 
     }
 }

@@ -206,11 +206,8 @@ void GalaxyView::RandomizeCommodity()
         connected.insert(system);
         
         for(const QString &name : system->Links())
-        {
-            auto it = mapData.Systems().find(name);
-            if(it != mapData.Systems().end())
-                edge.push(&it->second);
-        }
+            if(mapData.Systems().count(name))
+                edge.push(&mapData.Systems()[name]);
     }
     
     // Commodity parameters.
@@ -316,7 +313,7 @@ void GalaxyView::RandomizeCommodity()
                 for(const System *source : sources)
                     for(const QString &name : source->Links())
                     {
-                        auto it = mapData.Systems().find(name);
+                        const auto &it = mapData.Systems().find(name);
                         if(it == mapData.Systems().end() || done.count(&it->second))
                             continue;
                         const System *link = &it->second;
@@ -352,14 +349,12 @@ void GalaxyView::RandomizeCommodity()
         int count = 0;
         int sum = 0;
         for(const QString &link : system->Links())
-        {
-            auto it = mapData.Systems().find(link);
-            if(it == mapData.Systems().end())
-                continue;
-            
-            sum += rough[&it->second];
-            ++count;
-        }
+            if(mapData.Systems().count(link))
+            {
+                sum += rough[&mapData.Systems()[link]];
+                ++count;
+            }
+
         if(!count)
             sum = rough[system];
         else

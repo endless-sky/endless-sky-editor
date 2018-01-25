@@ -666,7 +666,7 @@ void System::ChangeSprite(StellarObject *object)
             else
                 newObject = StellarObject::Uninhabited();
         }
-    } while(used.find(newObject.Sprite()) != used.end());
+    } while(used.count(newObject.Sprite()));
 
     // Check how much the radius will change by, then change the sprite.
     double radiusChange = newObject.Radius() - object->Radius();
@@ -752,7 +752,7 @@ void System::AddPlanet()
             root = isHabitable ? StellarObject::Planet() : StellarObject::Uninhabited();
         else
             root = StellarObject::Giant();
-    } while(used.find(root.Sprite()) != used.end());
+    } while(used.count(root.Sprite()));
     objects.push_back(root);
     used.insert(root.Sprite());
 
@@ -772,7 +772,7 @@ void System::AddPlanet()
         StellarObject moon;
         do {
             moon = StellarObject::Moon();
-        } while(used.find(moon.Sprite()) != used.end());
+        } while(used.count(moon.Sprite()));
         used.insert(moon.Sprite());
 
         moon.distance = moonDistance + moon.Radius();
@@ -808,7 +808,7 @@ void System::AddMoon(StellarObject *object, bool isStation)
     StellarObject moon;
     do {
         moon = isStation ? StellarObject::Station() : StellarObject::Moon();
-    } while(used.find(moon.Sprite()) != used.end());
+    } while(used.count(moon.Sprite()));
 
     moon.distance = moonDistance + moon.Radius();
     moon.parent = rootIndex;

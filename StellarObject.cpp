@@ -234,8 +234,8 @@ double StellarObject::Period() const
 // Get the radius of this planet, i.e. how close you must be to land.
 double StellarObject::Radius() const
 {
-    auto it = INFO.find(sprite);
-    return (it != INFO.end() ? it->second.radius : 40);
+    const auto &it = INFO.find(sprite);
+    return (it != INFO.end() ? it->second.radius : 40.);
 }
 
 
@@ -386,7 +386,7 @@ bool StellarObject::IsInhabited() const
     if(IsStation())
         return true;
 
-    auto it = INFO.find(sprite);
+    const auto &it = INFO.find(sprite);
     return(it != INFO.end() && it->second.info == 2);
 }
 

@@ -190,8 +190,7 @@ void DetailView::NameChanged()
     if(!system || system->Name() == name->text() || name->text().isEmpty())
         return;
 
-    auto it = mapData.Systems().find(name->text());
-    if(it != mapData.Systems().end())
+    if(mapData.Systems().count(name->text()))
     {
         QMessageBox::warning(this, "Duplicate name",
             "A system named \"" + name->text() + "\" already exists.");
