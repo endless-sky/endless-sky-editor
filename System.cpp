@@ -64,7 +64,7 @@ void System::Load(const DataNode &node)
         else if(child.Token(0) == "music" && child.Size() >= 2)
             music = child.Token(1);
         else if(child.Token(0) == "link" && child.Size() >= 2)
-            links.push_back(child.Token(1));
+            links.emplace(child.Token(1));
         else if(child.Token(0) == "asteroids" && child.Size() >= 4)
             asteroids.emplace_back(child.Token(1), static_cast<int>(child.Value(2)), child.Value(3));
         else if(child.Token(0) == "trade" && child.Size() >= 3)
@@ -143,7 +143,7 @@ const QString &System::Government() const
 
 
 // Get a list of systems you can travel to through hyperspace from here.
-const vector<QString> &System::Links() const
+const set<QString> &System::Links() const
 {
     return links;
 }
@@ -384,34 +384,29 @@ void System::SetGovernment(const QString &gov)
 
 
 
+// Either create or destroy a linking set with the pointed System.
 void System::ToggleLink(System *other)
 {
     if(!other || other == this)
         return;
 
-    auto it = find(links.begin(), links.end(), other->name);
-    auto oit = find(other->links.begin(), other->links.end(), name);
-    if(it == links.end())
-    {
-        links.push_back(other->name);
-        if(oit == other->links.end())
-            other->links.push_back(name);
-    }
+    if(links.erase(other->name))
+        other->links.erase(name);
     else
     {
-        links.erase(it);
-        if(oit != other->links.end())
-            other->links.erase(oit);
+        // These systems were not linked, so link them.
+        links.emplace(other->name);
+        other->links.emplace(name);
     }
 }
 
 
 
+// Change the name of a linked System.
 void System::ChangeLink(const QString &from, const QString &to)
 {
-    auto it = find(links.begin(), links.end(), from);
-    if(it != links.end())
-        *it = to;
+    if(links.erase(from))
+        links.emplace(to);
 }
 
 

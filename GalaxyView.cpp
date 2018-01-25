@@ -136,6 +136,7 @@ void GalaxyView::KeyPress(QKeyEvent *event)
 
 
 
+// Delete a system, and remove any string references to it (i.e. links).
 void GalaxyView::DeleteSystem()
 {
     if(!systemView || !systemView->Selected())
@@ -146,12 +147,14 @@ void GalaxyView::DeleteSystem()
         "Are you sure you want to delete \"" + system->Name() + "\"?");
     if(button == QMessageBox::Yes)
     {
+        // Deselect this system.
         systemView->Select(nullptr);
+        // Remove all links from this system (and the corresponding return links).
         while(!system->Links().empty())
-            system->ToggleLink(&mapData.Systems().find(system->Links().front())->second);
+            system->ToggleLink(&mapData.Systems().find(*system->Links().begin())->second);
 
-        auto it = mapData.Systems().find(system->Name());
-        mapData.Systems().erase(it);
+        // Remove this system from known systems.
+        mapData.Systems().erase(system->Name());
         mapData.SetChanged();
     }
 }

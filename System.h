@@ -60,7 +60,7 @@ public:
     const QString &Government() const;
 
     // Get a list of systems you can travel to through hyperspace from here.
-    const std::vector<QString> &Links() const;
+    const std::set<QString> &Links() const;
 
     // Get the stellar object locations on the most recently set date.
     std::vector<StellarObject> &Objects();
@@ -127,7 +127,7 @@ private:
     QString government;
 
     // Hyperspace links to other systems.
-    std::vector<QString> links;
+    std::set<QString> links;
 
     // Stellar objects, listed in such an order that an object's parents are
     // guaranteed to appear before it (so that if we traverse the vector in
