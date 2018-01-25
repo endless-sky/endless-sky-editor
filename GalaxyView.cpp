@@ -169,8 +169,16 @@ void GalaxyView::DeleteSystem()
         mapData.Systems().erase(system->Name());
         mapData.SetChanged();
     }
+    update();
 }
 
+
+
+void GalaxyView::Recenter()
+{
+    Center();
+    update();
+}
 
 
 void GalaxyView::RandomizeCommodity()

@@ -45,6 +45,7 @@ signals:
 public slots:
     void CreateSystem();
     void DeleteSystem();
+    void Recenter();
     void RandomizeCommodity();
 
 protected:

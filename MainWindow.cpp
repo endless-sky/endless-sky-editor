@@ -267,6 +267,11 @@ void MainWindow::CreateMenus()
         connect(deleteSystemAction, SIGNAL(triggered()), galaxyView, SLOT(DeleteSystem()));
         deleteSystemAction->setShortcut(QKeySequence(Qt::Key_Backspace));
 
+        galaxyMenu->addSeparator();
+        QAction *centerAction = galaxyMenu->addAction("Recenter View");
+        connect(centerAction, SIGNAL(triggered()), galaxyView, SLOT(Recenter()));
+        galaxyMenu->addSeparator();
+
         QAction *randomizeCommodityAction = galaxyMenu->addAction("Randomize Commodity");
         connect(randomizeCommodityAction, SIGNAL(triggered()), galaxyView, SLOT(RandomizeCommodity()));
         randomizeCommodityAction->setShortcut(QKeySequence("C"));
