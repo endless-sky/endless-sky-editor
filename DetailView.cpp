@@ -31,50 +31,51 @@ using namespace std;
 DetailView::DetailView(Map &mapData, GalaxyView *galaxyView, QWidget *parent) :
     QWidget(parent), mapData(mapData), galaxyView(galaxyView)
 {
+    // Create the left sidebar, showing details about the selected system.
+    QVBoxLayout *layout = new QVBoxLayout(this);
+
+    layout->addWidget(new QLabel("System Name:", this));
     name = new QLineEdit(this);
     connect(name, SIGNAL(editingFinished()), this, SLOT(NameChanged()));
+    layout->addWidget(name);
+
+
+    layout->addWidget(new QLabel("Government:", this));
     government = new QLineEdit(this);
     connect(government, SIGNAL(editingFinished()), this, SLOT(GovernmentChanged()));
-
-    QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->addWidget(new QLabel("System Name:", this));
-    layout->addWidget(name);
-    layout->addWidget(new QLabel("Government:", this));
     layout->addWidget(government);
+    // Selecting the government field changes the system and link colors on the Galaxy map.
     government->installEventFilter(this);
 
+
+    // Add a table to display this system's default trade.
     tradeWidget = new QTreeWidget(this);
     tradeWidget->setIndentation(0);
     tradeWidget->setColumnCount(3);
-    QStringList tradeLabels;
-    tradeLabels.append("Commodity");
-    tradeLabels.append("Price");
-    tradeLabels.append("");
-    tradeWidget->setHeaderLabels(tradeLabels);
+    tradeWidget->setHeaderLabels({"Commodity", "Price", ""});
+    // Selecting a commodity field changes the system and link colors on the Galaxy map.
     connect(tradeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
         this, SLOT(CommodityClicked(QTreeWidgetItem *, int)));
     layout->addWidget(tradeWidget);
 
+
+    // Add a table to display this system's fleets.
     fleets = new QTreeWidget(this);
     fleets->setIndentation(0);
     fleets->setColumnCount(2);
-    QStringList fleetLabels;
-    fleetLabels.append("Fleet Type");
-    fleetLabels.append("Period");
-    fleets->setHeaderLabels(fleetLabels);
+    fleets->setHeaderLabels({"Fleet Name", "Period"});
     fleets->setColumnWidth(0, 200);
     layout->addWidget(fleets);
 
+
+    // Add a table to display this system's minables (if any).
     minables = new QTreeWidget(this);
     minables->setIndentation(0);
     minables->setColumnCount(3);
-    QStringList minableLabels;
-    minableLabels.append("Minable Type");
-    minableLabels.append("count");
-    minableLabels.append("energy");
-    minables->setHeaderLabels(minableLabels);
+    minables->setHeaderLabels({"Minable", "Count", "Energy"});
     minables->setColumnWidth(0, 120);
     layout->addWidget(minables);
+
 
     setLayout(layout);
 }
