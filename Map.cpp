@@ -42,10 +42,7 @@ void Map::Load(const QString &path)
         else if(node.Token(0) == "system" && node.Size() >= 2)
             systems[node.Token(1)].Load(node);
         else if(node.Token(0) == "galaxy")
-        {
-            galaxies.push_back(Galaxy());
-            galaxies.back().Load(node);
-        }
+            galaxies.emplace_back(node);
         else
             unparsed.push_back(node);
     }
@@ -53,15 +50,14 @@ void Map::Load(const QString &path)
     QString commodityPath = dataDirectory + "commodities.txt";
     DataFile tradeData(commodityPath);
 
+    // Load in "standard" commodities - those that supply a category, low, and high price.
+    // "Special" commodities that are only used as names for mission cargo are not loaded.
     for(const DataNode &node : tradeData)
         if(node.Token(0) == "trade")
             for(const DataNode &child : node)
                 if(child.Token(0) == "commodity" && child.Size() >= 4)
-                {
-                    int low = static_cast<int>(child.Value(2));
-                    int high = static_cast<int>(child.Value(3));
-                    commodities.push_back({child.Token(1), low, high});
-                }
+                    commodities.emplace_back(child.Token(1), child.Value(2), child.Value(3));
+
     isChanged = false;
 }
 

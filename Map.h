@@ -46,7 +46,10 @@ public:
     const std::map<QString, Planet> &Planets() const;
 
     // Access the commodity data:
-    struct Commodity { QString name; int low; int high; };
+    struct Commodity {
+        QString name; int low; int high;
+        Commodity(const QString &name, int low, int high) : name(name), low(low), high(high) {}
+    };
     const std::vector<Commodity> &Commodities() const;
     // Map a price to a value between 0 and 1 (lowest vs. highest).
     double MapPrice(const QString &commodity, int price) const;

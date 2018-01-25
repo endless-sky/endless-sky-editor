@@ -195,6 +195,7 @@ void PlanetView::SetPlanet(StellarObject *object)
 }
 
 
+
 void PlanetView::Reinitialize()
 {
     SetPlanet(nullptr);
@@ -461,7 +462,7 @@ vector<QString> PlanetView::ToList(const QString &str)
 
     QStringList strings = str.split(",", QString::SkipEmptyParts);
     for(const QString &token : strings)
-        result.push_back(token.trimmed());
+        result.emplace_back(token.trimmed());
 
     return result;
 }

@@ -229,7 +229,7 @@ void GalaxyView::RandomizeCommodity()
         // loosen the quota a little bit.
         vector<int> quota;
         for(int weight : binIt->second)
-            quota.push_back((connected.size() * weight) / 100 + tries / 4 + 1);
+            quota.emplace_back((connected.size() * weight) / 100 + tries / 4 + 1);
         
         vector<const System *> unassigned;
         map<const System *, int> low;

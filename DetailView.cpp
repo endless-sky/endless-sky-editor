@@ -249,7 +249,7 @@ void DetailView::FleetChanged(QTreeWidgetItem *item, int column)
 
     unsigned row = item->text(2).toInt();
     if(row == system->Fleets().size())
-        system->Fleets().push_back({item->text(0), item->text(1).toInt()});
+        system->Fleets().emplace_back(item->text(0), item->text(1).toInt());
     else if(item->text(0).isEmpty() && item->text(1).isEmpty())
         system->Fleets().erase(system->Fleets().begin() + row);
     else if(column == 0)
@@ -273,7 +273,7 @@ void DetailView::MinablesChanged(QTreeWidgetItem *item, int column)
 
     unsigned row = item->text(2).toInt();
     if(row == system->Minables().size())
-        system->Minables().push_back({item->text(0), item->text(1).toInt(), item->text(2).toDouble()});
+        system->Minables().emplace_back(item->text(0), item->text(1).toInt(), item->text(2).toDouble());
     else if(item->text(0).isEmpty() && item->text(1).isEmpty())
         system->Minables().erase(system->Minables().begin() + row);
     else if(column == 0)

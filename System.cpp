@@ -66,13 +66,13 @@ void System::Load(const DataNode &node)
         else if(child.Token(0) == "link" && child.Size() >= 2)
             links.push_back(child.Token(1));
         else if(child.Token(0) == "asteroids" && child.Size() >= 4)
-            asteroids.push_back({child.Token(1), static_cast<int>(child.Value(2)), child.Value(3)});
+            asteroids.emplace_back(child.Token(1), static_cast<int>(child.Value(2)), child.Value(3));
         else if(child.Token(0) == "trade" && child.Size() >= 3)
             trade[child.Token(1)] = child.Value(2);
         else if(child.Token(0) == "fleet" && child.Size() >= 3)
-            fleets.push_back({child.Token(1), static_cast<int>(child.Value(2))});
+            fleets.emplace_back(child.Token(1), static_cast<int>(child.Value(2)));
         else if(child.Token(0) == "minables" && child.Size() >= 3)
-            minables.push_back({child.Token(1), static_cast<int>(child.Value(2)), child.Value(3)});
+            minables.emplace_back(child.Token(1), static_cast<int>(child.Value(2)), child.Value(3));
         else if(child.Token(0) == "object")
             LoadObject(child);
         else
@@ -230,10 +230,24 @@ const vector<System::Asteroid> &System::Asteroids() const
 
 
 
+vector<System::Minable> &System::Minables()
+{
+    return minables;
+}
+
+
+
+const vector<System::Minable> &System::Minables() const
+{
+    return minables;
+}
+
+
+
 // Get the price of the given commodity in this system.
 int System::Trade(const QString &commodity) const
 {
-    auto it = trade.find(commodity);
+    const auto &it = trade.find(commodity);
     return (it == trade.end()) ? 0 : it->second;
 }
 
@@ -247,23 +261,9 @@ vector<System::Fleet> &System::Fleets()
 
 
 
-vector<System::Minable> &System::Minables()
-{
-    return minables;
-}
-
-
-
 const vector<System::Fleet> &System::Fleets() const
 {
     return fleets;
-}
-
-
-
-const vector<System::Minable> &System::Minables() const
-{
-    return minables;
 }
 
 
@@ -292,9 +292,8 @@ void System::LoadObject(const DataNode &node, int parent)
 {
     int index = static_cast<int>(objects.size());
 
-    objects.push_back(StellarObject());
+    objects.emplace_back(parent);
     StellarObject &object = objects.back();
-    object.parent = parent;
 
     if(node.Size() >= 2)
         object.planet = node.Token(1);
@@ -508,10 +507,10 @@ void System::ChangeAsteroids()
 
         for(int j = 0; j < 3; ++j)
             if(count[j])
-                asteroids.push_back({
+                asteroids.emplace_back(
                     prefix[j] + suffix[i],
                     count[j],
-                    energy * (rand() % 101 + 50) * .01});
+                    energy * (rand() % 101 + 50) * .01);
     }
 }
 
@@ -532,6 +531,7 @@ void System::ChangeMinables()
         totalEnergy += asteroid.energy * asteroid.count;
     }
     
+    // Do not auto-create systems with only minable asteroids.
     if(!totalCount)
         return;
     
@@ -575,7 +575,7 @@ void System::ChangeMinables()
     for(const auto &it : choices)
     {
         double energy = (rand() % 1000 + 1000) * .001 * meanEnergy;
-        minables.push_back({it.first, it.second, energy});
+        minables.emplace_back(it.first, it.second, energy);
     }
 }
 
@@ -773,6 +773,7 @@ void System::AddPlanet()
         // Each moon, on average, should be spaced more widely than the one before.
         randomMoonSpace += 20;
 
+        // Use a moon sprite only once per system.
         StellarObject moon;
         do {
             moon = StellarObject::Moon();
