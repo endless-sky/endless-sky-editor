@@ -110,9 +110,7 @@ void SystemView::RandomizeInhabited()
     {
         selectedObject = nullptr;
         system->Randomize(true, true);
-        system->SetDay(timeStep);
-        mapData.SetChanged();
-        update();
+        DidChange();
     }
 }
 
@@ -124,9 +122,7 @@ void SystemView::Randomize()
     {
         selectedObject = nullptr;
         system->Randomize(true, false);
-        system->SetDay(timeStep);
-        mapData.SetChanged();
-        update();
+        DidChange();
     }
 }
 
@@ -138,9 +134,7 @@ void SystemView::RandomizeUninhabited()
     {
         selectedObject = nullptr;
         system->Randomize(false, false);
-        system->SetDay(timeStep);
-        mapData.SetChanged();
-        update();
+        DidChange();
     }
 }
 
@@ -152,8 +146,7 @@ void SystemView::ChangeAsteroids()
     {
         system->ChangeAsteroids();
         asteroids.Set(system);
-        mapData.SetChanged();
-        update();
+        DidChange();
     }
 }
 
@@ -165,9 +158,8 @@ void SystemView::ChangeMinables()
     {
         system->ChangeMinables();
         asteroids.Set(system);
-        mapData.SetChanged();
         detailView->UpdateMinables();
-        update();
+        DidChange();
     }
 }
 
@@ -179,14 +171,13 @@ void SystemView::ChangeStar()
     {
         system->ChangeStar();
         selectedObject = nullptr;
-        system->SetDay(timeStep);
-        mapData.SetChanged();
-        update();
+        DidChange();
     }
 }
 
 
 
+// Update the sprite for the selected planet, or create a new planet.
 void SystemView::ChangePlanet()
 {
     if(!system)
@@ -195,21 +186,18 @@ void SystemView::ChangePlanet()
     if(selectedObject && selectedObject->Parent() < 0 && !selectedObject->IsStation())
     {
         system->ChangeSprite(selectedObject);
-        system->SetDay(timeStep);
-        mapData.SetChanged();
-        update();
+        DidChange();
     }
     else if(!selectedObject)
     {
         system->AddPlanet();
-        system->SetDay(timeStep);
-        mapData.SetChanged();
-        update();
+        DidChange();
     }
 }
 
 
 
+// Update the sprite for the selected moon, or create a new moon for the selected planet.
 void SystemView::ChangeMoon()
 {
     if(!system)
@@ -218,23 +206,20 @@ void SystemView::ChangeMoon()
     if(selectedObject && selectedObject->Parent() >= 0 && !selectedObject->IsStation())
     {
         system->ChangeSprite(selectedObject);
-        system->SetDay(timeStep);
-        mapData.SetChanged();
-        update();
+        DidChange();
     }
     else if(selectedObject && selectedObject->Parent() < 0)
     {
         int index = selectedObject - &system->Objects().front();
         system->AddMoon(selectedObject);
         selectedObject = &system->Objects()[index];
-        system->SetDay(timeStep);
-        mapData.SetChanged();
-        update();
+        DidChange();
     }
 }
 
 
 
+// Update the sprite for the selected station, or create a new station for the selected planet.
 void SystemView::ChangeStation()
 {
     if(!system)
@@ -243,18 +228,14 @@ void SystemView::ChangeStation()
     if(selectedObject && selectedObject->IsStation())
     {
         system->ChangeSprite(selectedObject);
-        system->SetDay(timeStep);
-        mapData.SetChanged();
-        update();
+        DidChange();
     }
     else if(selectedObject && selectedObject->Parent() < 0)
     {
         int index = selectedObject - &system->Objects().front();
         system->AddMoon(selectedObject, true);
         selectedObject = &system->Objects()[index];
-        system->SetDay(timeStep);
-        mapData.SetChanged();
-        update();
+        DidChange();
     }
 }
 
@@ -266,9 +247,7 @@ void SystemView::DeleteObject()
     {
         system->Delete(selectedObject);
         selectedObject = nullptr;
-        system->SetDay(timeStep);
-        mapData.SetChanged();
-        update();
+        DidChange();
     }
 }
 
@@ -281,20 +260,29 @@ void SystemView::Pause()
 
 
 
+// Select a StellarObject and/or set the dragging position.
 void SystemView::mousePressEvent(QMouseEvent *event)
 {
+    // Reset the dragging target.
     dragObject = nullptr;
+
+    // Right- and middle-clicking deselects.
     if(event->button() != Qt::LeftButton)
     {
         selectedObject = nullptr;
         return;
     }
+    else if(!system)
+        return;
+
     clickOff = QVector2D(event->pos()) - offset;
 
     QVector2D pos = MapPoint(event->pos());
+    // Check if the click was on a StellarObject (e.g. to start dragging it).
     for(StellarObject &object : system->Objects())
         if(!object.IsStar() && pos.distanceToPoint(object.Position()) < object.Radius())
         {
+            // Correct the click position to the object's initial position.
             dragTime.start();
             selectedObject = dragObject = &object;
             clickOff = object.Position() - pos;
@@ -306,14 +294,17 @@ void SystemView::mousePressEvent(QMouseEvent *event)
 
 
 
+// Switch the view to that of the targeted StellarObject.
 void SystemView::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    if(event->button() != Qt::LeftButton)
+    // Only double left-clicks are supported.
+    if(event->button() != Qt::LeftButton || !system)
         return;
 
     clickOff = QVector2D(event->pos()) - offset;
 
     QVector2D pos = MapPoint(event->pos());
+    // Check if the click was on a StellarObject (i.e. to view its details).
     for(StellarObject &object : system->Objects())
         if(!object.IsStar() && pos.distanceToPoint(object.Position()) < object.Radius())
         {
@@ -325,9 +316,11 @@ void SystemView::mouseDoubleClickEvent(QMouseEvent *event)
 
 
 
+// Perform a drag action (panning the view or moving a StellarObject).
+// If moving an object, update its properties appropriately.
 void SystemView::mouseMoveEvent(QMouseEvent *event)
 {
-    if(!(event->buttons() & Qt::LeftButton))
+    if(!(event->buttons() & Qt::LeftButton) || !system)
         return;
 
     if(!dragObject)
@@ -360,6 +353,7 @@ void SystemView::mouseMoveEvent(QMouseEvent *event)
 
 
 
+// Zoom in or out from the event point.
 void SystemView::wheelEvent(QWheelEvent *event)
 {
     // Figure out where in the 100% scale image the click occurred.
@@ -392,7 +386,7 @@ void SystemView::paintEvent(QPaintEvent */*event*/)
     painter.translate(offset.x(), offset.y());
     painter.scale(scale, scale);
 
-    // Draw faint circles showing the region occupied by each planet.
+    // Draw faint circles showing the region occupied by each planet as it orbits.
     painter.setPen(Qt::NoPen);
     QBrush occupiedBrush(QColor(20, 20, 20));
     painter.setBrush(occupiedBrush);
@@ -497,4 +491,14 @@ QVector2D SystemView::MapPoint(QPoint pos) const
     QVector2D center(.5 * width(), .5 * height());
     // point = origin * scale + offset + center.
     return (point - offset - center) / scale;
+}
+
+
+
+// If a method did something, this updates the map, date, and draw window.
+void SystemView::DidChange()
+{
+    system->SetDay(timeStep);
+    mapData.SetChanged();
+    update();
 }

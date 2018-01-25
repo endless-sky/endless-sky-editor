@@ -69,8 +69,10 @@ protected:
 
     virtual void paintEvent(QPaintEvent *event) override;
 
+
 private:
     QVector2D MapPoint(QPoint pos) const;
+    void DidChange();
 
 
 private:
