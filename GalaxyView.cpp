@@ -104,6 +104,7 @@ void GalaxyView::SetDetailView(DetailView *view)
 
 
 
+// Color the map by this commodity.
 void GalaxyView::SetCommodity(const QString &name)
 {
     if(commodity != name)
@@ -116,6 +117,7 @@ void GalaxyView::SetCommodity(const QString &name)
 
 
 
+// Color the map by this government.
 void GalaxyView::SetGovernment(const QString &name)
 {
     if(government != name)
@@ -179,6 +181,7 @@ void GalaxyView::Recenter()
     Center();
     update();
 }
+
 
 
 void GalaxyView::RandomizeCommodity()
@@ -339,7 +342,7 @@ void GalaxyView::RandomizeCommodity()
     
     // Assign each star system a value based on its bin.
     map<const System *, int> rough;
-    for(auto &it : bin)
+    for(const auto &it : bin)
         rough[it.first] = base + (rand() % 100) + 100 * it.second;
     
     // Smooth out the values by averaging each system with the average of all
@@ -393,6 +396,8 @@ void GalaxyView::mousePressEvent(QMouseEvent *event)
             CreateSystem(origin);
         return;
     }
+    // An existing system was clicked. Select it, or toggle a link with the
+    // already-selected system.
     if(event->button() == Qt::LeftButton)
     {
         dragTime.start();
@@ -400,6 +405,9 @@ void GalaxyView::mousePressEvent(QMouseEvent *event)
         if(systemView)
         {
             systemView->Select(dragSystem);
+            // Update the coloring scheme if coloring by government.
+            if(!government.isEmpty() && !dragSystem->Government().isEmpty())
+                government = dragSystem->Government();
             update();
         }
     }
@@ -438,6 +446,7 @@ void GalaxyView::mouseDoubleClickEvent(QMouseEvent *event)
 
 
 
+// Drag either the selected system, or the background.
 void GalaxyView::mouseMoveEvent(QMouseEvent *event)
 {
     if(!(event->buttons() & Qt::LeftButton))
@@ -460,6 +469,7 @@ void GalaxyView::mouseMoveEvent(QMouseEvent *event)
 
 
 
+// Zoom in or out.
 void GalaxyView::wheelEvent(QWheelEvent *event)
 {
     QVector2D point(event->pos());
@@ -498,6 +508,7 @@ void GalaxyView::paintEvent(QPaintEvent */*event*/)
         painter.drawPixmap(pos, sprite);
     }
 
+    // Draw the links between systems.
     painter.setBrush(Qt::NoBrush);
     for(const auto &it : mapData.Systems())
     {
@@ -523,6 +534,7 @@ void GalaxyView::paintEvent(QPaintEvent */*event*/)
         }
     }
 
+    // Draw the systems, colored by commodity or if the government is the selected government.
     for(const auto &it : mapData.Systems())
     {
         QPointF pos = it.second.Position().toPointF();
@@ -546,6 +558,7 @@ void GalaxyView::paintEvent(QPaintEvent */*event*/)
         painter.drawText(pos + QPointF(5, 5), it.first);
     }
 
+    // Draw the selection circle and neighbor radius ring.
     painter.setPen(mediumPen);
     painter.setBrush(Qt::NoBrush);
     if(systemView && systemView->Selected())
