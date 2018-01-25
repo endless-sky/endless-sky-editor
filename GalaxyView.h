@@ -23,8 +23,8 @@ class Map;
 class System;
 class SystemView;
 
+class QPoint;
 class QTabWidget;
-
 
 
 class GalaxyView : public QWidget
@@ -43,6 +43,7 @@ public:
 signals:
 
 public slots:
+    void CreateSystem();
     void DeleteSystem();
     void RandomizeCommodity();
 
@@ -56,6 +57,7 @@ protected:
 
 private:
     QVector2D MapPoint(QPoint pos) const;
+    void CreateSystem(const QVector2D &origin);
 
 
 private:

@@ -80,6 +80,8 @@ void MainWindow::NewMap()
         map.Save(path);
         // Initialize the editor with the empty map.
         DoOpen(path);
+        // Create a system at (0, 0).
+        galaxyView->CreateSystem();
     }
 }
 
@@ -257,68 +259,72 @@ void MainWindow::CreateMenus()
 
     // Galaxy Menu:
     galaxyMenu = menuBar()->addMenu("Galaxy");
+    {
+        QAction *createSystemAction = galaxyMenu->addAction("Create System");
+        connect(createSystemAction, SIGNAL(triggered()), galaxyView, SLOT(CreateSystem()));
 
-    QAction *deleteSystemAction = galaxyMenu->addAction("Delete System");
-    connect(deleteSystemAction, SIGNAL(triggered()), galaxyView, SLOT(DeleteSystem()));
-    deleteSystemAction->setShortcut(QKeySequence(Qt::Key_Backspace));
+        QAction *deleteSystemAction = galaxyMenu->addAction("Delete System");
+        connect(deleteSystemAction, SIGNAL(triggered()), galaxyView, SLOT(DeleteSystem()));
+        deleteSystemAction->setShortcut(QKeySequence(Qt::Key_Backspace));
 
-    QAction *randomizeCommodityAction = galaxyMenu->addAction("Randomize Commodity");
-    connect(randomizeCommodityAction, SIGNAL(triggered()), galaxyView, SLOT(RandomizeCommodity()));
-    randomizeCommodityAction->setShortcut(QKeySequence("C"));
-
+        QAction *randomizeCommodityAction = galaxyMenu->addAction("Randomize Commodity");
+        connect(randomizeCommodityAction, SIGNAL(triggered()), galaxyView, SLOT(RandomizeCommodity()));
+        randomizeCommodityAction->setShortcut(QKeySequence("C"));
+    }
 
     // System Menu:
     systemMenu = menuBar()->addMenu("System");
+    {
+        QAction *randomInhabited = systemMenu->addAction("Randomize (Inhabited)");
+        connect(randomInhabited, SIGNAL(triggered()), systemView, SLOT(RandomizeInhabited()));
+        randomInhabited->setShortcut(QKeySequence("I"));
 
-    QAction *randomInhabited = systemMenu->addAction("Randomize (Inhabited)");
-    connect(randomInhabited, SIGNAL(triggered()), systemView, SLOT(RandomizeInhabited()));
-    randomInhabited->setShortcut(QKeySequence("I"));
+        QAction *randomSystem = systemMenu->addAction("Randomize");
+        connect(randomSystem, SIGNAL(triggered()), systemView, SLOT(Randomize()));
+        randomSystem->setShortcut(QKeySequence("R"));
 
-    QAction *randomSystem = systemMenu->addAction("Randomize");
-    connect(randomSystem, SIGNAL(triggered()), systemView, SLOT(Randomize()));
-    randomSystem->setShortcut(QKeySequence("R"));
+        QAction *randomUninhabited = systemMenu->addAction("Randomize (Uninhabited)");
+        connect(randomUninhabited, SIGNAL(triggered()), systemView, SLOT(RandomizeUninhabited()));
+        randomUninhabited->setShortcut(QKeySequence("U"));
 
-    QAction *randomUninhabited = systemMenu->addAction("Randomize (Uninhabited)");
-    connect(randomUninhabited, SIGNAL(triggered()), systemView, SLOT(RandomizeUninhabited()));
-    randomUninhabited->setShortcut(QKeySequence("U"));
+        systemMenu->addSeparator();
 
-    systemMenu->addSeparator();
+        QAction *changeAsteroids = systemMenu->addAction("Change Asteroids");
+        connect(changeAsteroids, SIGNAL(triggered()), systemView, SLOT(ChangeAsteroids()));
+        changeAsteroids->setShortcut(QKeySequence("A"));
 
-    QAction *changeAsteroids = systemMenu->addAction("Change Asteroids");
-    connect(changeAsteroids, SIGNAL(triggered()), systemView, SLOT(ChangeAsteroids()));
-    changeAsteroids->setShortcut(QKeySequence("A"));
+        QAction *changeMinables = systemMenu->addAction("Change Minables");
+        connect(changeMinables, SIGNAL(triggered()), systemView, SLOT(ChangeMinables()));
+        changeMinables->setShortcut(QKeySequence("H"));
 
-    QAction *changeMinables = systemMenu->addAction("Change Minables");
-    connect(changeMinables, SIGNAL(triggered()), systemView, SLOT(ChangeMinables()));
-    changeMinables->setShortcut(QKeySequence("H"));
+        systemMenu->addSeparator();
 
-    systemMenu->addSeparator();
+        QAction *changeStar = systemMenu->addAction("Change Star");
+        connect(changeStar, SIGNAL(triggered()), systemView, SLOT(ChangeStar()));
+        changeStar->setShortcut(QKeySequence("T"));
 
-    QAction *changeStar = systemMenu->addAction("Change Star");
-    connect(changeStar, SIGNAL(triggered()), systemView, SLOT(ChangeStar()));
-    changeStar->setShortcut(QKeySequence("T"));
+        QAction *addPlanet = systemMenu->addAction("Add/Change Planet");
+        connect(addPlanet, SIGNAL(triggered()), systemView, SLOT(ChangePlanet()));
+        addPlanet->setShortcut(QKeySequence("P"));
 
-    QAction *addPlanet = systemMenu->addAction("Add/Change Planet");
-    connect(addPlanet, SIGNAL(triggered()), systemView, SLOT(ChangePlanet()));
-    addPlanet->setShortcut(QKeySequence("P"));
+        QAction *addMoon = systemMenu->addAction("Add/Change Moon");
+        connect(addMoon, SIGNAL(triggered()), systemView, SLOT(ChangeMoon()));
+        addMoon->setShortcut(QKeySequence("M"));
 
-    QAction *addMoon = systemMenu->addAction("Add/Change Moon");
-    connect(addMoon, SIGNAL(triggered()), systemView, SLOT(ChangeMoon()));
-    addMoon->setShortcut(QKeySequence("M"));
+        QAction *addStation = systemMenu->addAction("Add/Change Station");
+        connect(addStation, SIGNAL(triggered()), systemView, SLOT(ChangeStation()));
+        addStation->setShortcut(QKeySequence("S"));
 
-    QAction *addStation = systemMenu->addAction("Add/Change Station");
-    connect(addStation, SIGNAL(triggered()), systemView, SLOT(ChangeStation()));
-    addStation->setShortcut(QKeySequence("S"));
+        QAction *deleteObject = systemMenu->addAction("Delete Object");
+        connect(deleteObject, SIGNAL(triggered()), systemView, SLOT(DeleteObject()));
+        deleteObject->setShortcut(QKeySequence("X"));
 
-    QAction *deleteObject = systemMenu->addAction("Delete Object");
-    connect(deleteObject, SIGNAL(triggered()), systemView, SLOT(DeleteObject()));
-    deleteObject->setShortcut(QKeySequence("X"));
+        systemMenu->addSeparator();
 
-    systemMenu->addSeparator();
-
-    QAction *pause = systemMenu->addAction("Pause/Unpause");
-    connect(pause, SIGNAL(triggered()), systemView, SLOT(Pause()));
-    pause->setShortcut(QKeySequence(Qt::Key_Space));
+        QAction *pause = systemMenu->addAction("Pause/Unpause");
+        connect(pause, SIGNAL(triggered()), systemView, SLOT(Pause()));
+        pause->setShortcut(QKeySequence(Qt::Key_Space));
+    }
 
     // Activate only the menu for the current tab.
     TabChanged(0);
