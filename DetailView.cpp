@@ -50,6 +50,7 @@ DetailView::DetailView(Map &mapData, GalaxyView *galaxyView, QWidget *parent) :
 
     // Add a table to display this system's default trade.
     tradeWidget = new QTreeWidget(this);
+    tradeWidget->setMinimumHeight(310);
     tradeWidget->setIndentation(0);
     tradeWidget->setColumnCount(3);
     tradeWidget->setHeaderLabels({"Commodity", "Price", ""});
@@ -65,6 +66,7 @@ DetailView::DetailView(Map &mapData, GalaxyView *galaxyView, QWidget *parent) :
     fleets->setColumnCount(2);
     fleets->setHeaderLabels({"Fleet Name", "Period"});
     fleets->setColumnWidth(0, 200);
+    fleets->setColumnWidth(1, 80);
     layout->addWidget(fleets);
 
 
@@ -73,7 +75,9 @@ DetailView::DetailView(Map &mapData, GalaxyView *galaxyView, QWidget *parent) :
     minables->setIndentation(0);
     minables->setColumnCount(3);
     minables->setHeaderLabels({"Minable", "Count", "Energy"});
-    minables->setColumnWidth(0, 120);
+    minables->setColumnWidth(0, 140);
+    minables->setColumnWidth(1, 70);
+    minables->setColumnWidth(2, 70);
     layout->addWidget(minables);
 
 
