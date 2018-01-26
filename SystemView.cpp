@@ -270,6 +270,7 @@ void SystemView::mousePressEvent(QMouseEvent *event)
     if(event->button() != Qt::LeftButton)
     {
         selectedObject = nullptr;
+        update();
         return;
     }
     else if(!system)
