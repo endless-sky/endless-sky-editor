@@ -101,7 +101,10 @@ void DetailView::SetSystem(System *system)
     {
         name->clear();
         government->clear();
+
+        tradeWidget->clear();
         fleets->clear();
+        minables->clear();
     }
     update();
 }
