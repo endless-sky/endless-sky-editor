@@ -216,6 +216,9 @@ void Map::RenameSystem(const QString &from, const QString &to)
 
     System &renamed = systems[to] = systems[from];
     renamed.SetName(to);
+    // Links to "plugin" systems (i.e. those not a part of this map file)
+    // are kept, but the returning link from the plugin system to this
+    // system will not exist. (There is no way to update it.)
     for(const QString &link : systems[from].Links())
         if(systems.count(link))
             systems[link].ChangeLink(from, to);

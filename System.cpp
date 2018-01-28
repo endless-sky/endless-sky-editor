@@ -402,10 +402,11 @@ void System::ToggleLink(System *other)
 
 
 
-// Change the name of a linked System.
+// Change the name of a linked System. If the new name is empty, this
+// effectively deletes the link.
 void System::ChangeLink(const QString &from, const QString &to)
 {
-    if(links.erase(from))
+    if(links.erase(from) && !to.isEmpty())
         links.emplace(to);
 }
 

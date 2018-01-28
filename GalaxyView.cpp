@@ -211,9 +211,17 @@ void GalaxyView::DeleteSystem()
     {
         // Deselect this system.
         systemView->Select(nullptr);
-        // Remove all links from this system (and the corresponding return links).
+        // Remove all links from this system (and the corresponding return links, if able).
         while(!system->Links().empty())
-            system->ToggleLink(&mapData.Systems().find(*system->Links().begin())->second);
+        {
+            // The system to be deleted may have a link to a "plugin" system.
+            const auto &it = mapData.Systems().find(*system->Links().begin());
+            if(it != mapData.Systems().end())
+                system->ToggleLink(&it->second);
+            // Only this system's endpoint can be modified.
+            else
+                system->ChangeLink(*system->Links().begin(), QString());
+        }
 
         // Remove this system from known systems.
         mapData.Systems().erase(system->Name());
