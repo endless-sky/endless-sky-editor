@@ -44,6 +44,7 @@ signals:
 
 public slots:
     void CreateSystem();
+    bool RenameSystem(const QString &from, const QString &to);
     void DeleteSystem();
     void Recenter();
     void RandomizeCommodity();

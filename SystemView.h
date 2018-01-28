@@ -79,7 +79,9 @@ private:
     Map &mapData;
     DetailView *detailView;
     QTabWidget *tabs;
+    // The detail view for the selected Planet object.
     PlanetView *planetView;
+    // The current system being accessed and drawn.
     System *system = nullptr;
     StellarObject *selectedObject = nullptr;
 

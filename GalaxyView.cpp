@@ -150,6 +150,54 @@ void GalaxyView::CreateSystem()
 
 
 
+// Change the name of a system, which involves creating a new pointer
+// and updating the system and detail views with it.
+bool GalaxyView::RenameSystem(const QString &from, const QString &to)
+{
+    if(!mapData.Systems().count(from))
+    {
+        QMessageBox::warning(this, "Missing name",
+            "A system named \"" + from + "\" didn't exist.");
+        mapData.Systems()[from];
+        mapData.SetChanged();
+        update();
+        return false;
+    }
+    // If the desired name is empty, prompt to delete the system.
+    else if(to.isEmpty())
+    {
+        if(systemView && systemView->Selected())
+            DeleteSystem();
+        else
+            return false;
+    }
+    else if(mapData.Systems().count(to))
+    {
+        QMessageBox::warning(this, "Duplicate name",
+            "A system named \"" + to + "\" already exists.");
+        return false;
+    }
+    else
+    {
+        mapData.RenameSystem(from, to);
+        mapData.SetChanged();
+
+        // Update the system pointed to by the two views, as the old pointer is invalid.
+        System *newSystem = &mapData.Systems()[to];
+        if(systemView)
+            systemView->Select(newSystem);
+        if(detailView)
+            detailView->SetSystem(newSystem);
+
+        // Redraw the Galaxy map using the new system's name.
+        update();
+    }
+
+    return true;
+}
+
+
+
 // Delete a system, and remove any string references to it (i.e. links).
 void GalaxyView::DeleteSystem()
 {

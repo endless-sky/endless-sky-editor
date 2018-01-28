@@ -192,34 +192,32 @@ bool DetailView::eventFilter(QObject *object, QEvent *event)
 
 
 
+// Change the name of the selected system.
 void DetailView::NameChanged()
 {
-    if(!system || system->Name() == name->text() || name->text().isEmpty())
-        return;
-
-    if(mapData.Systems().count(name->text()))
+    name->blockSignals(true);
+    if(galaxyView && system && system->Name() != name->text())
     {
-        QMessageBox::warning(this, "Duplicate name",
-            "A system named \"" + name->text() + "\" already exists.");
+        // Attempt the name change in GalaxyView, to update both this and SystemView.
+        if(!galaxyView->RenameSystem(system->Name(), name->text()))
+            name->setText(system->Name());
     }
-    else
-    {
-        mapData.RenameSystem(system->Name(), name->text());
-        mapData.SetChanged();
-        galaxyView->update();
-    }
+    name->blockSignals(false);
 }
 
 
 
 void DetailView::GovernmentChanged()
 {
-    if(!system || system->Government() == government->text() || government->text().isEmpty())
+    const QString &newGov = government->text();
+    if(!system || system->Government() == newGov || newGov.isEmpty())
         return;
 
-    system->SetGovernment(government->text());
-    galaxyView->SetGovernment(government->text());
+    system->SetGovernment(newGov);
+    galaxyView->SetGovernment(newGov);
     mapData.SetChanged();
+
+    // Refresh the Galaxy map since it is using a new Government color.
     galaxyView->update();
 }
 
