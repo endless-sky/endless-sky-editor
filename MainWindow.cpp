@@ -63,20 +63,31 @@ void MainWindow::DoOpen(const QString &path)
     systemView->Select(nullptr);
     planetView->Reinitialize();
     tabs->setCurrentWidget(galaxyView);
-    update();
     galaxyView->update();
+    update();
 }
 
 
 
 void MainWindow::NewMap()
 {
+    if(map.IsChanged())
+    {
+        QMessageBox::StandardButton button = QMessageBox::question(this, "Save the current map?",
+                "There are unsaved changes. Would you like to save them before making a new map?");
+        if(button == QMessageBox::Yes)
+            SaveAs();
+        else if(button != QMessageBox::No)
+            return;
+    }
+
     // Start in the previous map file's directory.
     QString dir = map.DataDirectory();
     QString path = QFileDialog::getSaveFileName(this, "Create map file", dir, "*.txt");
     if(!path.isEmpty())
     {
         // Create the empty map file.
+        map = Map();
         map.Save(path);
         // Initialize the editor with the empty map.
         DoOpen(path);
