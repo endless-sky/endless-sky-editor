@@ -227,7 +227,7 @@ void MainWindow::CreateWidgets()
     galaxyView->SetDetailView(detailView);
 
     systemView = new SystemView(map, detailView, tabs, tabs);
-    const auto &it = map.Systems().find("Sol");
+    auto it = map.Systems().find("Sol");
     if(it != map.Systems().end())
         systemView->Select(&it->second);
     galaxyView->SetSystemView(systemView);

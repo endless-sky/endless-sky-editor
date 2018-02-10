@@ -215,7 +215,7 @@ void GalaxyView::DeleteSystem()
         while(!system->Links().empty())
         {
             // The system to be deleted may have a link to a "plugin" system.
-            const auto &it = mapData.Systems().find(*system->Links().begin());
+            auto it = mapData.Systems().find(*system->Links().begin());
             if(it != mapData.Systems().end())
                 system->ToggleLink(&it->second);
             // Only this system's endpoint can be modified.
@@ -369,7 +369,7 @@ void GalaxyView::RandomizeCommodity()
                 for(const System *source : sources)
                     for(const QString &name : source->Links())
                     {
-                        const auto &it = mapData.Systems().find(name);
+                        auto it = mapData.Systems().find(name);
                         if(it == mapData.Systems().end() || done.count(&it->second))
                             continue;
                         const System *link = &it->second;

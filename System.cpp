@@ -247,7 +247,7 @@ const vector<System::Minable> &System::Minables() const
 // Get the price of the given commodity in this system.
 int System::Trade(const QString &commodity) const
 {
-    const auto &it = trade.find(commodity);
+    auto it = trade.find(commodity);
     return (it == trade.end()) ? 0 : it->second;
 }
 
