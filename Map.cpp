@@ -28,6 +28,7 @@ void Map::Load(const QString &path)
     *this = Map();
 
     dataDirectory = path.left(path.lastIndexOf('/'));
+    fileName = path.right(path.lastIndexOf('/'));
     QString rootDir = dataDirectory.left(dataDirectory.lastIndexOf('/'));
     dataDirectory += "/";
     SpriteSet::SetRootPath(rootDir + "/images/");
@@ -42,10 +43,7 @@ void Map::Load(const QString &path)
         else if(node.Token(0) == "system" && node.Size() >= 2)
             systems[node.Token(1)].Load(node);
         else if(node.Token(0) == "galaxy")
-        {
-            galaxies.push_back(Galaxy());
-            galaxies.back().Load(node);
-        }
+            galaxies.emplace_back(node);
         else
             unparsed.push_back(node);
     }
@@ -53,22 +51,22 @@ void Map::Load(const QString &path)
     QString commodityPath = dataDirectory + "commodities.txt";
     DataFile tradeData(commodityPath);
 
+    // Load in "standard" commodities - those that supply a category, low, and high price.
+    // "Special" commodities that are only used as names for mission cargo are not loaded.
     for(const DataNode &node : tradeData)
         if(node.Token(0) == "trade")
             for(const DataNode &child : node)
                 if(child.Token(0) == "commodity" && child.Size() >= 4)
-                {
-                    int low = static_cast<int>(child.Value(2));
-                    int high = static_cast<int>(child.Value(3));
-                    commodities.push_back({child.Token(1), low, high});
-                }
+                    commodities.emplace_back(child.Token(1), child.Value(2), child.Value(3));
+
     isChanged = false;
 }
 
 
 
-void Map::Save(const QString &path) const
+void Map::Save(const QString &path)
 {
+    fileName = path.right(path.lastIndexOf('/'));
     DataWriter file(path);
     file.WriteRaw(comments);
     file.Write();
@@ -101,6 +99,13 @@ void Map::Save(const QString &path) const
 const QString &Map::DataDirectory() const
 {
     return dataDirectory;
+}
+
+
+
+const QString &Map::FileName() const
+{
+    return fileName;
 }
 
 
@@ -202,27 +207,30 @@ QString Map::PriceLevel(const QString &commodity, int price) const
 
 
 
-// Rename a system. This involves changing all the systems that link to it
-// and moving it to a new place in the map.
+// Rename a system. This requires updating all the known systems that link to it.
 void Map::RenameSystem(const QString &from, const QString &to)
 {
-    auto it = systems.find(from);
-    if(it == systems.end() || systems.find(to) != systems.end())
+    // If the desired name is taken, or the current name doesn't exist, bail out.
+    if(systems.count(to) || !systems.count(from))
         return;
 
-    System &renamed = systems[to] = it->second;
+    System &renamed = systems[to] = systems[from];
     renamed.SetName(to);
-    for(const QString &link : it->second.Links())
-    {
-        auto oit = systems.find(link);
-        if(oit != systems.end())
-            oit->second.ChangeLink(from, to);
-    }
-    systems.erase(it);
+    // Links to "plugin" systems (i.e. those not a part of this map file)
+    // are kept, but the returning link from the plugin system to this
+    // system will not exist. (There is no way to update it.)
+    for(const QString &link : systems[from].Links())
+        if(systems.count(link))
+            systems[link].ChangeLink(from, to);
+
+    // Erase the original name's system definition.
+    systems.erase(from);
 }
 
 
 
+// Rename a planet. The editor does not support planets sharing a name with
+// a system, or renaming an object to share a planet definition (i.e. wormholes).
 void Map::RenamePlanet(StellarObject *object, const QString &name)
 {
     if(!object || systems.find(name) != systems.end())
@@ -231,7 +239,9 @@ void Map::RenamePlanet(StellarObject *object, const QString &name)
     auto it = planets.find(object->GetPlanet());
     if(it != planets.end())
     {
+        // Copy the existing definition to the new name.
         planets[name] = it->second;
+        // Erase the previous definition.
         planets.erase(it);
     }
     planets[name].SetName(name);

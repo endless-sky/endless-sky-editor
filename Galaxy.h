@@ -25,6 +25,9 @@ class DataWriter;
 
 class Galaxy {
 public:
+    Galaxy() = default;
+    Galaxy(const DataNode &node);
+
     void Load(const DataNode &node);
     void Save(DataWriter &file) const;
 

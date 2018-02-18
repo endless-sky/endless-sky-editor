@@ -103,8 +103,8 @@ private:
     QString music;
     QString tributeFleetName;
 
+    // Use a vector so the printing order is preserved.
     std::vector<QString> attributes;
-
     std::vector<QString> shipyard;
     std::vector<QString> outfitter;
 

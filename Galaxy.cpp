@@ -19,6 +19,13 @@ using namespace std;
 
 
 
+Galaxy::Galaxy(const DataNode &node)
+{
+    Load(node);
+}
+
+
+
 void Galaxy::Load(const DataNode &node)
 {
     if(node.Size() >= 2)

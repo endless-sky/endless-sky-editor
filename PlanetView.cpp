@@ -30,6 +30,13 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 using namespace std;
 
+namespace {
+    double GetOptionalValue(const QString &text)
+    {
+        return text.isEmpty() ? numeric_limits<double>::quiet_NaN() : text.toDouble();
+    }
+}
+
 
 
 PlanetView::PlanetView(Map &mapData, QWidget *parent) :
@@ -163,36 +170,38 @@ void PlanetView::SetPlanet(StellarObject *object)
     }
     else
     {
-        name->setText(it->second.Name());
-        attributes->setText(ToString(it->second.Attributes()));
-        landscape->SetPlanet(&it->second);
+        Planet &planet = it->second;
+        name->setText(planet.Name());
+        attributes->setText(ToString(planet.Attributes()));
+        landscape->SetPlanet(&planet);
 
         disconnect(description, SIGNAL(textChanged()), this, SLOT(DescriptionChanged()));
-        description->setPlainText(it->second.Description());
+        description->setPlainText(planet.Description());
         connect(description, SIGNAL(textChanged()), this, SLOT(DescriptionChanged()));
 
         disconnect(spaceport, SIGNAL(textChanged()), this, SLOT(SpaceportDescriptionChanged()));
-        spaceport->setPlainText(it->second.SpaceportDescription());
+        spaceport->setPlainText(planet.SpaceportDescription());
         connect(spaceport, SIGNAL(textChanged()), this, SLOT(SpaceportDescriptionChanged()));
 
-        shipyard->setText(ToString(it->second.Shipyard()));
-        outfitter->setText(ToString(it->second.Outfitter()));
-        reputation->setText(std::isnan(it->second.RequiredReputation()) ?
-            QString() : QString::number(it->second.RequiredReputation()));
-        bribe->setText(std::isnan(it->second.Bribe()) ?
-            QString() : QString::number(it->second.Bribe()));
-        security->setText(std::isnan(it->second.Security()) ?
-            QString() : QString::number(it->second.Security()));
-        tribute->setText(std::isnan(it->second.Tribute()) ?
-            QString() : QString::number(it->second.Tribute()));
-        tributeThreshold->setText(std::isnan(it->second.TributeThreshold()) ?
-            QString() : QString::number(it->second.TributeThreshold()));
-        tributeFleetName->setText(it->second.TributeFleetName());
-        tributeFleetQuantity->setText(std::isnan(it->second.TributeFleetQuantity()) ?
-            QString() : QString::number(it->second.TributeFleetQuantity()));
+        shipyard->setText(ToString(planet.Shipyard()));
+        outfitter->setText(ToString(planet.Outfitter()));
+        reputation->setText(std::isnan(planet.RequiredReputation()) ?
+            QString() : QString::number(planet.RequiredReputation()));
+        bribe->setText(std::isnan(planet.Bribe()) ?
+            QString() : QString::number(planet.Bribe()));
+        security->setText(std::isnan(planet.Security()) ?
+            QString() : QString::number(planet.Security()));
+        tribute->setText(std::isnan(planet.Tribute()) ?
+            QString() : QString::number(planet.Tribute()));
+        tributeThreshold->setText(std::isnan(planet.TributeThreshold()) ?
+            QString() : QString::number(planet.TributeThreshold()));
+        tributeFleetName->setText(planet.TributeFleetName());
+        tributeFleetQuantity->setText(std::isnan(planet.TributeFleetQuantity()) ?
+            QString() : QString::number(planet.TributeFleetQuantity()));
 
     }
 }
+
 
 
 void PlanetView::Reinitialize()
@@ -208,27 +217,31 @@ void PlanetView::NameChanged()
     if(!object || object->GetPlanet() == name->text() || name->text().isEmpty())
         return;
 
-    auto it = mapData.Planets().find(name->text());
-    if(it != mapData.Planets().end())
+    if(mapData.Planets().count(name->text()))
     {
         QMessageBox::warning(this, "Duplicate name",
             "A planet named \"" + name->text() + "\" already exists.");
     }
     else
     {
+        // Copy the planet data from the old name to the new name..
         mapData.RenamePlanet(object, name->text());
+
+        // Update (or create, if not previously a planet) the new name's data.
         Planet &planet = mapData.Planets()[name->text()];
         planet.Attributes() = ToList(attributes->text());
         planet.SetLandscape(landscape->Landscape());
         landscape->SetPlanet(&planet);
         planet.SetDescription(description->toPlainText());
         planet.SetSpaceportDescription(spaceport->toPlainText());
+
         if(!reputation->text().isEmpty())
             planet.SetRequiredReputation(reputation->text().toDouble());
         if(!bribe->text().isEmpty())
             planet.SetBribe(bribe->text().toDouble());
         if(!security->text().isEmpty())
             planet.SetSecurity(security->text().toDouble());
+
         mapData.SetChanged();
     }
 }
@@ -319,9 +332,7 @@ void PlanetView::ReputationChanged()
 {
     if(object && !object->GetPlanet().isEmpty())
     {
-        double value = numeric_limits<double>::quiet_NaN();
-        if(!reputation->text().isEmpty())
-            value = reputation->text().toDouble();
+        double value = GetOptionalValue(reputation->text());
         Planet &planet = mapData.Planets()[object->GetPlanet()];
         if(planet.RequiredReputation() != value || std::isnan(planet.RequiredReputation()) != std::isnan(value))
         {
@@ -337,9 +348,7 @@ void PlanetView::BribeChanged()
 {
     if(object && !object->GetPlanet().isEmpty())
     {
-        double value = numeric_limits<double>::quiet_NaN();
-        if(!bribe->text().isEmpty())
-            value = bribe->text().toDouble();
+        double value = GetOptionalValue(bribe->text());
         Planet &planet = mapData.Planets()[object->GetPlanet()];
         if(planet.Bribe() != value || std::isnan(planet.Bribe()) != std::isnan(value))
         {
@@ -355,9 +364,7 @@ void PlanetView::SecurityChanged()
 {
     if(object && !object->GetPlanet().isEmpty())
     {
-        double value = numeric_limits<double>::quiet_NaN();
-        if(!security->text().isEmpty())
-            value = security->text().toDouble();
+        double value = GetOptionalValue(security->text());
         Planet &planet = mapData.Planets()[object->GetPlanet()];
         if(planet.Security() != value || std::isnan(planet.Security()) != std::isnan(value))
         {
@@ -373,9 +380,7 @@ void PlanetView::TributeChanged()
 {
     if(object && !object->GetPlanet().isEmpty())
     {
-        double value = numeric_limits<double>::quiet_NaN();
-        if(!tribute->text().isEmpty())
-            value = tribute->text().toDouble();
+        double value = GetOptionalValue(tribute->text());
         Planet &planet = mapData.Planets()[object->GetPlanet()];
         if(planet.Tribute() != value || std::isnan(planet.Tribute()) != std::isnan(value))
         {
@@ -391,9 +396,7 @@ void PlanetView::TributeThresholdChanged()
 {
     if(object && !object->GetPlanet().isEmpty())
     {
-        double value = numeric_limits<double>::quiet_NaN();
-        if(!tributeThreshold->text().isEmpty())
-            value = tributeThreshold->text().toDouble();
+        double value = GetOptionalValue(tributeThreshold->text());
         Planet &planet = mapData.Planets()[object->GetPlanet()];
         if(planet.TributeThreshold() != value || std::isnan(planet.TributeThreshold()) != std::isnan(value))
         {
@@ -409,9 +412,7 @@ void PlanetView::TributeFleetQuantityChanged()
 {
     if(object && !object->GetPlanet().isEmpty())
     {
-        double value = numeric_limits<double>::quiet_NaN();
-        if(!tributeFleetQuantity->text().isEmpty())
-            value = tributeFleetQuantity->text().toDouble();
+        double value = GetOptionalValue(tributeFleetQuantity->text());
         Planet &planet = mapData.Planets()[object->GetPlanet()];
         if(planet.TributeFleetQuantity() != value || std::isnan(planet.TributeFleetQuantity()) != std::isnan(value))
         {
@@ -427,11 +428,11 @@ void PlanetView::TributeFleetNameChanged()
 {
     if(object && !object->GetPlanet().isEmpty())
     {
-        QString newDescription = tributeFleetName->text();
+        QString newFleetName = tributeFleetName->text();
         Planet &planet = mapData.Planets()[object->GetPlanet()];
-        if(planet.TributeFleetName() != newDescription)
+        if(planet.TributeFleetName() != newFleetName)
         {
-            planet.SetTributeFleetName(newDescription);
+            planet.SetTributeFleetName(newFleetName);
             mapData.SetChanged();
         }
     }
@@ -461,7 +462,7 @@ vector<QString> PlanetView::ToList(const QString &str)
 
     QStringList strings = str.split(",", QString::SkipEmptyParts);
     for(const QString &token : strings)
-        result.push_back(token.trimmed());
+        result.emplace_back(token.trimmed());
 
     return result;
 }

@@ -104,6 +104,7 @@ void GalaxyView::SetDetailView(DetailView *view)
 
 
 
+// Color the map by this commodity.
 void GalaxyView::SetCommodity(const QString &name)
 {
     if(commodity != name)
@@ -116,6 +117,7 @@ void GalaxyView::SetCommodity(const QString &name)
 
 
 
+// Color the map by this government.
 void GalaxyView::SetGovernment(const QString &name)
 {
     if(government != name)
@@ -136,6 +138,67 @@ void GalaxyView::KeyPress(QKeyEvent *event)
 
 
 
+// Create a system at (0, 0).
+void GalaxyView::CreateSystem()
+{
+    // TODO: Create a custom event filter to receive the next mouse click event
+    // TODO: Draw crosshairs and / or a simulated system and neighbor ring when
+    // this custom filter is active, then pass the coordinates here (rather than
+    // always using 0, 0).
+    CreateSystem({0, 0});
+}
+
+
+
+// Change the name of a system, which involves creating a new pointer
+// and updating the system and detail views with it.
+bool GalaxyView::RenameSystem(const QString &from, const QString &to)
+{
+    if(!mapData.Systems().count(from))
+    {
+        QMessageBox::warning(this, "Missing name",
+            "A system named \"" + from + "\" didn't exist.");
+        mapData.Systems()[from];
+        mapData.SetChanged();
+        update();
+        return false;
+    }
+    // If the desired name is empty, prompt to delete the system.
+    else if(to.isEmpty())
+    {
+        if(systemView && systemView->Selected())
+            DeleteSystem();
+        else
+            return false;
+    }
+    else if(mapData.Systems().count(to))
+    {
+        QMessageBox::warning(this, "Duplicate name",
+            "A system named \"" + to + "\" already exists.");
+        return false;
+    }
+    else
+    {
+        mapData.RenameSystem(from, to);
+        mapData.SetChanged();
+
+        // Update the system pointed to by the two views, as the old pointer is invalid.
+        System *newSystem = &mapData.Systems()[to];
+        if(systemView)
+            systemView->Select(newSystem);
+        if(detailView)
+            detailView->SetSystem(newSystem);
+
+        // Redraw the Galaxy map using the new system's name.
+        update();
+    }
+
+    return true;
+}
+
+
+
+// Delete a system, and remove any string references to it (i.e. links).
 void GalaxyView::DeleteSystem()
 {
     if(!systemView || !systemView->Selected())
@@ -146,14 +209,33 @@ void GalaxyView::DeleteSystem()
         "Are you sure you want to delete \"" + system->Name() + "\"?");
     if(button == QMessageBox::Yes)
     {
+        // Deselect this system.
         systemView->Select(nullptr);
+        // Remove all links from this system (and the corresponding return links, if able).
         while(!system->Links().empty())
-            system->ToggleLink(&mapData.Systems().find(system->Links().front())->second);
+        {
+            // The system to be deleted may have a link to a "plugin" system.
+            auto it = mapData.Systems().find(*system->Links().begin());
+            if(it != mapData.Systems().end())
+                system->ToggleLink(&it->second);
+            // Only this system's endpoint can be modified.
+            else
+                system->ChangeLink(*system->Links().begin(), QString());
+        }
 
-        auto it = mapData.Systems().find(system->Name());
-        mapData.Systems().erase(it);
+        // Remove this system from known systems.
+        mapData.Systems().erase(system->Name());
         mapData.SetChanged();
     }
+    update();
+}
+
+
+
+void GalaxyView::Recenter()
+{
+    Center();
+    update();
 }
 
 
@@ -180,11 +262,8 @@ void GalaxyView::RandomizeCommodity()
         connected.insert(system);
         
         for(const QString &name : system->Links())
-        {
-            auto it = mapData.Systems().find(name);
-            if(it != mapData.Systems().end())
-                edge.push(&it->second);
-        }
+            if(mapData.Systems().count(name))
+                edge.push(&mapData.Systems()[name]);
     }
     
     // Commodity parameters.
@@ -229,7 +308,7 @@ void GalaxyView::RandomizeCommodity()
         // loosen the quota a little bit.
         vector<int> quota;
         for(int weight : binIt->second)
-            quota.push_back((connected.size() * weight) / 100 + tries / 4 + 1);
+            quota.emplace_back((connected.size() * weight) / 100 + tries / 4 + 1);
         
         vector<const System *> unassigned;
         map<const System *, int> low;
@@ -316,7 +395,7 @@ void GalaxyView::RandomizeCommodity()
     
     // Assign each star system a value based on its bin.
     map<const System *, int> rough;
-    for(auto &it : bin)
+    for(const auto &it : bin)
         rough[it.first] = base + (rand() % 100) + 100 * it.second;
     
     // Smooth out the values by averaging each system with the average of all
@@ -326,14 +405,12 @@ void GalaxyView::RandomizeCommodity()
         int count = 0;
         int sum = 0;
         for(const QString &link : system->Links())
-        {
-            auto it = mapData.Systems().find(link);
-            if(it == mapData.Systems().end())
-                continue;
-            
-            sum += rough[&it->second];
-            ++count;
-        }
+            if(mapData.Systems().count(link))
+            {
+                sum += rough[&mapData.Systems()[link]];
+                ++count;
+            }
+
         if(!count)
             sum = rough[system];
         else
@@ -367,37 +444,11 @@ void GalaxyView::mousePressEvent(QMouseEvent *event)
     if(!dragSystem)
     {
         if(event->button() == Qt::RightButton)
-        {
-            QString text = QInputDialog::getText(this, "New system", "Name:");
-            if(!text.isEmpty())
-            {
-                auto it = mapData.Systems().find(text);
-                if(it != mapData.Systems().end())
-                    QMessageBox::warning(this, "Duplicate name",
-                        "A system named \"" + text + "\" already exists.");
-                else
-                {
-                    System &system = mapData.Systems()[text];
-                    system.Init(text, origin);
-                    if(systemView && systemView->Selected())
-                    {
-                        System &previous = *systemView->Selected();
-                        for(const Map::Commodity &commodity : mapData.Commodities())
-                            system.SetTrade(commodity.name, previous.Trade(commodity.name));
-                        system.SetGovernment(previous.Government());
-                    }
-                    else
-                        for(const Map::Commodity &commodity : mapData.Commodities())
-                            system.SetTrade(commodity.name, (commodity.low + commodity.high) / 2);
-                    if(systemView)
-                        systemView->Select(&system);
-                    mapData.SetChanged();
-                    update();
-                }
-            }
-        }
+            CreateSystem(origin);
         return;
     }
+    // An existing system was clicked. Select it, or toggle a link with the
+    // already-selected system.
     if(event->button() == Qt::LeftButton)
     {
         dragTime.start();
@@ -405,6 +456,9 @@ void GalaxyView::mousePressEvent(QMouseEvent *event)
         if(systemView)
         {
             systemView->Select(dragSystem);
+            // Update the coloring scheme if coloring by government.
+            if(!government.isEmpty() && !dragSystem->Government().isEmpty())
+                government = dragSystem->Government();
             update();
         }
     }
@@ -443,6 +497,7 @@ void GalaxyView::mouseDoubleClickEvent(QMouseEvent *event)
 
 
 
+// Drag either the selected system, or the background.
 void GalaxyView::mouseMoveEvent(QMouseEvent *event)
 {
     if(!(event->buttons() & Qt::LeftButton))
@@ -465,6 +520,7 @@ void GalaxyView::mouseMoveEvent(QMouseEvent *event)
 
 
 
+// Zoom in or out.
 void GalaxyView::wheelEvent(QWheelEvent *event)
 {
     QVector2D point(event->pos());
@@ -503,6 +559,7 @@ void GalaxyView::paintEvent(QPaintEvent */*event*/)
         painter.drawPixmap(pos, sprite);
     }
 
+    // Draw the links between systems.
     painter.setBrush(Qt::NoBrush);
     for(const auto &it : mapData.Systems())
     {
@@ -528,6 +585,7 @@ void GalaxyView::paintEvent(QPaintEvent */*event*/)
         }
     }
 
+    // Draw the systems, colored by commodity or if the government is the selected government.
     for(const auto &it : mapData.Systems())
     {
         QPointF pos = it.second.Position().toPointF();
@@ -551,6 +609,7 @@ void GalaxyView::paintEvent(QPaintEvent */*event*/)
         painter.drawText(pos + QPointF(5, 5), it.first);
     }
 
+    // Draw the selection circle and neighbor radius ring.
     painter.setPen(mediumPen);
     painter.setBrush(Qt::NoBrush);
     if(systemView && systemView->Selected())
@@ -570,4 +629,38 @@ QVector2D GalaxyView::MapPoint(QPoint pos) const
     QVector2D center(.5 * width(), .5 * height());
     // point = origin * scale + offset + center.
     return (point - offset - center) / scale;
+}
+
+
+
+// Create a system at the given position.
+void GalaxyView::CreateSystem(const QVector2D &origin)
+{
+    QString text = QInputDialog::getText(this, "New system", "Name:");
+    if(!text.isEmpty())
+    {
+        if(mapData.Systems().count(text))
+            QMessageBox::warning(this, "Duplicate name",
+                "A system named \"" + text + "\" already exists.");
+        else
+        {
+            System &system = mapData.Systems()[text];
+            system.Init(text, origin);
+            // If a previous system was selected, the new system extends from it.
+            if(systemView && systemView->Selected())
+            {
+                System &previous = *systemView->Selected();
+                for(const Map::Commodity &commodity : mapData.Commodities())
+                    system.SetTrade(commodity.name, previous.Trade(commodity.name));
+                system.SetGovernment(previous.Government());
+            }
+            else
+                for(const Map::Commodity &commodity : mapData.Commodities())
+                    system.SetTrade(commodity.name, (commodity.low + commodity.high) / 2);
+            if(systemView)
+                systemView->Select(&system);
+            mapData.SetChanged();
+            update();
+        }
+    }
 }

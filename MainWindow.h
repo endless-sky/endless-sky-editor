@@ -40,8 +40,10 @@ public:
     void DoOpen(const QString &path);
 
 public slots:
+    void NewMap();
     void Open();
     void Save();
+    void SaveAs();
     void Quit();
 
     void TabChanged(int);

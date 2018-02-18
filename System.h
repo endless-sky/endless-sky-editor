@@ -34,9 +34,18 @@ class Planet;
 // objects in each system, and the hyperspace links between systems.
 class System {
 public:
-    struct Asteroid { QString type; int count; double energy; };
-    struct Fleet { QString name; int period; };
-    struct Minable { QString type; int count; double energy; };
+    struct Asteroid {
+        QString type; int count; double energy;
+        Asteroid(const QString &type, int count, double energy) : type(type), count(count), energy(energy) {}
+    };
+    struct Fleet {
+        QString name; int period;
+        Fleet(const QString &name, int period) : name(name), period(period) {}
+    };
+    struct Minable {
+        QString type; int count; double energy;
+        Minable(const QString &type, int count, double energy) : type(type), count(count), energy(energy) {}
+    };
 
 
 public:
@@ -51,7 +60,7 @@ public:
     const QString &Government() const;
 
     // Get a list of systems you can travel to through hyperspace from here.
-    const std::vector<QString> &Links() const;
+    const std::set<QString> &Links() const;
 
     // Get the stellar object locations on the most recently set date.
     std::vector<StellarObject> &Objects();
@@ -71,6 +80,7 @@ public:
     // Get the specification of how many minables of each type there are.
     std::vector<Minable> &Minables();
     const std::vector<Minable> &Minables() const;
+
     // Get the price of the given commodity in this system.
     int Trade(const QString &commodity) const;
 
@@ -117,7 +127,7 @@ private:
     QString government;
 
     // Hyperspace links to other systems.
-    std::vector<QString> links;
+    std::set<QString> links;
 
     // Stellar objects, listed in such an order that an object's parents are
     // guaranteed to appear before it (so that if we traverse the vector in

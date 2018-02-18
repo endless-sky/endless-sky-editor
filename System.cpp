@@ -64,15 +64,15 @@ void System::Load(const DataNode &node)
         else if(child.Token(0) == "music" && child.Size() >= 2)
             music = child.Token(1);
         else if(child.Token(0) == "link" && child.Size() >= 2)
-            links.push_back(child.Token(1));
+            links.emplace(child.Token(1));
         else if(child.Token(0) == "asteroids" && child.Size() >= 4)
-            asteroids.push_back({child.Token(1), static_cast<int>(child.Value(2)), child.Value(3)});
+            asteroids.emplace_back(child.Token(1), static_cast<int>(child.Value(2)), child.Value(3));
         else if(child.Token(0) == "trade" && child.Size() >= 3)
             trade[child.Token(1)] = child.Value(2);
         else if(child.Token(0) == "fleet" && child.Size() >= 3)
-            fleets.push_back({child.Token(1), static_cast<int>(child.Value(2))});
+            fleets.emplace_back(child.Token(1), static_cast<int>(child.Value(2)));
         else if(child.Token(0) == "minables" && child.Size() >= 3)
-            minables.push_back({child.Token(1), static_cast<int>(child.Value(2)), child.Value(3)});
+            minables.emplace_back(child.Token(1), static_cast<int>(child.Value(2)), child.Value(3));
         else if(child.Token(0) == "object")
             LoadObject(child);
         else
@@ -143,7 +143,7 @@ const QString &System::Government() const
 
 
 // Get a list of systems you can travel to through hyperspace from here.
-const vector<QString> &System::Links() const
+const set<QString> &System::Links() const
 {
     return links;
 }
@@ -230,6 +230,20 @@ const vector<System::Asteroid> &System::Asteroids() const
 
 
 
+vector<System::Minable> &System::Minables()
+{
+    return minables;
+}
+
+
+
+const vector<System::Minable> &System::Minables() const
+{
+    return minables;
+}
+
+
+
 // Get the price of the given commodity in this system.
 int System::Trade(const QString &commodity) const
 {
@@ -247,23 +261,9 @@ vector<System::Fleet> &System::Fleets()
 
 
 
-vector<System::Minable> &System::Minables()
-{
-    return minables;
-}
-
-
-
 const vector<System::Fleet> &System::Fleets() const
 {
     return fleets;
-}
-
-
-
-const vector<System::Minable> &System::Minables() const
-{
-    return minables;
 }
 
 
@@ -292,9 +292,8 @@ void System::LoadObject(const DataNode &node, int parent)
 {
     int index = static_cast<int>(objects.size());
 
-    objects.push_back(StellarObject());
+    objects.emplace_back(parent);
     StellarObject &object = objects.back();
-    object.parent = parent;
 
     if(node.Size() >= 2)
         object.planet = node.Token(1);
@@ -385,34 +384,30 @@ void System::SetGovernment(const QString &gov)
 
 
 
+// Either create or destroy a linking set with the pointed System.
 void System::ToggleLink(System *other)
 {
     if(!other || other == this)
         return;
 
-    auto it = find(links.begin(), links.end(), other->name);
-    auto oit = find(other->links.begin(), other->links.end(), name);
-    if(it == links.end())
-    {
-        links.push_back(other->name);
-        if(oit == other->links.end())
-            other->links.push_back(name);
-    }
+    if(links.erase(other->name))
+        other->links.erase(name);
     else
     {
-        links.erase(it);
-        if(oit != other->links.end())
-            other->links.erase(oit);
+        // These systems were not linked, so link them.
+        links.emplace(other->name);
+        other->links.emplace(name);
     }
 }
 
 
 
+// Change the name of a linked System. If the new name is empty, this
+// effectively deletes the link.
 void System::ChangeLink(const QString &from, const QString &to)
 {
-    auto it = find(links.begin(), links.end(), from);
-    if(it != links.end())
-        *it = to;
+    if(links.erase(from) && !to.isEmpty())
+        links.emplace(to);
 }
 
 
@@ -508,10 +503,10 @@ void System::ChangeAsteroids()
 
         for(int j = 0; j < 3; ++j)
             if(count[j])
-                asteroids.push_back({
+                asteroids.emplace_back(
                     prefix[j] + suffix[i],
                     count[j],
-                    energy * (rand() % 101 + 50) * .01});
+                    energy * (rand() % 101 + 50) * .01);
     }
 }
 
@@ -532,6 +527,7 @@ void System::ChangeMinables()
         totalEnergy += asteroid.energy * asteroid.count;
     }
     
+    // Do not auto-create systems with only minable asteroids.
     if(!totalCount)
         return;
     
@@ -575,7 +571,7 @@ void System::ChangeMinables()
     for(const auto &it : choices)
     {
         double energy = (rand() % 1000 + 1000) * .001 * meanEnergy;
-        minables.push_back({it.first, it.second, energy});
+        minables.emplace_back(it.first, it.second, energy);
     }
 }
 
@@ -671,7 +667,7 @@ void System::ChangeSprite(StellarObject *object)
             else
                 newObject = StellarObject::Uninhabited();
         }
-    } while(used.find(newObject.Sprite()) != used.end());
+    } while(used.count(newObject.Sprite()));
 
     // Check how much the radius will change by, then change the sprite.
     double radiusChange = newObject.Radius() - object->Radius();
@@ -757,7 +753,7 @@ void System::AddPlanet()
             root = isHabitable ? StellarObject::Planet() : StellarObject::Uninhabited();
         else
             root = StellarObject::Giant();
-    } while(used.find(root.Sprite()) != used.end());
+    } while(used.count(root.Sprite()));
     objects.push_back(root);
     used.insert(root.Sprite());
 
@@ -773,10 +769,11 @@ void System::AddPlanet()
         // Each moon, on average, should be spaced more widely than the one before.
         randomMoonSpace += 20;
 
+        // Use a moon sprite only once per system.
         StellarObject moon;
         do {
             moon = StellarObject::Moon();
-        } while(used.find(moon.Sprite()) != used.end());
+        } while(used.count(moon.Sprite()));
         used.insert(moon.Sprite());
 
         moon.distance = moonDistance + moon.Radius();
@@ -812,7 +809,7 @@ void System::AddMoon(StellarObject *object, bool isStation)
     StellarObject moon;
     do {
         moon = isStation ? StellarObject::Station() : StellarObject::Moon();
-    } while(used.find(moon.Sprite()) != used.end());
+    } while(used.count(moon.Sprite()));
 
     moon.distance = moonDistance + moon.Radius();
     moon.parent = rootIndex;

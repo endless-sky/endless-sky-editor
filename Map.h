@@ -28,9 +28,12 @@ class StellarObject;
 
 class Map {
 public:
+    // Load from the given file, and remember which file was read from.
     void Load(const QString &path);
-    void Save(const QString &path) const;
+    // Write all the information, and remember which file was chosen.
+    void Save(const QString &path);
     const QString &DataDirectory() const;
+    const QString &FileName() const;
 
     // Mark this file as changed.
     void SetChanged(bool changed = true);
@@ -46,7 +49,10 @@ public:
     const std::map<QString, Planet> &Planets() const;
 
     // Access the commodity data:
-    struct Commodity { QString name; int low; int high; };
+    struct Commodity {
+        QString name; int low; int high;
+        Commodity(const QString &name, int low, int high) : name(name), low(low), high(high) {}
+    };
     const std::vector<Commodity> &Commodities() const;
     // Map a price to a value between 0 and 1 (lowest vs. highest).
     double MapPrice(const QString &commodity, int price) const;
@@ -60,6 +66,7 @@ public:
 
 private:
     QString dataDirectory;
+    QString fileName;
 
     std::list<Galaxy> galaxies;
     std::map<QString, System> systems;

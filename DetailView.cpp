@@ -31,50 +31,55 @@ using namespace std;
 DetailView::DetailView(Map &mapData, GalaxyView *galaxyView, QWidget *parent) :
     QWidget(parent), mapData(mapData), galaxyView(galaxyView)
 {
+    // Create the left sidebar, showing details about the selected system.
+    QVBoxLayout *layout = new QVBoxLayout(this);
+
+    layout->addWidget(new QLabel("System Name:", this));
     name = new QLineEdit(this);
     connect(name, SIGNAL(editingFinished()), this, SLOT(NameChanged()));
+    layout->addWidget(name);
+
+
+    layout->addWidget(new QLabel("Government:", this));
     government = new QLineEdit(this);
     connect(government, SIGNAL(editingFinished()), this, SLOT(GovernmentChanged()));
-
-    QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->addWidget(new QLabel("System Name:", this));
-    layout->addWidget(name);
-    layout->addWidget(new QLabel("Government:", this));
     layout->addWidget(government);
+    // Selecting the government field changes the system and link colors on the Galaxy map.
     government->installEventFilter(this);
 
+
+    // Add a table to display this system's default trade.
     tradeWidget = new QTreeWidget(this);
+    tradeWidget->setMinimumHeight(310);
     tradeWidget->setIndentation(0);
     tradeWidget->setColumnCount(3);
-    QStringList tradeLabels;
-    tradeLabels.append("Commodity");
-    tradeLabels.append("Price");
-    tradeLabels.append("");
-    tradeWidget->setHeaderLabels(tradeLabels);
+    tradeWidget->setHeaderLabels({"Commodity", "Price", ""});
+    // Selecting a commodity field changes the system and link colors on the Galaxy map.
     connect(tradeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
         this, SLOT(CommodityClicked(QTreeWidgetItem *, int)));
     layout->addWidget(tradeWidget);
 
+
+    // Add a table to display this system's fleets.
     fleets = new QTreeWidget(this);
     fleets->setIndentation(0);
     fleets->setColumnCount(2);
-    QStringList fleetLabels;
-    fleetLabels.append("Fleet Type");
-    fleetLabels.append("Period");
-    fleets->setHeaderLabels(fleetLabels);
+    fleets->setHeaderLabels({"Fleet Name", "Period"});
     fleets->setColumnWidth(0, 200);
+    fleets->setColumnWidth(1, 80);
     layout->addWidget(fleets);
 
+
+    // Add a table to display this system's minables (if any).
     minables = new QTreeWidget(this);
     minables->setIndentation(0);
     minables->setColumnCount(3);
-    QStringList minableLabels;
-    minableLabels.append("Minable Type");
-    minableLabels.append("count");
-    minableLabels.append("energy");
-    minables->setHeaderLabels(minableLabels);
-    minables->setColumnWidth(0, 120);
+    minables->setHeaderLabels({"Minable", "Count", "Energy"});
+    minables->setColumnWidth(0, 140);
+    minables->setColumnWidth(1, 70);
+    minables->setColumnWidth(2, 70);
     layout->addWidget(minables);
+
 
     setLayout(layout);
 }
@@ -100,7 +105,10 @@ void DetailView::SetSystem(System *system)
     {
         name->clear();
         government->clear();
+
+        tradeWidget->clear();
         fleets->clear();
+        minables->clear();
     }
     update();
 }
@@ -184,35 +192,32 @@ bool DetailView::eventFilter(QObject *object, QEvent *event)
 
 
 
+// Change the name of the selected system.
 void DetailView::NameChanged()
 {
-    if(!system || system->Name() == name->text() || name->text().isEmpty())
-        return;
-
-    auto it = mapData.Systems().find(name->text());
-    if(it != mapData.Systems().end())
+    name->blockSignals(true);
+    if(galaxyView && system && system->Name() != name->text())
     {
-        QMessageBox::warning(this, "Duplicate name",
-            "A system named \"" + name->text() + "\" already exists.");
+        // Attempt the name change in GalaxyView, to update both this and SystemView.
+        if(!galaxyView->RenameSystem(system->Name(), name->text()))
+            name->setText(system->Name());
     }
-    else
-    {
-        mapData.RenameSystem(system->Name(), name->text());
-        mapData.SetChanged();
-        galaxyView->update();
-    }
+    name->blockSignals(false);
 }
 
 
 
 void DetailView::GovernmentChanged()
 {
-    if(!system || system->Government() == government->text() || government->text().isEmpty())
+    const QString &newGov = government->text();
+    if(!system || system->Government() == newGov || newGov.isEmpty())
         return;
 
-    system->SetGovernment(government->text());
-    galaxyView->SetGovernment(government->text());
+    system->SetGovernment(newGov);
+    galaxyView->SetGovernment(newGov);
     mapData.SetChanged();
+
+    // Refresh the Galaxy map since it is using a new Government color.
     galaxyView->update();
 }
 
@@ -249,7 +254,7 @@ void DetailView::FleetChanged(QTreeWidgetItem *item, int column)
 
     unsigned row = item->text(2).toInt();
     if(row == system->Fleets().size())
-        system->Fleets().push_back({item->text(0), item->text(1).toInt()});
+        system->Fleets().emplace_back(item->text(0), item->text(1).toInt());
     else if(item->text(0).isEmpty() && item->text(1).isEmpty())
         system->Fleets().erase(system->Fleets().begin() + row);
     else if(column == 0)
@@ -273,7 +278,7 @@ void DetailView::MinablesChanged(QTreeWidgetItem *item, int column)
 
     unsigned row = item->text(2).toInt();
     if(row == system->Minables().size())
-        system->Minables().push_back({item->text(0), item->text(1).toInt(), item->text(2).toDouble()});
+        system->Minables().emplace_back(item->text(0), item->text(1).toInt(), item->text(2).toDouble());
     else if(item->text(0).isEmpty() && item->text(1).isEmpty())
         system->Minables().erase(system->Minables().begin() + row);
     else if(column == 0)

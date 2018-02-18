@@ -27,6 +27,9 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 // objects in each system move slightly in their orbits.
 class StellarObject {
 public:
+    StellarObject() = default;
+    StellarObject(int parent) : parent(parent) {};
+
     // Some objects do not have sprites, because they are just an orbital
     // center for two or more other objects.
     const QString &Sprite() const;
