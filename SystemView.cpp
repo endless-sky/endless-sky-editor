@@ -25,6 +25,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include <QPalette>
 #include <QMouseEvent>
 #include <QTabWidget>
+#include <QVector2D>
 
 #include <algorithm>
 #include <cmath>

@@ -27,6 +27,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include <QMessageBox>
 #include <QMimeData>
 #include <QSizePolicy>
+#include <QString>
 #include <QTabWidget>
 #include <QUrl>
 
