@@ -13,6 +13,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include "SpriteSet.h"
 
 #include <QFileInfo>
+#include <QString>
 
 #include <map>
 

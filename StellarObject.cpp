@@ -14,6 +14,8 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 #include "Planet.h"
 
+#include <QString>
+
 #include <algorithm>
 #include <cstdint>
 #include <map>

@@ -13,6 +13,7 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include "DataFile.h"
 
 #include <QFile>
+#include <QString>
 #include <QTextStream>
 
 using namespace std;

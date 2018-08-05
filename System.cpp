@@ -17,6 +17,8 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include "pi.h"
 #include "Planet.h"
 
+#include <QString>
+
 #include <algorithm>
 #include <cmath>
 #include <limits>

@@ -15,6 +15,8 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include "DataNode.h"
 #include "DataWriter.h"
 
+#include <QString>
+
 using namespace std;
 
 
