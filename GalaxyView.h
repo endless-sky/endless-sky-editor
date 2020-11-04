@@ -40,6 +40,18 @@ public:
     void SetGovernment(const QString &name);
     void KeyPress(QKeyEvent *event);
 
+    // Paint tool settings
+    double paintToolRange = 0;
+    double paintToolSeparationAverage = 100;
+    double paintToolSeparationDeviation = 10;
+    double connectionDistanceAverage = 150;
+    double connectionDistanceDeviation = 10;
+
+    // Percentage of randomly generated systems with the paint tool that are inhabited and have a landable planet
+    double inhabitedFraction = 0.9;
+    // Percentage of those planets that have a spaceport
+    double spaceportFraction = 1;
+
 signals:
 
 public slots:
@@ -48,6 +60,7 @@ public slots:
     void DeleteSystem();
     void Recenter();
     void RandomizeCommodity();
+    void SetToolOptions();
 
 protected:
     virtual void mousePressEvent(QMouseEvent *event) override;

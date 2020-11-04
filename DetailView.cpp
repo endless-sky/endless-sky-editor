@@ -51,7 +51,7 @@ DetailView::DetailView(Map &mapData, GalaxyView *galaxyView, QWidget *parent) :
 
     // Add a table to display this system's default trade.
     tradeWidget = new QTreeWidget(this);
-    tradeWidget->setMinimumHeight(310);
+    tradeWidget->setMinimumHeight(100);
     tradeWidget->setIndentation(0);
     tradeWidget->setColumnCount(3);
     tradeWidget->setHeaderLabels({"Commodity", "Price", ""});

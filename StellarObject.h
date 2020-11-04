@@ -74,6 +74,10 @@ public:
     // Check if this object is definitely inhabited (i.e. the sprite includes
     // city lights).
     bool IsInhabited() const;
+    // Checks if it is between 0.5*habitableZone and 2*habitableZone
+    bool InHabitableZone(double habitableZone) const;
+
+    bool IsPotentiallyHabitable(double habitableZone) const;
 
     // Editing a stellar object:
     void SetPlanet(const QString &name);
