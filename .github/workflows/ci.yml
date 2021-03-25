@@ -1,0 +1,17 @@
+name: CI
+
+on:
+  push:
+    branches: [ master, actions ] # TODO
+  pull_request:
+    branches: [ master, actions ] # TODO
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: test
+      run: echo foo
