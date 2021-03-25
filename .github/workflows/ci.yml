@@ -56,8 +56,9 @@ jobs:
     - name: Run make
       run: make -j $(nproc)
       
-    - run: ls -la
-        
+    - run: |
+        ls -la
+        ls la release
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
