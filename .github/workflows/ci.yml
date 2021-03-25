@@ -39,14 +39,15 @@ jobs:
       id: cache-qt
       uses: actions/cache@v1
       with:
-        path: '${{ github.workspace }}/Qt/'
+        path: ${{ github.workspace }}/Qt/
         key: ${{ runner.os }}-QtCache
 
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
         version: "5.15.2"
-        dir: '${{ github.workspace }}/Qt/'
+        dir: ${{ github.workspace }}/Qt/
+        arch: win64_mingw81 # This is only used (and needed on windows, so we can safely specify it for all OSes
         cached: ${{ steps.cache-qt.outputs.cache-hit }}
         
     - name: Run qmake
