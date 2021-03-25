@@ -24,6 +24,6 @@ jobs:
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
-        version: "4.8"
+        version: "5.15.2"
         dir: '${{ github.workspace }}/Qt/'
         cached: ${{ steps.cache-qt.outputs.cache-hit }}
