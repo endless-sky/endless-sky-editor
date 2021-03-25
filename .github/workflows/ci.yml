@@ -6,10 +6,31 @@ on:
   pull_request:
     branches: [ master, actions ] # TODO
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   build:
+  
+    strategy:
+      matrix:
+        target:
+          - linux
+          - windows
+          - macos
+        include:
+          - target: linux
+            os: ubuntu-latest
+            artifact: endless-sky-editor
+          - target: windows
+            os: windows-latest
+            artifact: endless-sky-editor.exe
+          - target: macos
+            os: macos-latest
+            artifact: endless-sky-editor
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v2
@@ -37,8 +58,9 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
-        name: endless-sky-editor-amd64
-        path: endless-sky-editor
+        name: ${{ matrix.target }}
+        path: ${{ matrix.artifact }}
+        
     
     
     
