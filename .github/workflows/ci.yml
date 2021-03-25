@@ -27,3 +27,13 @@ jobs:
         version: "5.15.2"
         dir: '${{ github.workspace }}/Qt/'
         cached: ${{ steps.cache-qt.outputs.cache-hit }}
+        
+    - name: Run qmake
+      run: qmake
+      
+    - name: Run make
+      run: make -j $(nproc)
+    
+    
+    
+    
