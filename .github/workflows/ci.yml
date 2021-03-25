@@ -57,8 +57,9 @@ jobs:
       run: make -j $(nproc)
       
     - run: |
+        git status
         ls -la
-        ls la release
+        ls -la release
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
