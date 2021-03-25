@@ -33,6 +33,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
+
     - uses: actions/checkout@v2
 
     - name: Cache Qt
@@ -55,9 +56,7 @@ jobs:
       
     - name: Run make
       run: make -j $(nproc)
-      
-    - run: |
-        git status
+
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
