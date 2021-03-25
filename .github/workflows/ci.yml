@@ -25,7 +25,7 @@ jobs:
             artifact: endless-sky-editor
           - target: windows
             os: windows-latest
-            artifact: endless-sky-editor.exe
+            artifact: release/endless-sky-editor.exe
           - target: macos
             os: macos-latest
             artifact: endless-sky-editor
@@ -58,8 +58,6 @@ jobs:
       
     - run: |
         git status
-        ls -la
-        ls -la release
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
