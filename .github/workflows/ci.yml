@@ -28,7 +28,7 @@ jobs:
             artifact: release/endless-sky-editor.exe
           - target: macos
             os: macos-latest
-            artifact: endless-sky-editor
+            artifact: endless-sky-editor.app/
 
     runs-on: ${{ matrix.os }}
 
