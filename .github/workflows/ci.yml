@@ -33,6 +33,12 @@ jobs:
       
     - name: Run make
       run: make -j $(nproc)
+        
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: endless-sky-editor-amd64
+        path: endless-sky-editor
     
     
     
