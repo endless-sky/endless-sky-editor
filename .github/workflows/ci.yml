@@ -2,9 +2,8 @@ name: CI
 
 on:
   push:
-    branches: [ master, actions ] # TODO
   pull_request:
-    branches: [ master, actions ] # TODO
+  workflow_dispatch:
 
 defaults:
   run:
