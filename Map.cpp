@@ -16,8 +16,8 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include "DataWriter.h"
 #include "SpriteSet.h"
 
-#include <QString>
 #include <QFileInfo>
+#include <QString>
 
 #include <algorithm>
 
