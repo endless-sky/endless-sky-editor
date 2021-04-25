@@ -18,9 +18,10 @@ jobs:
     strategy:
       matrix:
         target:
-          - linux
-          - windows
-          - macos
+          - ubuntu-latest
+          - ubuntu-18.04
+          - windows-latest
+          - macos-latest
         include:
           - target: ubuntu-latest
             artifact: endless-sky-editor
