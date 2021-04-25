@@ -2,6 +2,10 @@ name: CI
 
 on:
   push:
+    branches:
+      - master
+  pull_request:
+    types: [opened, synchronize]
 
 defaults:
   run:
