@@ -50,13 +50,13 @@ jobs:
         dir: ${{ github.workspace }}/Qt/
         arch: win64_mingw81 # This is only used (and needed) on windows, so we can safely specify it for all OSes
         cached: ${{ steps.cache-qt.outputs.cache-hit }}
-        
+
     - name: Run qmake
       run: qmake
-      
+
     - name: Run make
       run: make -j $(nproc)
-      
+
     - name: Run --version
       run: ./${{ matrix.binary }} --version
 
