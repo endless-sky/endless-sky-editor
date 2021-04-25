@@ -58,7 +58,7 @@ jobs:
       run: make -j $(nproc)
       
     - name: Run --version
-      run: ${{ matrix.binary }} --version
+      run: ./${{ matrix.binary }} --version
 
     - name: Upload artifact
       uses: actions/upload-artifact@v2
