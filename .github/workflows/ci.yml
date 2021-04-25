@@ -20,12 +20,15 @@ jobs:
           - target: linux
             os: ubuntu-latest
             artifact: endless-sky-editor
+            binary: endless-sky-editor
           - target: windows
             os: windows-latest
             artifact: release/endless-sky-editor.exe
+            binary: release/endless-sky-editor.exe
           - target: macos
             os: macos-latest
             artifact: endless-sky-editor.app/
+            binary: endless-sky-editor.app/Contents/MacOS/endless-sky-editor
 
     runs-on: ${{ matrix.os }}
 
@@ -53,6 +56,9 @@ jobs:
       
     - name: Run make
       run: make -j $(nproc)
+      
+    - name: Run --version
+      run: ${{ matrix.binary }} --version
 
     - name: Upload artifact
       uses: actions/upload-artifact@v2
