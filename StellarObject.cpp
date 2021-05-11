@@ -392,7 +392,19 @@ bool StellarObject::IsInhabited() const
     return(it != INFO.end() && it->second.info == 2);
 }
 
+bool StellarObject::InHabitableZone(double habitableZone) const
+{
+    return distance > .5 * habitableZone && habitableZone < 2. * habitableZone;
+}
 
+bool StellarObject::IsPotentiallyHabitable(double habitableZone) const
+{
+
+    return
+            Parent() < 0 // Moons can't be habitable
+            && IsTerrestrial() // Nonterrestrial planets can't be habitable
+            && InHabitableZone(habitableZone); // Not too hot, not too cold
+}
 
 void StellarObject::SetPlanet(const QString &name)
 {

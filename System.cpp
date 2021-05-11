@@ -850,10 +850,9 @@ void System::Randomize(bool allowHabitable, bool requireHabitable)
         bool isHabitable = false;
         for(const StellarObject &object : objects)
         {
+
             isInhabited |= object.IsInhabited();
-            double d = object.Distance();
-            isHabitable |= object.Parent() < 0 && object.IsTerrestrial()
-                && d > .5 * habitable && d < 2. * habitable;
+            isHabitable |= object.IsPotentiallyHabitable(habitable);
         }
         if(isInhabited && !allowHabitable)
             continue;

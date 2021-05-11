@@ -42,7 +42,7 @@ MainWindow::MainWindow(Map &map, QWidget *parent)
     CreateMenus();
     setAcceptDrops(true);
 
-    resize(1200, 900);
+    resize(700, 500);
     show();
 }
 
@@ -212,6 +212,7 @@ void MainWindow::dropEvent(QDropEvent *event)
 void MainWindow::CreateWidgets()
 {
     QWidget *box = new QWidget(this);
+    box->setFixedHeight(600);
     QHBoxLayout *layout = new QHBoxLayout(box);
     setCentralWidget(box);
 
@@ -220,6 +221,7 @@ void MainWindow::CreateWidgets()
     tabs->setSizePolicy(policy);
 
     galaxyView = new GalaxyView(map, tabs, tabs);
+    galaxyView->setMaximumHeight(600);
 
     // Initialize the sidebar with the system, government, fleet, trade, and minables data.
     detailView = new DetailView(map, galaxyView, box);
@@ -288,6 +290,11 @@ void MainWindow::CreateMenus()
         QAction *randomizeCommodityAction = galaxyMenu->addAction("Randomize Commodity");
         connect(randomizeCommodityAction, SIGNAL(triggered()), galaxyView, SLOT(RandomizeCommodity()));
         randomizeCommodityAction->setShortcut(QKeySequence("C"));
+        galaxyMenu->addSeparator();
+
+        QAction *setToolOptions= galaxyMenu->addAction("Set Tool Options");
+        connect(setToolOptions, SIGNAL(triggered()), galaxyView, SLOT(SetToolOptions()));
+        setToolOptions->setShortcut(QKeySequence("CTRL+T"));
     }
 
     // System Menu:
@@ -343,6 +350,7 @@ void MainWindow::CreateMenus()
         connect(pause, SIGNAL(triggered()), systemView, SLOT(Pause()));
         pause->setShortcut(QKeySequence(Qt::Key_Space));
     }
+
 
     // Activate only the menu for the current tab.
     TabChanged(0);
