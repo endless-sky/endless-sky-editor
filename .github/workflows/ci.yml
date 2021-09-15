@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - actions
   pull_request:
     types: [opened, synchronize]
 
@@ -17,11 +16,6 @@ jobs:
   
     strategy:
       matrix:
-        target:
-          - ubuntu-latest
-          - ubuntu-18.04
-          - windows-latest
-          - macos-latest
         include:
           - target: ubuntu-latest
             artifact: endless-sky-editor
@@ -39,9 +33,7 @@ jobs:
     runs-on: ${{ matrix.target }}
 
     steps:
-
     - uses: actions/checkout@v2
-
     - name: Cache Qt
       id: cache-qt
       uses: actions/cache@v1
