@@ -22,7 +22,18 @@ To randomize commodity prices, click on the name of one of the commodities in th
 You can delete the currently selected system by pressing the delete key.
  
 The “galaxy” objects in the map file define background images, including the big image of the galaxy itself and the text labels for different regions of space. Right now, you need to add these to the map file manually. The existing labels use 24-point Zapfino font, with the fill color set to #AABBCCDD.
- 
+
+### Paint tool
+
+The paint tool is a tool to quickly create large amounts of systems, links, and planets
+
+When pressing ctrl+t or going to Galaxy > Set Tool Options, you can increase the paint tool range. When it is 0, the paint tool is disabled. Larger numbers will allow you to create more systems at the same time.
+
+You can also change it using shift+scroll wheel
+
+Most of the settings there are gaussian distribution parameters to tweak the random parameters of the paint tool. Other settings should be self-explanatory
+
+Use right-click+drag on an empty place in the galaxy map to create more systems using the paint tool.
  
 ## The System tab
  
