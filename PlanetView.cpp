@@ -52,11 +52,11 @@ PlanetView::PlanetView(Map &mapData, QWidget *parent) :
     landscape->setMaximumHeight(360);
 
     description = new QPlainTextEdit(this);
-    description->setTabStopWidth(20);
+    description->setTabStopDistance(20);
     connect(description, SIGNAL(textChanged()), this, SLOT(DescriptionChanged()));
 
     spaceport = new QPlainTextEdit(this);
-    spaceport->setTabStopWidth(20);
+    spaceport->setTabStopDistance(20);
     connect(spaceport, SIGNAL(textChanged()), this, SLOT(SpaceportDescriptionChanged()));
 
     shipyard = new QLineEdit(this);
@@ -460,7 +460,7 @@ vector<QString> PlanetView::ToList(const QString &str)
 {
     vector<QString> result;
 
-    QStringList strings = str.split(",", QString::SkipEmptyParts);
+    QStringList strings = str.split(",", Qt::SkipEmptyParts);
     for(const QString &token : strings)
         result.emplace_back(token.trimmed());
 

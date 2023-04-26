@@ -359,12 +359,12 @@ void SystemView::mouseMoveEvent(QMouseEvent *event)
 void SystemView::wheelEvent(QWheelEvent *event)
 {
     // Figure out where in the 100% scale image the click occurred.
-    QVector2D point(event->pos());
+    QVector2D point(event->position());
     QVector2D center(.5 * width(), .5 * height());
     // point = origin * scale + offset + center.
     QVector2D origin = (point - offset - center) / scale;
 
-    scale = max(.0625, min(1., scale * exp(event->delta() * .001)));
+    scale = max(.0625, min(1., scale * exp(event->angleDelta().y() / 8 * .01))); // we select only vertical (y axis) scrolling, additionally angleDelta returns 8ths of degree, so we convert the into degrees
 
     // We want: point = origin * scale + offset + center.
     offset = point - origin * scale - center;
