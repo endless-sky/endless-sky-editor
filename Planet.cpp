@@ -117,13 +117,13 @@ void Planet::Save(DataWriter &file) const
             file.Write("music", music);
 
         // Break the descriptions into paragraphs.
-        for(const QString &str : description.split('\n', QString::SkipEmptyParts))
+        for(const QString &str : description.split('\n', Qt::SkipEmptyParts))
         {
             file.WriteToken("description");
             file.WriteToken(str, '`');
             file.Write();
         }
-        for(const QString &str : spaceport.split('\n', QString::SkipEmptyParts))
+        for(const QString &str : spaceport.split('\n', Qt::SkipEmptyParts))
         {
             file.WriteToken("spaceport");
             file.WriteToken(str, '`');
