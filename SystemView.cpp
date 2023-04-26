@@ -364,8 +364,9 @@ void SystemView::wheelEvent(QWheelEvent *event)
     // point = origin * scale + offset + center.
     QVector2D origin = (point - offset - center) / scale;
 
-    scale = max(.0625, min(1., scale * exp(event->angleDelta().y() / 8 * .01))); // we select only vertical (y axis) scrolling, additionally angleDelta returns 8ths of degree, so we convert the into degrees
-
+    scale = max(.0625, min(1., scale * exp(event->angleDelta().y() * .001))); // we select only vertical (y axis) scrolling
+    // additionally angleDelta returns 8ths of degree, so we should (?) convert into degrees, however that makes scrolling unbearably slow
+    
     // We want: point = origin * scale + offset + center.
     offset = point - origin * scale - center;
 
